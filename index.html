@@ -2,8 +2,10 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Novo Produto para Negociação IA</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negotia AI — Atendimento</title>
+<meta name="viewport" content="width=1280">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#F6F7F9">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -22,8 +24,11 @@
     --accent-soft:#EEECFE;
     --accent-soft-border:#DAD6FB;
     --green:#16A34A;
+    --green-bg:#E9F8EE;
     --amber:#B45309;
+    --amber-bg:#FEF3E2;
     --red:#DC2626;
+    --red-bg:#FCEAEA;
     --radius-lg:20px;
     --radius-md:12px;
     --radius-sm:9px;
@@ -33,33 +38,124 @@
     --font-mono:'DM Mono',ui-monospace,monospace;
   }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:var(--font-sans);background:var(--bg-page);color:var(--text-primary);-webkit-font-smoothing:antialiased;}
+  html{color-scheme:light only;background:#F6F7F9 !important;min-width:1280px;}
+  body{margin:0;font-family:var(--font-sans);background:#F6F7F9 !important;color:var(--text-primary);-webkit-font-smoothing:antialiased;min-width:1280px;}
+  .app{display:flex;min-height:100vh;background:#F6F7F9;}
   .app{display:flex;min-height:100vh;}
 
-  /* ---------- sidebar (contextual / decorative, desfocada) ---------- */
+  /* ---------- sidebar ---------- */
   .sidebar{width:236px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);
-    padding:26px 16px;filter:blur(1.4px);opacity:.48;pointer-events:none;user-select:none;}
-  .sidebar .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;margin:4px 8px 26px;color:var(--text-primary);}
-  .sidebar .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--green);}
-  .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;font-size:14px;color:var(--text-secondary);margin-bottom:2px;}
+    padding:24px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;margin:4px 8px 22px;color:var(--text-primary);}
+  .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--green);}
+  .nav-section{flex:1;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;font-size:14px;
+    color:var(--text-secondary);margin-bottom:2px;cursor:pointer;transition:.15s;user-select:none;}
   .nav-item svg{width:17px;height:17px;flex-shrink:0;}
+  .nav-item:hover{background:#FAFAFB;color:var(--text-primary);}
   .nav-item.active{background:var(--accent-soft);color:var(--accent-dark);font-weight:500;}
+  .nav-item.disabled{opacity:.45;cursor:default;}
+  .nav-item.disabled:hover{background:transparent;color:var(--text-secondary);}
+  .sidebar-footer{border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;gap:10px;}
+  .avatar-sm{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;flex-shrink:0;}
+  .sidebar-footer .who p{margin:0;font-size:13px;font-weight:500;}
+  .sidebar-footer .who span{font-size:11.5px;color:var(--text-tertiary);}
 
-  /* ---------- main content ---------- */
-  .main{flex:1;padding:46px 56px 110px;}
-  .content{max-width:920px;margin:0 auto;}
+  /* ---------- main ---------- */
+  .main{flex:1;min-width:0;padding:42px 52px 100px;}
+  .content{max-width:1060px;margin:0 auto;}
+  .view{display:none;}
+  .view.active{display:block;}
 
-  .header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:34px;}
-  h1{font-size:25px;font-weight:700;letter-spacing:-0.01em;margin:0 0 7px;}
-  .subtitle{font-size:15px;color:var(--text-secondary);line-height:1.55;max-width:580px;margin:0;}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:30px;}
+  h1{font-size:24px;font-weight:700;letter-spacing:-0.01em;margin:0 0 6px;}
+  .subtitle{font-size:14.5px;color:var(--text-secondary);line-height:1.55;max-width:560px;margin:0;}
 
-  .preview-btn{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;white-space:nowrap;
-    border:1px solid var(--border-strong);background:#fff;border-radius:var(--radius-sm);
-    font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;margin-top:2px;}
-  .preview-btn:hover{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft);}
-  .preview-btn svg{width:15px;height:15px;}
+  .btn-secondary{height:42px;padding:0 18px;border:1px solid var(--border-strong);background:#fff;border-radius:var(--radius-sm);
+    font-size:13.5px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;font-family:var(--font-sans);}
+  .btn-secondary:hover{background:#FAFAFB;}
+  .btn-primary{display:flex;align-items:center;gap:8px;height:42px;padding:0 20px;border:none;background:var(--accent);
+    color:#fff;border-radius:var(--radius-sm);font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;
+    box-shadow:0 1px 2px rgba(79,70,229,.25),0 6px 16px -6px rgba(79,70,229,.45);font-family:var(--font-sans);white-space:nowrap;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-primary svg, .btn-secondary svg{width:15px;height:15px;}
+  .btn-danger{background:var(--red);box-shadow:0 1px 2px rgba(220,38,38,.25);}
+  .btn-danger:hover{background:#B91C1C;}
 
-  /* ---------- card shell ---------- */
+  .search-input{position:relative;max-width:280px;}
+  .search-input input{width:100%;height:40px;padding:0 14px 0 38px;border:1px solid var(--border-strong);
+    border-radius:var(--radius-sm);font-size:13.5px;font-family:var(--font-sans);outline:none;background:#fff;transition:.15s;}
+  .search-input input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .search-input svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text-tertiary);}
+
+  /* ---------- KPI cards ---------- */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:20px 22px;box-shadow:var(--shadow-card);}
+  .kpi-label{font-size:12.5px;color:var(--text-tertiary);margin:0 0 10px;}
+  .kpi-value{font-family:var(--font-mono);font-size:25px;font-weight:700;margin:0;}
+  .kpi-trend{font-size:12px;margin-top:8px;display:flex;align-items:center;gap:4px;}
+  .kpi-trend svg{width:13px;height:13px;}
+  .kpi-trend.up{color:var(--green);} .kpi-trend.down{color:var(--red);}
+
+  .section-block{margin-bottom:30px;}
+  .block-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .block-head h2{font-size:15.5px;font-weight:600;margin:0;}
+  .link-btn{font-size:13px;color:var(--accent-dark);background:none;border:none;cursor:pointer;font-weight:500;
+    font-family:var(--font-sans);padding:0;}
+  .link-btn:hover{text-decoration:underline;}
+
+  /* ---------- table ---------- */
+  .data-table{width:100%;border-collapse:collapse;background:var(--bg-card);border:1px solid var(--border);
+    border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-card);}
+  .data-table thead th{text-align:left;font-size:11.5px;color:var(--text-tertiary);font-weight:600;
+    padding:12px 18px;background:#FAFAFB;border-bottom:1px solid var(--border);white-space:nowrap;}
+  .data-table tbody td{padding:14px 18px;font-size:13.5px;border-bottom:1px solid var(--border);color:var(--text-primary);}
+  .data-table tbody tr:last-child td{border-bottom:none;}
+  .data-table tbody tr{cursor:pointer;transition:.12s;}
+  .data-table tbody tr:hover{background:#FAFAFB;}
+  .cell-muted{color:var(--text-secondary);}
+  .cell-mono{font-family:var(--font-mono);font-weight:500;}
+
+  .status-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 11px;border-radius:999px;}
+  .status-pill::before{content:'';width:6px;height:6px;border-radius:50%;}
+  .status-pill.andamento{background:var(--amber-bg);color:var(--amber);}
+  .status-pill.andamento::before{background:var(--amber);}
+  .status-pill.fechado{background:var(--green-bg);color:var(--green);}
+  .status-pill.fechado::before{background:var(--green);}
+  .status-pill.perdido{background:var(--red-bg);color:var(--red);}
+  .status-pill.perdido::before{background:var(--red);}
+  .status-pill.novo{background:var(--accent-soft);color:var(--accent-dark);}
+  .status-pill.novo::before{background:var(--accent);}
+
+  /* ---------- product cards ---------- */
+  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(266px,1fr));gap:16px;}
+  .product-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:20px;box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:12px;}
+  .product-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .product-name{font-size:14.5px;font-weight:600;margin:0 0 5px;}
+  .type-badge{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent-dark);text-transform:uppercase;letter-spacing:.02em;}
+  .product-price{font-family:var(--font-mono);font-size:21px;font-weight:700;color:var(--accent-dark);}
+  .product-price-min{font-size:11.5px;color:var(--text-tertiary);margin-top:2px;}
+  .product-meta-row{display:flex;align-items:center;gap:8px;}
+  .discount-badge{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;}
+  .product-card-actions{display:flex;gap:8px;border-top:1px solid var(--border);padding-top:12px;margin-top:auto;}
+  .ghost-action{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:34px;border:1px solid var(--border-strong);
+    background:#fff;border-radius:8px;font-size:12.5px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;
+    font-family:var(--font-sans);}
+  .ghost-action svg{width:13px;height:13px;}
+  .ghost-action:hover{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft);}
+  .ghost-action.danger:hover{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+
+  .empty-state{text-align:center;padding:70px 20px;background:var(--bg-card);border:1px dashed var(--border-strong);
+    border-radius:var(--radius-lg);}
+  .empty-state .icon-box{margin:0 auto 16px;width:48px;height:48px;}
+  .empty-state h3{font-size:15.5px;font-weight:600;margin:0 0 6px;}
+  .empty-state p{font-size:13.5px;color:var(--text-secondary);margin:0 0 20px;}
+
+  /* ---------- card shell (formulário de produto) ---------- */
   .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
     padding:32px 38px;box-shadow:var(--shadow-card);margin-bottom:22px;}
   .card-highlight{background:var(--bg-card-alt);border-color:var(--accent-soft-border);}
@@ -83,13 +179,11 @@
 
   .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
 
-  /* segmented control */
   .segmented{display:inline-flex;background:#F0F1F4;border-radius:var(--radius-sm);padding:4px;gap:2px;width:280px;}
   .segmented button{flex:1;height:34px;border:none;background:transparent;border-radius:7px;font-size:13.5px;
     font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;font-family:var(--font-sans);}
   .segmented button.active{background:#fff;color:var(--accent-dark);box-shadow:0 1px 2px rgba(16,24,40,.08);}
 
-  /* monetary fields */
   .money-input{display:flex;align-items:center;gap:6px;height:56px;padding:0 16px;background:var(--accent-soft);
     border:1px solid var(--accent-soft-border);border-radius:var(--radius-sm);transition:.15s;}
   .money-input:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
@@ -103,7 +197,6 @@
   .select-wrap svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:15px;height:15px;
     color:var(--text-tertiary);pointer-events:none;}
 
-  /* slider */
   .slider-row{display:flex;align-items:center;gap:20px;}
   input[type="range"]{flex:1;-webkit-appearance:none;height:8px;border-radius:999px;outline:none;
     background:linear-gradient(to right, #16A34A 0%, #16A34A 30%, #D97706 30%, #D97706 65%, #DC2626 65%, #DC2626 100%);}
@@ -119,7 +212,6 @@
 
   .section-label{font-size:13.5px;font-weight:600;color:var(--text-primary);margin:0 0 16px;}
 
-  /* radio cards */
   .radio-group{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:18px;}
   .radio-card{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--border-strong);
     border-radius:var(--radius-md);padding:15px;cursor:pointer;transition:.15s;}
@@ -127,7 +219,6 @@
   .radio-card input{margin-top:2px;accent-color:var(--accent);flex-shrink:0;}
   .radio-card span{font-size:13px;line-height:1.4;font-weight:500;color:var(--text-primary);}
 
-  /* rules table */
   .rules-table{border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;}
   .rules-header{display:grid;grid-template-columns:1fr 1fr 40px;background:#FAFAFB;
     padding:11px 16px;font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--text-tertiary);
@@ -143,19 +234,18 @@
   .rule-input .suffix{font-size:12.5px;color:var(--text-tertiary);}
   .icon-btn-ghost{width:30px;height:30px;border:none;background:transparent;border-radius:8px;
     display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);cursor:pointer;transition:.15s;}
-  .icon-btn-ghost:hover{background:#FBEAEA;color:var(--red);}
+  .icon-btn-ghost:hover{background:var(--red-bg);color:var(--red);}
   .icon-btn-ghost svg{width:15px;height:15px;}
   .add-rule-btn{display:flex;align-items:center;gap:7px;margin-top:14px;height:38px;padding:0 14px;
     border:1px dashed var(--border-strong);background:transparent;border-radius:var(--radius-sm);
-    font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;}
+    font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;font-family:var(--font-sans);}
   .add-rule-btn:hover{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft);}
   .add-rule-btn svg{width:14px;height:14px;}
 
-  /* restriction chips */
   .restrictions-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
   .chip{display:flex;align-items:center;gap:9px;border:1px solid var(--border-strong);border-radius:var(--radius-md);
     padding:12px 13px;cursor:pointer;font-size:13px;color:var(--text-secondary);transition:.15s;}
-  .chip:hover{border-color:var(--border-strong);background:#FAFAFB;}
+  .chip:hover{background:#FAFAFB;}
   .chip.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);font-weight:500;}
   .chip-box{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--border-strong);
     display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;}
@@ -164,31 +254,21 @@
   .chip.active .chip-box svg{opacity:1;}
   .outro-wrap{margin-top:12px;display:none;}
 
-  /* textarea card */
   textarea{width:100%;min-height:170px;padding:16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);
     font-family:var(--font-sans);font-size:14px;line-height:1.65;color:var(--text-primary);resize:vertical;outline:none;transition:.15s;}
   textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   textarea::placeholder{color:var(--text-tertiary);}
 
-  /* footer */
   .footer-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:8px;padding-top:26px;border-top:1px solid var(--border);}
-  .btn-secondary{height:44px;padding:0 20px;border:1px solid var(--border-strong);background:#fff;border-radius:var(--radius-sm);
-    font-size:14px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;}
-  .btn-secondary:hover{background:#FAFAFB;border-color:var(--border-strong);}
-  .btn-primary{display:flex;align-items:center;gap:8px;height:44px;padding:0 22px;border:none;background:var(--accent);
-    color:#fff;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;transition:.15s;
-    box-shadow:0 1px 2px rgba(79,70,229,.25),0 6px 16px -6px rgba(79,70,229,.45);}
-  .btn-primary:hover{background:var(--accent-dark);}
-  .btn-primary svg{width:15px;height:15px;}
 
-  /* drawer / preview */
-  #drawer-overlay{position:fixed;inset:0;background:rgba(15,15,25,.42);opacity:0;pointer-events:none;
+  /* ---------- overlays (drawer / modal / toast) ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(15,15,25,.42);opacity:0;pointer-events:none;
     transition:.2s ease;z-index:60;}
-  #drawer-overlay.open{opacity:1;pointer-events:auto;}
-  #drawer{position:fixed;top:0;right:0;height:100vh;width:420px;max-width:92vw;background:#fff;
+  .overlay.open{opacity:1;pointer-events:auto;}
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:420px;max-width:92vw;background:#fff;
     box-shadow:-16px 0 48px rgba(16,24,40,.18);transform:translateX(100%);transition:.28s cubic-bezier(.4,0,.2,1);
     z-index:61;display:flex;flex-direction:column;padding:28px;}
-  #drawer.open{transform:translateX(0);}
+  .drawer.open{transform:translateX(0);}
   .drawer-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
   .drawer-head h3{font-size:16.5px;font-weight:600;margin:0;}
   .drawer-head p{font-size:12.5px;color:var(--text-tertiary);margin:5px 0 0;}
@@ -203,311 +283,919 @@
   .bubble-time{font-size:10px;color:var(--text-tertiary);margin-top:4px;display:block;}
   .drawer-note{font-size:12px;color:var(--text-tertiary);margin-top:16px;line-height:1.5;display:flex;gap:7px;}
   .drawer-note svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
+
+  .mode-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;
+    padding:10px 12px;background:var(--accent-soft);border:1px solid var(--accent-soft-border);
+    border-radius:var(--radius-sm);transition:.15s;}
+  .mode-row.humano{background:var(--amber-bg);border-color:#F2D9A6;}
+  .mode-pill{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--accent-dark);}
+  .mode-row.humano .mode-pill{color:var(--amber);}
+  .mode-pill svg{width:15px;height:15px;flex-shrink:0;}
+  .mode-toggle-btn{height:30px;padding:0 12px;border:1px solid var(--border-strong);background:#fff;
+    border-radius:7px;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer;
+    transition:.15s;font-family:var(--font-sans);white-space:nowrap;}
+  .mode-toggle-btn:hover{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft);}
+
+  .system-note{align-self:center;font-size:11px;color:var(--text-tertiary);background:rgba(0,0,0,.05);
+    padding:4px 11px;border-radius:999px;margin:2px 0;}
+
+  .composer{display:flex;gap:8px;margin-top:14px;}
+  .composer input{flex:1;height:42px;padding:0 16px;border:1px solid var(--border-strong);border-radius:999px;
+    font-size:13.5px;font-family:var(--font-sans);outline:none;background:#fff;transition:.15s;}
+  .composer input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .composer input:disabled{background:#F4F4F6;color:var(--text-tertiary);cursor:not-allowed;}
+  .composer button{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;border:none;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+  .composer button svg{width:17px;height:17px;}
+  .composer button:hover{background:var(--accent-dark);}
+  .composer button:disabled{background:var(--border-strong);cursor:not-allowed;}
+
+  .modal-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:71;
+    opacity:0;pointer-events:none;transition:.15s;}
+  .modal-wrap.open{opacity:1;pointer-events:auto;}
+  .modal-box{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-pop);width:360px;
+    padding:26px;transform:scale(.96);transition:.15s;}
+  .modal-wrap.open .modal-box{transform:scale(1);}
+  .modal-box h3{font-size:15.5px;font-weight:600;margin:0 0 8px;}
+  .modal-box p{font-size:13.5px;color:var(--text-secondary);line-height:1.5;margin:0 0 22px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+
+  #toast{position:fixed;bottom:26px;right:26px;background:var(--text-primary);color:#fff;padding:13px 20px;
+    border-radius:var(--radius-sm);font-size:13.5px;font-weight:500;box-shadow:var(--shadow-pop);
+    display:flex;align-items:center;gap:9px;transform:translateY(12px);opacity:0;transition:.2s ease;z-index:80;}
+  #toast.show{transform:translateY(0);opacity:1;}
+  #toast svg{width:15px;height:15px;color:var(--green);}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <aside class="sidebar" aria-hidden="true">
+  <aside class="sidebar">
     <div class="logo"><span class="dot"></span>Negotia AI</div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</div>
-    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>Produtos</div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l1.6 5.6L19 9l-5.4 1.4L12 16l-1.6-5.6L5 9l5.4-1.4L12 2z"/></svg>IA</div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Conversas</div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l1.9-1.5-2-3.4-2.2.6a7.6 7.6 0 00-1.7-1l-.3-2.3H9.9l-.3 2.3a7.6 7.6 0 00-1.7 1l-2.2-.6-2 3.4L5.6 11a7.6 7.6 0 000 2l-1.9 1.5 2 3.4 2.2-.6a7.6 7.6 0 001.7 1l.3 2.3h4.2l.3-2.3a7.6 7.6 0 001.7-1l2.2.6 2-3.4z"/></svg>Configurações</div>
+    <div class="nav-section">
+      <div class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" data-view="atendimentos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Atendimentos
+      </div>
+      <div class="nav-item" data-view="produtos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>
+        Produtos
+      </div>
+      <div class="nav-item disabled">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l1.9-1.5-2-3.4-2.2.6a7.6 7.6 0 00-1.7-1l-.3-2.3H9.9l-.3 2.3a7.6 7.6 0 00-1.7 1l-2.2-.6-2 3.4L5.6 11a7.6 7.6 0 000 2l-1.9 1.5 2 3.4 2.2-.6a7.6 7.6 0 001.7 1l.3 2.3h4.2l.3-2.3a7.6 7.6 0 001.7-1l2.2.6 2-3.4z"/></svg>
+        Configurações
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="avatar-sm">NC</div>
+      <div class="who"><p>Nuno Costa</p><span>Conta Premium</span></div>
+    </div>
   </aside>
 
   <main class="main">
     <div class="content">
 
-      <div class="header-row">
-        <div>
-          <h1>Novo produto para negociação IA</h1>
-          <p class="subtitle">Configure como a IA poderá vender este produto ou serviço durante as conversas no WhatsApp.</p>
-        </div>
-        <button class="preview-btn" id="open-preview">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          Visualizar como a IA negocia
-        </button>
-      </div>
-
-      <!-- CARD 1 — Informações do produto -->
-      <section class="card">
-        <div class="card-header">
-          <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg></div>
+      <!-- ===================== DASHBOARD ===================== -->
+      <section class="view active" id="view-dashboard">
+        <div class="page-head">
           <div>
-            <p class="card-title">Informações do produto</p>
-            <p class="card-sub">O básico para a IA saber o que está vendendo</p>
+            <h1>Dashboard de atendimentos</h1>
+            <p class="subtitle">Visão geral de como a IA está negociando pelo WhatsApp hoje.</p>
           </div>
         </div>
 
-        <div class="field">
-          <label class="field-label" for="nome">Nome do produto ou serviço</label>
-          <input type="text" id="nome" placeholder="Ex.: Consultoria UX">
-        </div>
-
-        <div class="field">
-          <span class="field-label">Tipo</span>
-          <div class="segmented" id="tipo-segmented">
-            <button type="button" class="active" data-value="produto">Produto</button>
-            <button type="button" data-value="servico">Serviço</button>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <p class="kpi-label">Atendimentos hoje</p>
+            <p class="kpi-value">18</p>
+            <div class="kpi-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>12% vs. ontem</div>
+          </div>
+          <div class="kpi-card">
+            <p class="kpi-label">Em andamento</p>
+            <p class="kpi-value">6</p>
+            <div class="kpi-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>2 novos agora</div>
+          </div>
+          <div class="kpi-card">
+            <p class="kpi-label">Taxa de conversão</p>
+            <p class="kpi-value">42%</p>
+            <div class="kpi-trend down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6 13 12 19 18 13"/></svg>3% vs. semana</div>
+          </div>
+          <div class="kpi-card">
+            <p class="kpi-label">Ticket médio</p>
+            <p class="kpi-value">R$ 287</p>
+            <div class="kpi-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>8% vs. semana</div>
           </div>
         </div>
 
-        <div class="row-3">
-          <div class="field" style="margin-bottom:0;">
-            <label class="field-label" for="preco-padrao">Preço padrão</label>
-            <div class="money-input">
-              <span class="money-prefix">R$</span>
-              <input type="text" id="preco-padrao" class="money-value" value="350,00" inputmode="decimal">
+        <div class="section-block">
+          <div class="block-head">
+            <h2>Atendimentos recentes</h2>
+            <button class="link-btn" id="ver-todos-atend">Ver todos →</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr><th>Cliente</th><th>Produto</th><th>Status</th><th>Valor</th><th>Quando</th><th></th></tr>
+            </thead>
+            <tbody id="dashboard-recent-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== ATENDIMENTOS ===================== -->
+      <section class="view" id="view-atendimentos">
+        <div class="page-head">
+          <div>
+            <h1>Atendimentos</h1>
+            <p class="subtitle">Todas as conversas que a IA está conduzindo no WhatsApp.</p>
+          </div>
+        </div>
+
+        <div class="section-block" style="margin-bottom:16px;">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+            <input type="text" id="atend-search" placeholder="Buscar por cliente ou produto">
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr><th>Cliente</th><th>Produto</th><th>Status</th><th>Última mensagem</th><th>Valor</th><th>Quando</th><th></th></tr>
+          </thead>
+          <tbody id="atendimentos-body"></tbody>
+        </table>
+      </section>
+
+      <!-- ===================== PRODUTOS ===================== -->
+      <section class="view" id="view-produtos">
+
+        <div id="produtos-list-subview">
+          <div class="page-head">
+            <div>
+              <h1>Produtos</h1>
+              <p class="subtitle">Gerencie os produtos e serviços que a IA pode negociar no WhatsApp.</p>
+            </div>
+            <button class="btn-primary" id="btn-novo-produto">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar produto
+            </button>
+          </div>
+
+          <div class="section-block" style="margin-bottom:16px;" id="produtos-search-wrap">
+            <div class="search-input">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+              <input type="text" id="produtos-search" placeholder="Buscar produto">
             </div>
           </div>
-          <div class="field" style="margin-bottom:0;">
-            <label class="field-label" for="preco-minimo">Preço mínimo</label>
-            <div class="money-input">
-              <span class="money-prefix">R$</span>
-              <input type="text" id="preco-minimo" class="money-value" value="297,00" inputmode="decimal">
+
+          <div id="produtos-empty" class="empty-state" style="display:none;">
+            <div class="icon-box" style="margin:0 auto 16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg></div>
+            <h3>Nenhum produto cadastrado ainda</h3>
+            <p>Adicione o primeiro produto para a IA começar a negociar no WhatsApp.</p>
+            <button class="btn-primary" style="margin:0 auto;" id="btn-novo-produto-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar produto
+            </button>
+          </div>
+
+          <div class="product-grid" id="produtos-grid"></div>
+        </div>
+
+        <div id="produtos-form-subview" style="display:none;">
+
+          <div class="page-head">
+            <div>
+              <h1 id="form-title">Novo produto para negociação IA</h1>
+              <p class="subtitle">Configure como a IA poderá vender este produto ou serviço durante as conversas no WhatsApp.</p>
             </div>
+            <button class="preview-btn" id="open-preview" style="display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;white-space:nowrap;border:1px solid var(--border-strong);background:#fff;border-radius:9px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;margin-top:2px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              Visualizar como a IA negocia
+            </button>
           </div>
-          <div class="field" style="margin-bottom:0;">
-            <label class="field-label" for="unidade">Unidade de medida</label>
-            <div class="select-wrap">
-              <select class="std" id="unidade">
-                <option>Unidade</option>
-                <option>Hora</option>
-                <option>kg</option>
-                <option>metro</option>
-                <option>m²</option>
-                <option>diária</option>
-                <option>pacote</option>
-                <option>mensalidade</option>
-              </select>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+
+          <!-- CARD 1 — Informações do produto -->
+          <section class="card">
+            <div class="card-header">
+              <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg></div>
+              <div>
+                <p class="card-title">Informações do produto</p>
+                <p class="card-sub">O básico para a IA saber o que está vendendo</p>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- CARD 2 — Limites da negociação -->
-      <section class="card">
-        <div class="card-header">
-          <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/><line x1="19" y1="5" x2="5" y2="19"/></svg></div>
-          <div>
-            <p class="card-title">Como a IA pode negociar?</p>
-            <p class="card-sub">Defina o limite de desconto e a postura inicial</p>
-          </div>
-        </div>
+            <div class="field">
+              <label class="field-label" for="f-nome">Nome do produto ou serviço</label>
+              <input type="text" id="f-nome" placeholder="Ex.: Consultoria UX">
+            </div>
 
-        <div class="field">
-          <label class="field-label">Desconto máximo permitido</label>
-          <div class="slider-row">
-            <input type="range" id="discount-slider" min="0" max="50" step="1" value="15">
-            <span class="slider-value" id="discount-value" style="color:var(--green);">15%</span>
-          </div>
-          <div class="slider-scale"><span>0%</span><span>25%</span><span>50%</span></div>
-          <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>A IA nunca poderá ultrapassar esse desconto.</p>
-        </div>
+            <div class="field">
+              <span class="field-label">Tipo</span>
+              <div class="segmented" id="tipo-segmented">
+                <button type="button" class="active" data-value="produto">Produto</button>
+                <button type="button" data-value="servico">Serviço</button>
+              </div>
+            </div>
 
-        <div class="field" style="margin-bottom:0;">
-          <p class="section-label">Estratégia inicial</p>
-          <div class="radio-group" id="strategy-group">
-            <label class="radio-card">
-              <input type="radio" name="strategy" value="nunca">
-              <span>Nunca oferecer desconto primeiro</span>
-            </label>
-            <label class="radio-card active">
-              <input type="radio" name="strategy" value="se-pedir" checked>
-              <span>Oferecer desconto somente se o cliente pedir</span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="strategy" value="imediato">
-              <span>Pode oferecer desconto imediatamente</span>
-            </label>
-          </div>
-        </div>
-      </section>
+            <div class="row-3">
+              <div class="field" style="margin-bottom:0;">
+                <label class="field-label" for="f-preco-padrao">Preço padrão</label>
+                <div class="money-input">
+                  <span class="money-prefix">R$</span>
+                  <input type="text" id="f-preco-padrao" class="money-value" value="350,00" inputmode="decimal">
+                </div>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label class="field-label" for="f-preco-minimo">Preço mínimo</label>
+                <div class="money-input">
+                  <span class="money-prefix">R$</span>
+                  <input type="text" id="f-preco-minimo" class="money-value" value="297,00" inputmode="decimal">
+                </div>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label class="field-label" for="f-unidade">Unidade de medida</label>
+                <div class="select-wrap">
+                  <select class="std" id="f-unidade">
+                    <option>Unidade</option>
+                    <option>Hora</option>
+                    <option>kg</option>
+                    <option>metro</option>
+                    <option>m²</option>
+                    <option>diária</option>
+                    <option>pacote</option>
+                    <option>mensalidade</option>
+                  </select>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
+            </div>
+          </section>
 
-      <!-- CARD 3 — Desconto por quantidade -->
-      <section class="card">
-        <div class="card-header">
-          <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.2" cy="6" r="1"/><circle cx="4.2" cy="12" r="1"/><circle cx="4.2" cy="18" r="1"/></svg></div>
-          <div>
-            <p class="card-title">Descontos automáticos</p>
-            <p class="card-sub">Quanto mais o cliente compra, maior o desconto</p>
-          </div>
-        </div>
+          <!-- CARD 2 — Limites da negociação -->
+          <section class="card">
+            <div class="card-header">
+              <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/><line x1="19" y1="5" x2="5" y2="19"/></svg></div>
+              <div>
+                <p class="card-title">Como a IA pode negociar?</p>
+                <p class="card-sub">Defina o limite de desconto e a postura inicial</p>
+              </div>
+            </div>
 
-        <div class="rules-table" id="rules-table">
-          <div class="rules-header"><span>Quantidade mínima</span><span>Desconto</span><span></span></div>
+            <div class="field">
+              <label class="field-label">Desconto máximo permitido</label>
+              <div class="slider-row">
+                <input type="range" id="f-discount-slider" min="0" max="50" step="1" value="15">
+                <span class="slider-value" id="f-discount-value" style="color:var(--green);">15%</span>
+              </div>
+              <div class="slider-scale"><span>0%</span><span>25%</span><span>50%</span></div>
+              <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>A IA nunca poderá ultrapassar esse desconto.</p>
+            </div>
 
-          <div class="rule-row">
-            <div class="rule-input"><input type="text" value="5"><span class="suffix">unid.</span></div>
-            <div class="rule-input"><input type="text" value="5"><span class="suffix">%</span></div>
-            <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
-          </div>
-          <div class="rule-row">
-            <div class="rule-input"><input type="text" value="10"><span class="suffix">unid.</span></div>
-            <div class="rule-input"><input type="text" value="10"><span class="suffix">%</span></div>
-            <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
-          </div>
-          <div class="rule-row">
-            <div class="rule-input"><input type="text" value="20"><span class="suffix">unid.</span></div>
-            <div class="rule-input"><input type="text" value="15"><span class="suffix">%</span></div>
-            <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
-          </div>
-        </div>
+            <div class="field" style="margin-bottom:0;">
+              <p class="section-label">Estratégia inicial</p>
+              <div class="radio-group" id="strategy-group">
+                <label class="radio-card">
+                  <input type="radio" name="strategy" value="nunca">
+                  <span>Nunca oferecer desconto primeiro</span>
+                </label>
+                <label class="radio-card active">
+                  <input type="radio" name="strategy" value="se-pedir" checked>
+                  <span>Oferecer desconto somente se o cliente pedir</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="strategy" value="imediato">
+                  <span>Pode oferecer desconto imediatamente</span>
+                </label>
+              </div>
+            </div>
+          </section>
 
-        <button class="add-rule-btn" id="add-rule">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Adicionar regra
-        </button>
-      </section>
+          <!-- CARD 3 — Desconto por quantidade -->
+          <section class="card">
+            <div class="card-header">
+              <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.2" cy="6" r="1"/><circle cx="4.2" cy="12" r="1"/><circle cx="4.2" cy="18" r="1"/></svg></div>
+              <div>
+                <p class="card-title">Descontos automáticos</p>
+                <p class="card-sub">Quanto mais o cliente compra, maior o desconto</p>
+              </div>
+            </div>
 
-      <!-- CARD 4 — Restrições -->
-      <section class="card">
-        <div class="card-header">
-          <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg></div>
-          <div>
-            <p class="card-title">O que a IA não pode negociar</p>
-            <p class="card-sub">Esses pontos ficam sempre fora da conversa de desconto</p>
-          </div>
-        </div>
+            <div class="rules-table" id="rules-table">
+              <div class="rules-header"><span>Quantidade mínima</span><span>Desconto</span><span></span></div>
+              <div class="rule-row">
+                <div class="rule-input"><input type="text" value="5"><span class="suffix">unid.</span></div>
+                <div class="rule-input"><input type="text" value="5"><span class="suffix">%</span></div>
+                <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
+              </div>
+              <div class="rule-row">
+                <div class="rule-input"><input type="text" value="10"><span class="suffix">unid.</span></div>
+                <div class="rule-input"><input type="text" value="10"><span class="suffix">%</span></div>
+                <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
+              </div>
+              <div class="rule-row">
+                <div class="rule-input"><input type="text" value="20"><span class="suffix">unid.</span></div>
+                <div class="rule-input"><input type="text" value="15"><span class="suffix">%</span></div>
+                <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
+              </div>
+            </div>
 
-        <div class="restrictions-grid" id="restrictions-grid">
-          <label class="chip"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Frete</label>
-          <label class="chip"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Instalação</label>
-          <label class="chip"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Forma de pagamento</label>
-          <label class="chip"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Prazo</label>
-          <label class="chip"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Garantia</label>
-          <label class="chip"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Brindes</label>
-          <label class="chip"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Suporte</label>
-          <label class="chip" id="chip-outro"><input type="checkbox" hidden id="check-outro"><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Outro</label>
-        </div>
+            <button class="add-rule-btn" id="add-rule">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar regra
+            </button>
+          </section>
 
-        <div class="outro-wrap" id="outro-wrap">
-          <input type="text" placeholder="Especifique a restrição personalizada">
-        </div>
-      </section>
+          <!-- CARD 4 — Restrições -->
+          <section class="card">
+            <div class="card-header">
+              <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg></div>
+              <div>
+                <p class="card-title">O que a IA não pode negociar</p>
+                <p class="card-sub">Esses pontos ficam sempre fora da conversa de desconto</p>
+              </div>
+            </div>
 
-      <!-- CARD 5 — Instruções para IA -->
-      <section class="card card-highlight">
-        <div class="card-header">
-          <div class="icon-box solid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l1.6 5.6L19 9l-5.4 1.4L12 16l-1.6-5.6L5 9l5.4-1.4L12 2z"/></svg></div>
-          <div>
-            <p class="card-title">Orientações adicionais</p>
-            <p class="card-sub">O toque final que torna a negociação da IA mais inteligente</p>
-          </div>
-        </div>
+            <div class="restrictions-grid" id="restrictions-grid">
+              <label class="chip" data-restr="Frete"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Frete</label>
+              <label class="chip" data-restr="Instalação"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Instalação</label>
+              <label class="chip" data-restr="Forma de pagamento"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Forma de pagamento</label>
+              <label class="chip" data-restr="Prazo"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Prazo</label>
+              <label class="chip" data-restr="Garantia"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Garantia</label>
+              <label class="chip" data-restr="Brindes"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Brindes</label>
+              <label class="chip" data-restr="Suporte"><input type="checkbox" hidden><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Suporte</label>
+              <label class="chip" id="chip-outro" data-restr="Outro"><input type="checkbox" hidden id="check-outro"><span class="chip-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="3 8 6.5 11.5 13 4"/></svg></span>Outro</label>
+            </div>
 
-        <div class="field" style="margin-bottom:0;">
-          <textarea placeholder="Exemplos:
+            <div class="outro-wrap" id="outro-wrap">
+              <input type="text" id="f-outro-texto" placeholder="Especifique a restrição personalizada">
+            </div>
+          </section>
+
+          <!-- CARD 5 — Instruções para IA -->
+          <section class="card card-highlight">
+            <div class="card-header">
+              <div class="icon-box solid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l1.6 5.6L19 9l-5.4 1.4L12 16l-1.6-5.6L5 9l5.4-1.4L12 2z"/></svg></div>
+              <div>
+                <p class="card-title">Orientações adicionais</p>
+                <p class="card-sub">O toque final que torna a negociação da IA mais inteligente</p>
+              </div>
+            </div>
+
+            <div class="field" style="margin-bottom:0;">
+              <textarea id="f-instrucoes" placeholder="Exemplos:
 • Nunca ofereça desconto logo na primeira mensagem.
 • Se o cliente comprar mais de 10 unidades, ofereça frete grátis.
 • Sempre tente vender um produto complementar antes de reduzir o preço.
 • Priorize pagamento via PIX.
 • Caso o cliente peça um desconto maior que o permitido, informe educadamente que este é o melhor valor disponível."></textarea>
-          <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Essas instruções ajudam a IA a negociar de forma mais inteligente.</p>
+              <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Essas instruções ajudam a IA a negociar de forma mais inteligente.</p>
+            </div>
+          </section>
+
+          <div class="footer-actions">
+            <button class="btn-secondary" id="btn-cancelar-form">Cancelar</button>
+            <button class="btn-primary" id="btn-salvar-produto">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 12 9 17 20 6"/></svg>
+              <span id="btn-salvar-label">Salvar produto</span>
+            </button>
+          </div>
+
         </div>
       </section>
-
-      <div class="footer-actions">
-        <button class="btn-secondary">Cancelar</button>
-        <button class="btn-primary">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 12 9 17 20 6"/></svg>
-          Salvar produto
-        </button>
-      </div>
 
     </div>
   </main>
 </div>
 
 <!-- Drawer: simulação de negociação -->
-<div id="drawer-overlay"></div>
-<div id="drawer">
+<div class="overlay" id="neg-drawer-overlay"></div>
+<div class="drawer" id="neg-drawer">
   <div class="drawer-head">
     <div>
       <h3>Simulação de negociação</h3>
       <p>Exemplo de conversa com as regras configuradas</p>
     </div>
-    <button class="close-btn" id="close-preview" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <button class="close-btn" id="close-neg-preview" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
-  <div class="phone-frame">
-    <div class="bubble in">Vocês fazem desconto para mais de 10 unidades?<span class="bubble-time">14:02</span></div>
-    <div class="bubble out">Fazemos sim! A partir de 10 unidades aplicamos 10% de desconto automaticamente.<span class="bubble-time">14:02</span></div>
-    <div class="bubble in">Consegue um desconto melhor, uns 20%?<span class="bubble-time">14:03</span></div>
-    <div class="bubble out">Entendo a sua intenção. O maior desconto que posso oferecer é 15%, que já é uma condição especial. Posso fechar com 15% para você?<span class="bubble-time">14:03</span></div>
-  </div>
+  <div class="phone-frame" id="neg-phone-frame"></div>
   <p class="drawer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Esta é uma simulação baseada nas regras configuradas nos cards acima.</p>
 </div>
 
+<!-- Drawer: detalhe do atendimento -->
+<div class="overlay" id="atend-drawer-overlay"></div>
+<div class="drawer" id="atend-drawer">
+  <div class="drawer-head">
+    <div>
+      <h3 id="atend-drawer-name">Cliente</h3>
+      <p id="atend-drawer-meta">Atendimento via WhatsApp</p>
+    </div>
+    <button class="close-btn" id="close-atend-drawer" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+
+  <div class="mode-row" id="atend-mode-row">
+    <span class="mode-pill" id="atend-mode-pill"></span>
+    <button class="mode-toggle-btn" id="atend-mode-toggle"></button>
+  </div>
+
+  <div class="phone-frame" id="atend-phone-frame"></div>
+
+  <div class="composer">
+    <input type="text" id="atend-composer-input" placeholder="Assuma a conversa para responder manualmente">
+    <button id="atend-composer-send" aria-label="Enviar" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Modal: confirmação de exclusão -->
+<div class="modal-wrap" id="confirm-modal-wrap">
+  <div class="modal-box">
+    <h3>Excluir produto?</h3>
+    <p>Essa ação não pode ser desfeita. A IA deixará de negociar este item imediatamente.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
+      <button class="btn-primary btn-danger" id="confirm-delete">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="4 12 9 17 20 6"/></svg><span id="toast-msg">Salvo</span></div>
+
 <script>
-  // Segmented control
-  document.querySelectorAll('#tipo-segmented button').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('#tipo-segmented button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
+/* ===================== navegação ===================== */
+document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
+  item.addEventListener('click',()=>switchView(item.dataset.view));
+});
+function switchView(name){
+  document.querySelectorAll('.nav-item[data-view]').forEach(i=>i.classList.toggle('active', i.dataset.view===name));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  if(name==='produtos'){ showProductList(); }
+}
+document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
+
+/* ===================== toast ===================== */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ===================== mock: atendimentos ===================== */
+const atendimentosMock=[
+  {id:1,cliente:'Marina Silva',produto:'Consultoria UX',status:'andamento',ultimaMsg:'Consegue um desconto melhor?',valor:'R$ 350,00',quando:'Hoje, 14:32',
+    mensagens:[{from:'in',text:'Olá, vi o anúncio da consultoria UX, quanto custa?'},{from:'out',text:'Olá Marina! A consultoria UX custa R$ 350,00 por sessão.'},{from:'in',text:'Consegue um desconto melhor?'}]},
+  {id:2,cliente:'Rafael Almeida',produto:'Plano mensal Premium',status:'fechado',ultimaMsg:'Combinado, pode fechar!',valor:'R$ 199,00',quando:'Hoje, 11:08',
+    mensagens:[{from:'in',text:'Qual o valor do plano Premium?'},{from:'out',text:'O plano Premium custa R$ 199,00 por mês.'},{from:'in',text:'Combinado, pode fechar!'},{from:'out',text:'Perfeito! Já vou te enviar o link de pagamento.'}]},
+  {id:3,cliente:'Juliana Prado',produto:'Cabo USB-C 1m',status:'novo',ultimaMsg:'Vocês entregam em Curitiba?',valor:'R$ 39,90',quando:'Hoje, 09:51',
+    mensagens:[{from:'in',text:'Vocês entregam em Curitiba?'}]},
+  {id:4,cliente:'Carlos Eduardo',produto:'Consultoria UX',status:'perdido',ultimaMsg:'Vou pensar e te retorno.',valor:'R$ 350,00',quando:'Ontem, 18:20',
+    mensagens:[{from:'in',text:'Quanto custa a consultoria?'},{from:'out',text:'A consultoria custa R$ 350,00.'},{from:'in',text:'Vou pensar e te retorno.'}]},
+  {id:5,cliente:'Beatriz Lima',produto:'Plano mensal Premium',status:'andamento',ultimaMsg:'Tem desconto pagando anual?',valor:'R$ 199,00',quando:'Ontem, 16:44',
+    mensagens:[{from:'in',text:'Tem desconto pagando anual?'},{from:'out',text:'Sim! No plano anual aplicamos 15% de desconto.'}]},
+  {id:6,cliente:'Eduardo Santos',produto:'Cabo USB-C 1m',status:'fechado',ultimaMsg:'Perfeito, obrigado!',valor:'R$ 35,90',quando:'Ontem, 10:05',
+    mensagens:[{from:'in',text:'Quero 10 cabos, tem desconto?'},{from:'out',text:'Para 10 unidades aplicamos 10% de desconto: R$ 35,90 cada.'},{from:'in',text:'Perfeito, obrigado!'}]},
+  {id:7,cliente:'Patrícia Gomes',produto:'Consultoria UX',status:'novo',ultimaMsg:'Oi! Vi o anúncio no Instagram.',valor:'R$ 350,00',quando:'2 dias atrás',
+    mensagens:[{from:'in',text:'Oi! Vi o anúncio no Instagram.'}]},
+  {id:8,cliente:'Thiago Ferreira',produto:'Plano mensal Premium',status:'perdido',ultimaMsg:'Achei caro, vou procurar outra opção.',valor:'R$ 199,00',quando:'3 dias atrás',
+    mensagens:[{from:'in',text:'Quanto custa o plano?'},{from:'out',text:'O plano custa R$ 199,00 por mês.'},{from:'in',text:'Achei caro, vou procurar outra opção.'}]}
+];
+
+function statusLabel(s){return {andamento:'Em andamento',fechado:'Fechado',perdido:'Perdido',novo:'Novo'}[s]||s;}
+
+function renderAtendimentosTable(bodyId, list){
+  const body=document.getElementById(bodyId);
+  body.innerHTML=list.map(a=>`
+    <tr data-id="${a.id}">
+      <td>${a.cliente}</td>
+      <td class="cell-muted">${a.produto}</td>
+      <td><span class="status-pill ${a.status}">${statusLabel(a.status)}</span></td>
+      ${bodyId==='atendimentos-body' ? `<td class="cell-muted">${a.ultimaMsg}</td>` : ''}
+      <td class="cell-mono">${a.valor}</td>
+      <td class="cell-muted">${a.quando}</td>
+      <td onclick="event.stopPropagation()"><button class="ghost-action ver-conversa-btn" style="height:32px;padding:0 12px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button></td>
+    </tr>`).join('');
+  body.querySelectorAll('tr').forEach(tr=>{
+    tr.addEventListener('click',()=>openAtendDrawer(parseInt(tr.dataset.id,10)));
+  });
+  body.querySelectorAll('.ver-conversa-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const id=parseInt(e.target.closest('tr').dataset.id,10);
+      openAtendDrawer(id);
     });
   });
+}
+renderAtendimentosTable('dashboard-recent-body', atendimentosMock.slice(0,5));
+renderAtendimentosTable('atendimentos-body', atendimentosMock);
 
-  // Discount slider
-  const slider=document.getElementById('discount-slider');
-  const valueLabel=document.getElementById('discount-value');
-  function updateSlider(){
-    const v=parseInt(slider.value,10);
-    valueLabel.textContent=v+'%';
-    valueLabel.style.color = v<=15 ? 'var(--green)' : v<=30 ? 'var(--amber)' : 'var(--red)';
+document.getElementById('atend-search').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  const filtered=atendimentosMock.filter(a=>a.cliente.toLowerCase().includes(q)||a.produto.toLowerCase().includes(q));
+  renderAtendimentosTable('atendimentos-body', filtered);
+});
+
+const atendOverlay=document.getElementById('atend-drawer-overlay');
+const atendDrawer=document.getElementById('atend-drawer');
+let currentAtendId=null;
+let currentMode='ia';
+
+function botIconSvg(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="9" width="14" height="10" rx="2.5"/><circle cx="9.5" cy="14" r="1"/><circle cx="14.5" cy="14" r="1"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.1" fill="currentColor" stroke="none"/></svg>';
+}
+function userIconSvg(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"/></svg>';
+}
+
+function updateModeUI(){
+  const row=document.getElementById('atend-mode-row');
+  const pill=document.getElementById('atend-mode-pill');
+  const btn=document.getElementById('atend-mode-toggle');
+  const input=document.getElementById('atend-composer-input');
+  const send=document.getElementById('atend-composer-send');
+
+  if(currentMode==='ia'){
+    row.classList.remove('humano');
+    pill.innerHTML=botIconSvg()+'Atendimento por IA';
+    btn.textContent='Assumir conversa';
+    input.disabled=true; send.disabled=true;
+    input.placeholder='Assuma a conversa para responder manualmente';
+  }else{
+    row.classList.add('humano');
+    pill.innerHTML=userIconSvg()+'Atendimento humano (você)';
+    btn.textContent='Devolver para a IA';
+    input.disabled=false; send.disabled=false;
+    input.placeholder='Digite sua mensagem...';
   }
-  slider.addEventListener('input',updateSlider);
-  updateSlider();
+}
 
-  // Strategy radio cards
+document.getElementById('atend-mode-toggle').addEventListener('click',()=>{
+  currentMode = currentMode==='ia' ? 'humano' : 'ia';
+  updateModeUI();
+  addSystemNote(currentMode==='humano' ? 'Você assumiu esta conversa' : 'Conversa devolvida para a IA');
+  showToast(currentMode==='humano' ? 'Você assumiu o atendimento' : 'Atendimento devolvido para a IA');
+});
+
+function addSystemNote(text){
+  const frame=document.getElementById('atend-phone-frame');
+  frame.insertAdjacentHTML('beforeend', `<div class="system-note">${text}</div>`);
+  frame.scrollTop=frame.scrollHeight;
+}
+
+function sendHumanMessage(){
+  const input=document.getElementById('atend-composer-input');
+  const text=input.value.trim();
+  if(!text || currentMode!=='humano') return;
+  const a=atendimentosMock.find(x=>x.id===currentAtendId);
+  if(a){ a.mensagens.push({from:'out',text}); }
+  const frame=document.getElementById('atend-phone-frame');
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble out">${text}</div>`);
+  frame.scrollTop=frame.scrollHeight;
+  input.value='';
+}
+document.getElementById('atend-composer-send').addEventListener('click',sendHumanMessage);
+document.getElementById('atend-composer-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter') sendHumanMessage();
+});
+
+function openAtendDrawer(id){
+  const a=atendimentosMock.find(x=>x.id===id);
+  if(!a) return;
+  currentAtendId=id;
+  currentMode='ia';
+  document.getElementById('atend-drawer-name').textContent=a.cliente;
+  document.getElementById('atend-drawer-meta').textContent=a.produto+' · '+a.quando;
+  document.getElementById('atend-phone-frame').innerHTML=a.mensagens.map(m=>
+    `<div class="bubble ${m.from}">${m.text}</div>`).join('');
+  updateModeUI();
+  atendOverlay.classList.add('open'); atendDrawer.classList.add('open');
+}
+function closeAtendDrawer(){
+  atendOverlay.classList.remove('open'); atendDrawer.classList.remove('open');
+  currentMode='ia';
+  currentAtendId=null;
+}
+document.getElementById('close-atend-drawer').addEventListener('click',closeAtendDrawer);
+atendOverlay.addEventListener('click',closeAtendDrawer);
+
+/* ===================== produtos: persistência ===================== */
+const STORAGE_KEY='negotia_produtos';
+
+function loadProducts(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]; }catch(e){ return []; }
+}
+function saveProducts(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+function seedIfEmpty(){
+  if(loadProducts().length>0) return;
+  const seed=[
+    {id:'p1',nome:'Consultoria UX',tipo:'produto',precoPadrao:'350,00',precoMinimo:'297,00',unidade:'Hora',
+      descontoMax:15,estrategia:'se-pedir',regras:[{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}],
+      restricoes:['Frete','Prazo'],restricaoOutro:'',
+      instrucoes:'Nunca ofereça desconto logo na primeira mensagem. Priorize pagamento via PIX.'},
+    {id:'p2',nome:'Plano mensal Premium',tipo:'servico',precoPadrao:'199,00',precoMinimo:'169,00',unidade:'mensalidade',
+      descontoMax:20,estrategia:'imediato',regras:[],restricoes:['Forma de pagamento'],restricaoOutro:'',
+      instrucoes:'Se o cliente pedir o plano anual, ofereça 15% de desconto.'},
+    {id:'p3',nome:'Cabo USB-C 1m',tipo:'produto',precoPadrao:'39,90',precoMinimo:'29,90',unidade:'Unidade',
+      descontoMax:25,estrategia:'imediato',regras:[{qtd:10,desconto:10},{qtd:50,desconto:20}],restricoes:['Garantia'],restricaoOutro:'',
+      instrucoes:'Se o cliente comprar mais de 10 unidades, ofereça frete grátis.'}
+  ];
+  saveProducts(seed);
+}
+seedIfEmpty();
+
+let editingId=null;
+let pendingDeleteId=null;
+
+function riskColor(pct){ return pct<=15 ? 'green' : pct<=30 ? 'amber' : 'red'; }
+
+function renderProductGrid(filterText){
+  const all=loadProducts();
+  const list=filterText ? all.filter(p=>p.nome.toLowerCase().includes(filterText.toLowerCase())) : all;
+  const grid=document.getElementById('produtos-grid');
+  const empty=document.getElementById('produtos-empty');
+  const searchWrap=document.getElementById('produtos-search-wrap');
+
+  if(all.length===0){
+    grid.innerHTML=''; empty.style.display='block'; searchWrap.style.display='none';
+    return;
+  }
+  empty.style.display='none'; searchWrap.style.display='block';
+
+  grid.innerHTML=list.map(p=>{
+    const risk=riskColor(p.descontoMax);
+    const bg = risk==='green' ? 'var(--green-bg)' : risk==='amber' ? 'var(--amber-bg)' : 'var(--red-bg)';
+    const col = risk==='green' ? 'var(--green)' : risk==='amber' ? 'var(--amber)' : 'var(--red)';
+    return `
+    <div class="product-card" data-id="${p.id}">
+      <div class="product-card-top">
+        <div>
+          <p class="product-name">${p.nome}</p>
+          <span class="type-badge">${p.tipo==='produto'?'Produto':'Serviço'}</span>
+        </div>
+      </div>
+      <div>
+        <div class="product-price">R$ ${p.precoPadrao}</div>
+        <div class="product-price-min">mín. R$ ${p.precoMinimo} · por ${p.unidade}</div>
+      </div>
+      <div class="product-meta-row">
+        <span class="discount-badge" style="background:${bg};color:${col};">Desconto máx. ${p.descontoMax}%</span>
+      </div>
+      <div class="product-card-actions">
+        <button class="ghost-action edit-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>Editar</button>
+        <button class="ghost-action danger delete-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.edit-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const id=e.target.closest('.product-card').dataset.id;
+      openProductForm(loadProducts().find(p=>p.id===id));
+    });
+  });
+  grid.querySelectorAll('.delete-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      pendingDeleteId=e.target.closest('.product-card').dataset.id;
+      document.getElementById('confirm-modal-wrap').classList.add('open');
+    });
+  });
+}
+
+document.getElementById('produtos-search').addEventListener('input',e=>renderProductGrid(e.target.value));
+
+function showProductList(){
+  document.getElementById('produtos-list-subview').style.display='block';
+  document.getElementById('produtos-form-subview').style.display='none';
+  renderProductGrid('');
+}
+function showProductForm(){
+  document.getElementById('produtos-list-subview').style.display='none';
+  document.getElementById('produtos-form-subview').style.display='block';
+}
+
+/* ===================== formulário: helpers ===================== */
+function resetForm(){
+  editingId=null;
+  document.getElementById('form-title').textContent='Novo produto para negociação IA';
+  document.getElementById('btn-salvar-label').textContent='Salvar produto';
+  document.getElementById('f-nome').value='';
+  setTipo('produto');
+  document.getElementById('f-preco-padrao').value='';
+  document.getElementById('f-preco-minimo').value='';
+  document.getElementById('f-unidade').value='Unidade';
+  setSlider(15);
+  setStrategy('se-pedir');
+  setRules([{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}]);
+  setRestrictions([], '');
+  document.getElementById('f-instrucoes').value='';
+}
+
+function setTipo(value){
+  document.querySelectorAll('#tipo-segmented button').forEach(b=>b.classList.toggle('active', b.dataset.value===value));
+}
+function getTipo(){ return document.querySelector('#tipo-segmented button.active').dataset.value; }
+
+function setSlider(v){
+  document.getElementById('f-discount-slider').value=v;
+  updateSliderDisplay();
+}
+function updateSliderDisplay(){
+  const v=parseInt(document.getElementById('f-discount-slider').value,10);
+  const label=document.getElementById('f-discount-value');
+  label.textContent=v+'%';
+  label.style.color = v<=15 ? 'var(--green)' : v<=30 ? 'var(--amber)' : 'var(--red)';
+}
+document.getElementById('f-discount-slider').addEventListener('input',updateSliderDisplay);
+updateSliderDisplay();
+
+function setStrategy(value){
   document.querySelectorAll('#strategy-group .radio-card').forEach(card=>{
-    card.addEventListener('click',()=>{
-      document.querySelectorAll('#strategy-group .radio-card').forEach(c=>c.classList.remove('active'));
-      card.classList.add('active');
-      card.querySelector('input').checked=true;
-    });
+    const isMatch=card.querySelector('input').value===value;
+    card.classList.toggle('active', isMatch);
+    card.querySelector('input').checked=isMatch;
   });
+}
+function getStrategy(){ return document.querySelector('#strategy-group input:checked').value; }
+document.querySelectorAll('#strategy-group .radio-card').forEach(card=>{
+  card.addEventListener('click',()=>setStrategy(card.querySelector('input').value));
+});
 
-  // Quantity discount rules table
-  document.getElementById('rules-table').addEventListener('click', e=>{
-    const btn=e.target.closest('.delete-row');
-    if(btn){ btn.closest('.rule-row').remove(); }
-  });
-  document.getElementById('add-rule').addEventListener('click',()=>{
-    const row=document.createElement('div');
-    row.className='rule-row';
-    row.innerHTML=`
-      <div class="rule-input"><input type="text" value=""><span class="suffix">unid.</span></div>
-      <div class="rule-input"><input type="text" value=""><span class="suffix">%</span></div>
-      <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>`;
-    document.getElementById('rules-table').appendChild(row);
-    row.querySelector('input').focus();
-  });
+function ruleRowHtml(qtd,desconto){
+  return `
+    <div class="rule-row">
+      <div class="rule-input"><input type="text" value="${qtd!==undefined?qtd:''}"><span class="suffix">unid.</span></div>
+      <div class="rule-input"><input type="text" value="${desconto!==undefined?desconto:''}"><span class="suffix">%</span></div>
+      <button class="icon-btn-ghost delete-row" aria-label="Remover regra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
+    </div>`;
+}
+function setRules(rules){
+  const table=document.getElementById('rules-table');
+  table.querySelectorAll('.rule-row').forEach(r=>r.remove());
+  rules.forEach(r=>table.insertAdjacentHTML('beforeend', ruleRowHtml(r.qtd,r.desconto)));
+}
+function getRules(){
+  return Array.from(document.querySelectorAll('#rules-table .rule-row')).map(row=>{
+    const inputs=row.querySelectorAll('input');
+    return {qtd:inputs[0].value.trim(), desconto:inputs[1].value.trim()};
+  }).filter(r=>r.qtd!=='' || r.desconto!=='');
+}
+document.getElementById('rules-table').addEventListener('click', e=>{
+  const btn=e.target.closest('.delete-row');
+  if(btn){ btn.closest('.rule-row').remove(); }
+});
+document.getElementById('add-rule').addEventListener('click',()=>{
+  document.getElementById('rules-table').insertAdjacentHTML('beforeend', ruleRowHtml());
+  document.querySelector('#rules-table .rule-row:last-child input').focus();
+});
 
-  // Restriction chips
+function setRestrictions(list, outroText){
   document.querySelectorAll('#restrictions-grid .chip').forEach(chip=>{
-    const input=chip.querySelector('input');
-    const sync=()=>chip.classList.toggle('active', input.checked);
-    chip.addEventListener('click', e=>{
-      if(e.target.tagName!=='INPUT'){ input.checked=!input.checked; }
-      sync();
-      if(chip.id==='chip-outro'){
-        document.getElementById('outro-wrap').style.display = input.checked ? 'block' : 'none';
-      }
-    });
+    const isChecked=list.includes(chip.dataset.restr);
+    chip.querySelector('input').checked=isChecked;
+    chip.classList.toggle('active', isChecked);
   });
+  document.getElementById('f-outro-texto').value=outroText||'';
+  document.getElementById('outro-wrap').style.display = document.getElementById('check-outro').checked ? 'block' : 'none';
+}
+function getRestrictions(){
+  const list=Array.from(document.querySelectorAll('#restrictions-grid .chip'))
+    .filter(c=>c.querySelector('input').checked).map(c=>c.dataset.restr);
+  return {list, outro:document.getElementById('f-outro-texto').value.trim()};
+}
+document.querySelectorAll('#restrictions-grid .chip').forEach(chip=>{
+  const input=chip.querySelector('input');
+  chip.addEventListener('click', e=>{
+    if(e.target.tagName!=='INPUT'){ input.checked=!input.checked; }
+    chip.classList.toggle('active', input.checked);
+    if(chip.id==='chip-outro'){
+      document.getElementById('outro-wrap').style.display = input.checked ? 'block' : 'none';
+    }
+  });
+});
 
-  // Drawer (preview)
-  const overlay=document.getElementById('drawer-overlay');
-  const drawer=document.getElementById('drawer');
-  document.getElementById('open-preview').addEventListener('click',()=>{
-    overlay.classList.add('open'); drawer.classList.add('open');
-  });
-  function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
-  document.getElementById('close-preview').addEventListener('click',closeDrawer);
-  overlay.addEventListener('click',closeDrawer);
+document.getElementById('tipo-segmented').addEventListener('click',e=>{
+  const btn=e.target.closest('button');
+  if(btn) setTipo(btn.dataset.value);
+});
+
+/* ===================== formulário: abrir / salvar / cancelar ===================== */
+function openProductForm(product){
+  resetForm();
+  if(product){
+    editingId=product.id;
+    document.getElementById('form-title').textContent='Editar produto';
+    document.getElementById('btn-salvar-label').textContent='Salvar alterações';
+    document.getElementById('f-nome').value=product.nome;
+    setTipo(product.tipo);
+    document.getElementById('f-preco-padrao').value=product.precoPadrao;
+    document.getElementById('f-preco-minimo').value=product.precoMinimo;
+    document.getElementById('f-unidade').value=product.unidade;
+    setSlider(product.descontoMax);
+    setStrategy(product.estrategia);
+    setRules(product.regras&&product.regras.length ? product.regras : [{}]);
+    setRestrictions(product.restricoes||[], product.restricaoOutro||'');
+    document.getElementById('f-instrucoes').value=product.instrucoes||'';
+  }
+  showProductForm();
+}
+
+document.getElementById('btn-novo-produto').addEventListener('click',()=>openProductForm(null));
+document.getElementById('btn-novo-produto-empty').addEventListener('click',()=>openProductForm(null));
+document.getElementById('btn-cancelar-form').addEventListener('click',showProductList);
+
+document.getElementById('btn-salvar-produto').addEventListener('click',()=>{
+  const nome=document.getElementById('f-nome').value.trim();
+  if(!nome){
+    document.getElementById('f-nome').focus();
+    document.getElementById('f-nome').style.borderColor='var(--red)';
+    showToast('Dê um nome ao produto antes de salvar');
+    return;
+  }
+  document.getElementById('f-nome').style.borderColor='';
+
+  const restr=getRestrictions();
+  const data={
+    id: editingId || ('p'+Date.now()),
+    nome,
+    tipo:getTipo(),
+    precoPadrao:document.getElementById('f-preco-padrao').value.trim(),
+    precoMinimo:document.getElementById('f-preco-minimo').value.trim(),
+    unidade:document.getElementById('f-unidade').value,
+    descontoMax:parseInt(document.getElementById('f-discount-slider').value,10),
+    estrategia:getStrategy(),
+    regras:getRules(),
+    restricoes:restr.list,
+    restricaoOutro:restr.outro,
+    instrucoes:document.getElementById('f-instrucoes').value
+  };
+
+  const all=loadProducts();
+  if(editingId){
+    const idx=all.findIndex(p=>p.id===editingId);
+    if(idx>-1) all[idx]=data;
+  }else{
+    all.push(data);
+  }
+  saveProducts(all);
+  showToast(editingId ? 'Produto atualizado com sucesso' : 'Produto salvo com sucesso');
+  showProductList();
+});
+
+/* ===================== confirmação de exclusão ===================== */
+document.getElementById('confirm-cancel').addEventListener('click',()=>{
+  pendingDeleteId=null;
+  document.getElementById('confirm-modal-wrap').classList.remove('open');
+});
+document.getElementById('confirm-delete').addEventListener('click',()=>{
+  if(pendingDeleteId){
+    const all=loadProducts().filter(p=>p.id!==pendingDeleteId);
+    saveProducts(all);
+    showToast('Produto excluído');
+    pendingDeleteId=null;
+    renderProductGrid('');
+  }
+  document.getElementById('confirm-modal-wrap').classList.remove('open');
+});
+
+/* ===================== drawer: simulação de negociação (dinâmica) ===================== */
+const negOverlay=document.getElementById('neg-drawer-overlay');
+const negDrawer=document.getElementById('neg-drawer');
+document.getElementById('open-preview').addEventListener('click',()=>{
+  const maxDesc=document.getElementById('f-discount-slider').value;
+  const rules=getRules();
+  const firstRule=rules[0];
+  const nome=document.getElementById('f-nome').value.trim() || 'este produto';
+
+  let messages=[];
+  if(firstRule && firstRule.qtd && firstRule.desconto){
+    messages=[
+      {from:'in',text:`Vocês fazem desconto para mais de ${firstRule.qtd} unidades?`},
+      {from:'out',text:`Fazemos sim! A partir de ${firstRule.qtd} unidades aplicamos ${firstRule.desconto}% de desconto automaticamente.`},
+      {from:'in',text:`Consegue um desconto melhor, uns ${Math.min(50,parseInt(firstRule.desconto,10)+10)}%?`},
+      {from:'out',text:`Entendo a sua intenção. O maior desconto que posso oferecer em ${nome} é ${maxDesc}%, que já é uma condição especial. Posso fechar com ${maxDesc}% para você?`}
+    ];
+  }else{
+    messages=[
+      {from:'in',text:`Olá, quanto custa ${nome}?`},
+      {from:'out',text:`Olá! O valor é o que está configurado para este produto.`},
+      {from:'in',text:'Consegue algum desconto?'},
+      {from:'out',text:`Posso oferecer no máximo ${maxDesc}% de desconto, que é o melhor valor disponível.`}
+    ];
+  }
+  document.getElementById('neg-phone-frame').innerHTML=messages.map(m=>`<div class="bubble ${m.from}">${m.text}</div>`).join('');
+  negOverlay.classList.add('open'); negDrawer.classList.add('open');
+});
+function closeNegDrawer(){ negOverlay.classList.remove('open'); negDrawer.classList.remove('open'); }
+document.getElementById('close-neg-preview').addEventListener('click',closeNegDrawer);
+negOverlay.addEventListener('click',closeNegDrawer);
+
+/* ===================== inicialização ===================== */
+showProductList();
 </script>
 </body>
 </html>

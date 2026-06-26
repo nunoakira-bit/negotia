@@ -111,6 +111,13 @@
     border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-card);}
   .data-table thead th{text-align:left;font-size:11.5px;color:var(--text-tertiary);font-weight:600;
     padding:12px 18px;background:#FAFAFB;border-bottom:1px solid var(--border);white-space:nowrap;}
+  .data-table thead th.sortable{cursor:pointer;user-select:none;transition:.12s;}
+  .data-table thead th.sortable:hover{color:var(--text-secondary);background:#F3F4F6;}
+  .sort-icon{display:inline-flex;align-items:center;margin-left:4px;opacity:.35;vertical-align:middle;transition:.15s;}
+  .sort-icon svg{width:10px;height:10px;}
+  th.sort-active{color:var(--accent-dark) !important;}
+  th.sort-active .sort-icon{opacity:1;color:var(--accent-dark);}
+  th.sort-active.desc .sort-icon{transform:rotate(180deg);}
   .data-table tbody td{padding:14px 18px;font-size:13.5px;border-bottom:1px solid var(--border);color:var(--text-primary);}
   .data-table tbody tr:last-child td{border-bottom:none;}
   .data-table tbody tr{cursor:pointer;transition:.12s;}
@@ -322,13 +329,83 @@
 
   #toast{position:fixed;bottom:26px;right:26px;background:var(--text-primary);color:#fff;padding:13px 20px;
     border-radius:var(--radius-sm);font-size:13.5px;font-weight:500;box-shadow:var(--shadow-pop);
-    display:flex;align-items:center;gap:9px;transform:translateY(12px);opacity:0;transition:.2s ease;z-index:80;}
+    display:flex;align-items:center;gap:9px;transform:translateY(12px);opacity:0;transition:.2s ease;z-index:80;
+    pointer-events:none;}
   #toast.show{transform:translateY(0);opacity:1;}
   #toast svg{width:15px;height:15px;color:var(--green);}
+
+  /* ---------- notificações ---------- */
+  .bell-wrap{position:fixed;top:26px;right:36px;z-index:55;}
+  .bell-btn{position:relative;width:42px;height:42px;border-radius:50%;background:#fff;
+    border:1px solid var(--border-strong);box-shadow:var(--shadow-card);display:flex;align-items:center;
+    justify-content:center;cursor:pointer;color:var(--text-secondary);transition:.15s;}
+  .bell-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
+  .bell-btn svg{width:19px;height:19px;}
+  .bell-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;
+    background:var(--red);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;
+    justify-content:center;border:2px solid #fff;font-family:var(--font-sans);}
+  .bell-badge.hide{display:none;}
+
+  .notif-panel{position:absolute;top:52px;right:0;width:380px;background:#fff;border:1px solid var(--border);
+    border-radius:var(--radius-lg);box-shadow:var(--shadow-pop);opacity:0;pointer-events:none;
+    transform:translateY(-8px);transition:.16s ease;overflow:hidden;}
+  .notif-panel.open{opacity:1;pointer-events:auto;transform:translateY(0);}
+  .notif-panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;
+    border-bottom:1px solid var(--border);}
+  .notif-panel-head p{margin:0;font-size:14.5px;font-weight:600;}
+  .notif-panel-list{max-height:400px;overflow-y:auto;}
+  .notif-panel-foot{padding:12px 16px;border-top:1px solid var(--border);}
+  .notif-panel-empty{padding:40px 20px;text-align:center;font-size:13px;color:var(--text-tertiary);}
+
+  .notif-item{display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;
+    transition:.25s ease;}
+  .notif-item:last-child{border-bottom:none;}
+  .notif-item:hover{background:#FAFAFB;}
+  .notif-item.removing{opacity:0;max-height:0;padding-top:0;padding-bottom:0;overflow:hidden;}
+  .notif-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;}
+  .notif-icon svg{width:16px;height:16px;}
+  .notif-body{flex:1;min-width:0;}
+  .notif-title-row{display:flex;align-items:center;gap:7px;}
+  .notif-title-row p{margin:0;font-size:13.3px;font-weight:600;color:var(--text-primary);}
+  .notif-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .notif-desc{font-size:12.5px;color:var(--text-secondary);margin:3px 0 0;line-height:1.45;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .notif-item.expanded .notif-desc{-webkit-line-clamp:unset;overflow:visible;}
+  .notif-time{font-size:11px;color:var(--text-tertiary);margin-top:6px;display:block;}
+
+  .notif-filters{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+  .notif-page-list{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);
+    box-shadow:var(--shadow-card);overflow:hidden;}
+  .notif-page-list .notif-item{padding:16px 22px;}
+  .notif-page-list .notif-desc{-webkit-line-clamp:unset;overflow:visible;}
+  .read-pill{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:#F0F1F4;
+    color:var(--text-tertiary);flex-shrink:0;}
+  .notif-link{font-size:12px;color:var(--accent-dark);font-weight:500;margin-top:8px;display:inline-block;
+    cursor:pointer;}
+  .notif-link:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
 <div class="app">
+
+  <div class="bell-wrap" id="bell-wrap">
+    <button class="bell-btn" id="bell-btn" aria-label="Notificações">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 3.2-1 5-2 7h16c-1-2-2-3.8-2-7z"/><path d="M9.5 19.5a2.5 2.5 0 005 0"/></svg>
+      <span class="bell-badge" id="bell-badge">0</span>
+    </button>
+
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-panel-head">
+        <p>Notificações</p>
+        <button class="link-btn" id="mark-all-read-panel">Marcar todas como lidas</button>
+      </div>
+      <div class="notif-panel-list" id="notif-panel-list"></div>
+      <div class="notif-panel-foot">
+        <button class="btn-secondary" id="see-all-notifs" style="width:100%;justify-content:center;display:flex;">Ver todas as notificações</button>
+      </div>
+    </div>
+  </div>
 
   <aside class="sidebar">
     <div class="logo"><span class="dot"></span>Negotia AI</div>
@@ -398,7 +475,14 @@
           </div>
           <table class="data-table">
             <thead>
-              <tr><th>Cliente</th><th>Produto</th><th>Status</th><th>Valor</th><th>Quando</th><th></th></tr>
+              <tr>
+              <th class="sortable" data-key="cliente">Cliente<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="produto">Produto<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="status">Status<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="valor">Valor<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="quando">Quando<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th></th>
+            </tr>
             </thead>
             <tbody id="dashboard-recent-body"></tbody>
           </table>
@@ -423,7 +507,15 @@
 
         <table class="data-table">
           <thead>
-            <tr><th>Cliente</th><th>Produto</th><th>Status</th><th>Última mensagem</th><th>Valor</th><th>Quando</th><th></th></tr>
+            <tr>
+              <th class="sortable" data-key="cliente">Cliente<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="produto">Produto<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="status">Status<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="ultimaMsg">Última mensagem<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="valor">Valor<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="quando">Quando<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th></th>
+            </tr>
           </thead>
           <tbody id="atendimentos-body"></tbody>
         </table>
@@ -666,6 +758,50 @@
         </div>
       </section>
 
+      <!-- ===================== NOTIFICAÇÕES ===================== -->
+      <section class="view" id="view-notificacoes">
+        <div class="page-head">
+          <div>
+            <h1>Notificações</h1>
+            <p class="subtitle">Tudo o que aconteceu nas negociações e atendimentos da IA.</p>
+          </div>
+          <button class="btn-secondary" id="mark-all-read-page">Marcar todas como lidas</button>
+        </div>
+
+        <div class="notif-filters">
+          <div class="search-input" style="max-width:320px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+            <input type="text" id="notif-search" placeholder="Buscar notificação">
+          </div>
+          <div class="select-wrap" style="width:170px;">
+            <select class="std" id="notif-filter-status" style="height:40px;font-size:13px;">
+              <option value="todas">Todas</option>
+              <option value="nao-lidas">Não lidas</option>
+              <option value="lidas">Lidas</option>
+            </select>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="top:50%;"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="select-wrap" style="width:200px;">
+            <select class="std" id="notif-filter-tipo" style="height:40px;font-size:13px;">
+              <option value="todos">Todos os tipos</option>
+              <option value="negociacao">Negociação</option>
+              <option value="handoff">Atendimento humano</option>
+              <option value="venda">Venda concluída</option>
+              <option value="perdido">Atendimento perdido</option>
+              <option value="sla">Tempo de resposta</option>
+              <option value="sistema">Sistema</option>
+            </select>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="top:50%;"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <div id="notif-page-list" class="notif-page-list"></div>
+        <div id="notif-page-empty" class="empty-state" style="display:none;">
+          <h3>Nenhuma notificação encontrada</h3>
+          <p>Tente ajustar a busca ou os filtros.</p>
+        </div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -746,23 +882,214 @@ function showToast(msg){
   window._toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
+/* ===================== notificações ===================== */
+const notifTipos={
+  negociacao:{label:'Negociação',color:'var(--amber)',bg:'var(--amber-bg)',
+    icon:'<circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/><line x1="19" y1="5" x2="5" y2="19"/>'},
+  handoff:{label:'Atendimento humano',color:'var(--accent-dark)',bg:'var(--accent-soft)',
+    icon:'<circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/>'},
+  venda:{label:'Venda concluída',color:'var(--green)',bg:'var(--green-bg)',
+    icon:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>'},
+  perdido:{label:'Atendimento perdido',color:'var(--red)',bg:'var(--red-bg)',
+    icon:'<circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>'},
+  sla:{label:'Tempo de resposta',color:'var(--amber)',bg:'var(--amber-bg)',
+    icon:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>'},
+  sistema:{label:'Sistema',color:'var(--text-secondary)',bg:'#F0F1F4',
+    icon:'<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/>'}
+};
+
+const notificationsMock=[
+  {id:1,tipo:'negociacao',titulo:'Desconto acima do limite solicitado',
+    descricao:'Marina Silva pediu 25% de desconto em Consultoria UX, mas o limite configurado é 15%. A IA manteve o valor máximo permitido e não fechou acima disso.',
+    atendId:1,lida:false,minAgo:12},
+  {id:2,tipo:'handoff',titulo:'Cliente pediu para falar com um atendente',
+    descricao:'Juliana Prado solicitou atendimento humano para tirar dúvidas sobre entrega em Curitiba.',
+    atendId:3,lida:false,minAgo:25},
+  {id:3,tipo:'venda',titulo:'Negociação concluída com sucesso',
+    descricao:'Rafael Almeida fechou o Plano mensal Premium por R$ 199,00 sem necessidade de desconto.',
+    atendId:2,lida:false,minAgo:70},
+  {id:4,tipo:'perdido',titulo:'Atendimento perdido',
+    descricao:'Thiago Ferreira encerrou a conversa sobre o Plano mensal Premium sem concluir a compra, alegando que achou o preço alto.',
+    atendId:8,lida:false,minAgo:140},
+  {id:5,tipo:'sistema',titulo:'Produto sem preço mínimo definido',
+    descricao:'O produto "Cabo USB-C 1m" está sem preço mínimo configurado. A IA pode negociar esse item sem um piso de valor.',
+    lida:false,minAgo:200},
+  {id:6,tipo:'negociacao',titulo:'IA ofereceu o desconto máximo permitido',
+    descricao:'Beatriz Lima recebeu 15% de desconto em Plano mensal Premium — o limite máximo configurado para esse produto.',
+    atendId:5,lida:true,minAgo:300},
+  {id:7,tipo:'sla',titulo:'Cliente aguardando resposta há mais de 1 hora',
+    descricao:'Patrícia Gomes está sem retorno desde a primeira mensagem sobre Consultoria UX.',
+    atendId:7,lida:true,minAgo:340},
+  {id:8,tipo:'venda',titulo:'Negociação concluída com sucesso',
+    descricao:'Eduardo Santos comprou 10 unidades de Cabo USB-C 1m com 10% de desconto automático aplicado.',
+    atendId:6,lida:true,minAgo:1500}
+];
+
+function notifIconHtml(tipo){
+  const t=notifTipos[tipo]||notifTipos.sistema;
+  return `<div class="notif-icon" style="background:${t.bg};color:${t.color};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${t.icon}</svg></div>`;
+}
+function notifTimeLabel(min){
+  if(min<60) return `há ${min} min`;
+  if(min<1440) return `há ${Math.floor(min/60)}h`;
+  return `há ${Math.floor(min/1440)} dia(s)`;
+}
+function unreadCount(){ return notificationsMock.filter(n=>!n.lida).length; }
+
+function updateBellBadge(){
+  const count=unreadCount();
+  const badge=document.getElementById('bell-badge');
+  badge.textContent=count>9 ? '9+' : count;
+  badge.classList.toggle('hide', count===0);
+}
+
+/* --- painel suspenso (mostra só não lidas, somem ao serem lidas) --- */
+function renderBellPanel(){
+  const list=document.getElementById('notif-panel-list');
+  const unread=notificationsMock.filter(n=>!n.lida).sort((a,b)=>a.minAgo-b.minAgo).slice(0,8);
+  if(unread.length===0){
+    list.innerHTML='<div class="notif-panel-empty">Nenhuma notificação nova. Tudo em dia! 🎉</div>';
+    return;
+  }
+  list.innerHTML=unread.map(n=>`
+    <div class="notif-item" data-id="${n.id}">
+      ${notifIconHtml(n.tipo)}
+      <div class="notif-body">
+        <div class="notif-title-row"><span class="notif-dot"></span><p>${n.titulo}</p></div>
+        <p class="notif-desc">${n.descricao}</p>
+        <span class="notif-time">${notifTimeLabel(n.minAgo)}</span>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('.notif-item').forEach(el=>{
+    el.addEventListener('click',()=>expandAndReadPanelItem(parseInt(el.dataset.id,10), el));
+  });
+}
+
+function expandAndReadPanelItem(id, el){
+  if(el.classList.contains('expanded')) return;
+  el.classList.add('expanded');
+  const n=notificationsMock.find(x=>x.id===id);
+  if(n) n.lida=true;
+  updateBellBadge();
+  renderNotifPage();
+  setTimeout(()=>{
+    el.classList.add('removing');
+    setTimeout(()=>renderBellPanel(),260);
+  }, 1100);
+}
+
+document.getElementById('mark-all-read-panel').addEventListener('click',()=>{
+  notificationsMock.forEach(n=>n.lida=true);
+  updateBellBadge();
+  renderBellPanel();
+  renderNotifPage();
+  showToast('Todas as notificações foram marcadas como lidas');
+});
+
+document.getElementById('mark-all-read-page').addEventListener('click',()=>{
+  notificationsMock.forEach(n=>n.lida=true);
+  updateBellBadge();
+  renderBellPanel();
+  renderNotifPage();
+  showToast('Todas as notificações foram marcadas como lidas');
+});
+
+/* --- abrir/fechar o painel --- */
+const bellBtn=document.getElementById('bell-btn');
+const notifPanel=document.getElementById('notif-panel');
+bellBtn.addEventListener('click',e=>{
+  e.stopPropagation();
+  const willOpen=!notifPanel.classList.contains('open');
+  notifPanel.classList.toggle('open', willOpen);
+  if(willOpen) renderBellPanel();
+});
+document.addEventListener('click',e=>{
+  if(!document.getElementById('bell-wrap').contains(e.target)) notifPanel.classList.remove('open');
+});
+
+/* --- página completa de notificações --- */
+function showNotifPage(){
+  notifPanel.classList.remove('open');
+  document.querySelectorAll('.nav-item[data-view]').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-notificacoes').classList.add('active');
+  renderNotifPage();
+}
+document.getElementById('see-all-notifs').addEventListener('click',showNotifPage);
+
+function renderNotifPage(){
+  const q=(document.getElementById('notif-search').value||'').toLowerCase();
+  const statusFilter=document.getElementById('notif-filter-status').value;
+  const tipoFilter=document.getElementById('notif-filter-tipo').value;
+
+  let list=[...notificationsMock].sort((a,b)=>a.minAgo-b.minAgo);
+  if(q) list=list.filter(n=>n.titulo.toLowerCase().includes(q)||n.descricao.toLowerCase().includes(q));
+  if(statusFilter==='nao-lidas') list=list.filter(n=>!n.lida);
+  if(statusFilter==='lidas') list=list.filter(n=>n.lida);
+  if(tipoFilter!=='todos') list=list.filter(n=>n.tipo===tipoFilter);
+
+  const container=document.getElementById('notif-page-list');
+  const empty=document.getElementById('notif-page-empty');
+
+  if(list.length===0){
+    container.style.display='none'; empty.style.display='block';
+    return;
+  }
+  container.style.display='block'; empty.style.display='none';
+
+  container.innerHTML=list.map(n=>`
+    <div class="notif-item ${n.lida?'':''}" data-id="${n.id}">
+      ${notifIconHtml(n.tipo)}
+      <div class="notif-body">
+        <div class="notif-title-row">
+          ${n.lida?'':'<span class="notif-dot"></span>'}
+          <p>${n.titulo}</p>
+          <span class="read-pill" style="margin-left:auto;">${n.lida?'Lida':'Não lida'}</span>
+        </div>
+        <p class="notif-desc">${n.descricao}</p>
+        <span class="notif-time">${notifTimeLabel(n.minAgo)}</span>
+        ${n.atendId?`<span class="notif-link" data-atend="${n.atendId}">Ver atendimento →</span>`:''}
+      </div>
+    </div>`).join('');
+
+  container.querySelectorAll('.notif-item').forEach(el=>{
+    el.addEventListener('click',e=>{
+      if(e.target.closest('.notif-link')) return;
+      const n=notificationsMock.find(x=>x.id===parseInt(el.dataset.id,10));
+      if(n && !n.lida){ n.lida=true; updateBellBadge(); renderNotifPage(); }
+    });
+  });
+  container.querySelectorAll('.notif-link').forEach(link=>{
+    link.addEventListener('click',e=>{
+      e.stopPropagation();
+      openAtendDrawer(parseInt(link.dataset.atend,10));
+    });
+  });
+}
+document.getElementById('notif-search').addEventListener('input',renderNotifPage);
+document.getElementById('notif-filter-status').addEventListener('change',renderNotifPage);
+document.getElementById('notif-filter-tipo').addEventListener('change',renderNotifPage);
+
+updateBellBadge();
+renderNotifPage();
+
 /* ===================== mock: atendimentos ===================== */
 const atendimentosMock=[
-  {id:1,cliente:'Marina Silva',produto:'Consultoria UX',status:'andamento',ultimaMsg:'Consegue um desconto melhor?',valor:'R$ 350,00',quando:'Hoje, 14:32',
+  {id:1,cliente:'Marina Silva',produto:'Consultoria UX',status:'andamento',ultimaMsg:'Consegue um desconto melhor?',valor:'R$ 350,00',quando:'Hoje, 14:32',minAgo:30,
     mensagens:[{from:'in',text:'Olá, vi o anúncio da consultoria UX, quanto custa?'},{from:'out',text:'Olá Marina! A consultoria UX custa R$ 350,00 por sessão.'},{from:'in',text:'Consegue um desconto melhor?'}]},
-  {id:2,cliente:'Rafael Almeida',produto:'Plano mensal Premium',status:'fechado',ultimaMsg:'Combinado, pode fechar!',valor:'R$ 199,00',quando:'Hoje, 11:08',
+  {id:2,cliente:'Rafael Almeida',produto:'Plano mensal Premium',status:'fechado',ultimaMsg:'Combinado, pode fechar!',valor:'R$ 199,00',quando:'Hoje, 11:08',minAgo:210,
     mensagens:[{from:'in',text:'Qual o valor do plano Premium?'},{from:'out',text:'O plano Premium custa R$ 199,00 por mês.'},{from:'in',text:'Combinado, pode fechar!'},{from:'out',text:'Perfeito! Já vou te enviar o link de pagamento.'}]},
-  {id:3,cliente:'Juliana Prado',produto:'Cabo USB-C 1m',status:'novo',ultimaMsg:'Vocês entregam em Curitiba?',valor:'R$ 39,90',quando:'Hoje, 09:51',
+  {id:3,cliente:'Juliana Prado',produto:'Cabo USB-C 1m',status:'novo',ultimaMsg:'Vocês entregam em Curitiba?',valor:'R$ 39,90',quando:'Hoje, 09:51',minAgo:287,
     mensagens:[{from:'in',text:'Vocês entregam em Curitiba?'}]},
-  {id:4,cliente:'Carlos Eduardo',produto:'Consultoria UX',status:'perdido',ultimaMsg:'Vou pensar e te retorno.',valor:'R$ 350,00',quando:'Ontem, 18:20',
+  {id:4,cliente:'Carlos Eduardo',produto:'Consultoria UX',status:'perdido',ultimaMsg:'Vou pensar e te retorno.',valor:'R$ 350,00',quando:'Ontem, 18:20',minAgo:1000,
     mensagens:[{from:'in',text:'Quanto custa a consultoria?'},{from:'out',text:'A consultoria custa R$ 350,00.'},{from:'in',text:'Vou pensar e te retorno.'}]},
-  {id:5,cliente:'Beatriz Lima',produto:'Plano mensal Premium',status:'andamento',ultimaMsg:'Tem desconto pagando anual?',valor:'R$ 199,00',quando:'Ontem, 16:44',
+  {id:5,cliente:'Beatriz Lima',produto:'Plano mensal Premium',status:'andamento',ultimaMsg:'Tem desconto pagando anual?',valor:'R$ 199,00',quando:'Ontem, 16:44',minAgo:1100,
     mensagens:[{from:'in',text:'Tem desconto pagando anual?'},{from:'out',text:'Sim! No plano anual aplicamos 15% de desconto.'}]},
-  {id:6,cliente:'Eduardo Santos',produto:'Cabo USB-C 1m',status:'fechado',ultimaMsg:'Perfeito, obrigado!',valor:'R$ 35,90',quando:'Ontem, 10:05',
+  {id:6,cliente:'Eduardo Santos',produto:'Cabo USB-C 1m',status:'fechado',ultimaMsg:'Perfeito, obrigado!',valor:'R$ 35,90',quando:'Ontem, 10:05',minAgo:1500,
     mensagens:[{from:'in',text:'Quero 10 cabos, tem desconto?'},{from:'out',text:'Para 10 unidades aplicamos 10% de desconto: R$ 35,90 cada.'},{from:'in',text:'Perfeito, obrigado!'}]},
-  {id:7,cliente:'Patrícia Gomes',produto:'Consultoria UX',status:'novo',ultimaMsg:'Oi! Vi o anúncio no Instagram.',valor:'R$ 350,00',quando:'2 dias atrás',
+  {id:7,cliente:'Patrícia Gomes',produto:'Consultoria UX',status:'novo',ultimaMsg:'Oi! Vi o anúncio no Instagram.',valor:'R$ 350,00',quando:'2 dias atrás',minAgo:2880,
     mensagens:[{from:'in',text:'Oi! Vi o anúncio no Instagram.'}]},
-  {id:8,cliente:'Thiago Ferreira',produto:'Plano mensal Premium',status:'perdido',ultimaMsg:'Achei caro, vou procurar outra opção.',valor:'R$ 199,00',quando:'3 dias atrás',
+  {id:8,cliente:'Thiago Ferreira',produto:'Plano mensal Premium',status:'perdido',ultimaMsg:'Achei caro, vou procurar outra opção.',valor:'R$ 199,00',quando:'3 dias atrás',minAgo:4320,
     mensagens:[{from:'in',text:'Quanto custa o plano?'},{from:'out',text:'O plano custa R$ 199,00 por mês.'},{from:'in',text:'Achei caro, vou procurar outra opção.'}]}
 ];
 
@@ -793,11 +1120,61 @@ function renderAtendimentosTable(bodyId, list){
 renderAtendimentosTable('dashboard-recent-body', atendimentosMock.slice(0,5));
 renderAtendimentosTable('atendimentos-body', atendimentosMock);
 
-document.getElementById('atend-search').addEventListener('input',e=>{
-  const q=e.target.value.toLowerCase();
-  const filtered=atendimentosMock.filter(a=>a.cliente.toLowerCase().includes(q)||a.produto.toLowerCase().includes(q));
-  renderAtendimentosTable('atendimentos-body', filtered);
+/* ===================== ordenação das colunas ===================== */
+function parseValor(v){ return parseFloat(String(v).replace('R$','').trim().replace(/\./g,'').replace(',','.'))||0; }
+
+function sortList(list, key, dir){
+  const arr=[...list];
+  arr.sort((a,b)=>{
+    if(key==='valor') return dir*(parseValor(a.valor)-parseValor(b.valor));
+    if(key==='quando') return dir*(a.minAgo-b.minAgo);
+    let va, vb;
+    if(key==='status'){ va=statusLabel(a.status); vb=statusLabel(b.status); }
+    else { va=a[key]||''; vb=b[key]||''; }
+    return dir*String(va).localeCompare(String(vb),'pt-BR');
+  });
+  return arr;
+}
+
+const sortState={
+  'dashboard-recent-body':{key:null,dir:1},
+  'atendimentos-body':{key:null,dir:1}
+};
+
+function refreshDashboardTable(){
+  let list=atendimentosMock.slice(0,5);
+  const st=sortState['dashboard-recent-body'];
+  if(st.key) list=sortList(list, st.key, st.dir);
+  renderAtendimentosTable('dashboard-recent-body', list);
+}
+function refreshAtendimentosTable(){
+  const q=document.getElementById('atend-search').value.toLowerCase();
+  let list=atendimentosMock.filter(a=>a.cliente.toLowerCase().includes(q)||a.produto.toLowerCase().includes(q));
+  const st=sortState['atendimentos-body'];
+  if(st.key) list=sortList(list, st.key, st.dir);
+  renderAtendimentosTable('atendimentos-body', list);
+}
+
+document.querySelectorAll('.data-table').forEach(table=>{
+  const body=table.querySelector('tbody');
+  const bodyId=body.id;
+  if(!sortState[bodyId]) return;
+  table.querySelectorAll('th.sortable').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const key=th.dataset.key;
+      const st=sortState[bodyId];
+      st.dir = (st.key===key) ? st.dir*-1 : 1;
+      st.key = key;
+      table.querySelectorAll('th.sortable').forEach(t=>t.classList.remove('sort-active','desc'));
+      th.classList.add('sort-active');
+      if(st.dir===-1) th.classList.add('desc');
+      if(bodyId==='dashboard-recent-body') refreshDashboardTable();
+      else refreshAtendimentosTable();
+    });
+  });
 });
+
+document.getElementById('atend-search').addEventListener('input',refreshAtendimentosTable);
 
 const atendOverlay=document.getElementById('atend-drawer-overlay');
 const atendDrawer=document.getElementById('atend-drawer');

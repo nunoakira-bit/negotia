@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
   :root{
     --bg-page:#F6F7F9;
@@ -92,7 +93,7 @@
   /* ---------- main ---------- */
   .main{flex:1;min-width:0;height:100%;overflow-y:auto;}
   .main-body{padding:36px 52px 100px;}
-  .content{max-width:1060px;margin:0 auto;}
+  .content{width:100%;}
   .view{display:none;}
   .view.active{display:block;}
 
@@ -127,9 +128,9 @@
   .btn-danger:hover{background:#B91C1C;}
 
   .search-input{position:relative;max-width:280px;}
-  .search-input input{width:100%;height:40px;padding:0 14px 0 38px;border:1px solid var(--border-strong);
+  .search-input input[type="text"]{width:100%;height:40px;padding:0 14px 0 38px;border:1px solid var(--border-strong);
     border-radius:var(--radius-sm);font-size:13.5px;font-family:var(--font-sans);outline:none;background:#fff;transition:.15s;}
-  .search-input input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .search-input input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   .search-input svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text-tertiary);}
 
   /* ---------- KPI cards ---------- */
@@ -143,6 +144,15 @@
   .kpi-trend.up{color:var(--green);} .kpi-trend.down{color:var(--red);}
 
   .section-block{margin-bottom:30px;}
+
+  .shortcuts-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:28px;}
+  .shortcut-btn{display:flex;align-items:center;gap:12px;background:var(--bg-card);border:1px solid var(--border);
+    border-radius:var(--radius-md);padding:14px 16px;box-shadow:var(--shadow-card);cursor:pointer;
+    transition:.15s;text-align:left;font-family:var(--font-sans);}
+  .shortcut-btn:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .shortcut-btn:hover .icon-box{background:var(--accent);color:#fff;}
+  .shortcut-btn .icon-box{margin:0;}
+  .shortcut-btn span{font-size:13px;font-weight:600;color:var(--text-primary);}
   .block-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
   .block-head h2{font-size:15.5px;font-weight:600;margin:0;}
   .link-btn{font-size:13px;color:var(--accent-dark);background:none;border:none;cursor:pointer;font-weight:500;
@@ -330,7 +340,34 @@
   .bubble{max-width:84%;padding:10px 13px;border-radius:13px;font-size:13px;line-height:1.5;}
   .bubble.in{align-self:flex-start;background:#fff;border-top-left-radius:4px;color:var(--text-primary);}
   .bubble.out{align-self:flex-end;background:#D9F2D2;border-top-right-radius:4px;color:#1C3A1C;}
+  .bubble.out.helpdesk{background:var(--accent-soft);color:var(--accent-dark);}
+  .bubble.receipt{align-self:flex-start;background:#FEF3E2;border:1px solid #F2D9A6;color:#7A4A06;
+    font-size:12px;border-radius:10px;display:flex;align-items:center;gap:7px;}
+  .bubble.receipt svg{width:13px;height:13px;flex-shrink:0;}
   .bubble-time{font-size:10px;color:var(--text-tertiary);margin-top:4px;display:block;}
+  .bubble.receipt.success{background:var(--green-bg);border-color:#BBE5C8;color:#0F5C2E;}
+
+  /* ---------- card de pagamento (dentro do chat) ---------- */
+  .payment-card{align-self:flex-start;max-width:88%;background:#fff;border:1px solid var(--border);
+    border-radius:13px;border-top-left-radius:4px;padding:13px;box-shadow:0 1px 3px rgba(16,24,40,.06);}
+  .payment-card-title{font-size:12.5px;font-weight:600;color:var(--text-primary);margin-bottom:2px;}
+  .payment-card-value{font-family:var(--font-mono);font-size:17px;font-weight:700;color:var(--accent-dark);margin-bottom:10px;}
+  .payment-options{display:flex;flex-direction:column;gap:7px;}
+  .payment-option{display:flex;align-items:center;gap:10px;width:100%;height:40px;padding:0 12px;
+    border:1px solid var(--border-strong);background:#fff;border-radius:9px;font-size:13px;font-weight:500;
+    color:var(--text-primary);cursor:pointer;transition:.12s;text-align:left;}
+  .payment-option:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);}
+  .payment-option:disabled{opacity:.45;cursor:default;}
+  .payment-option svg{width:17px;height:17px;flex-shrink:0;color:var(--accent-dark);}
+  .payment-processing{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--text-secondary);padding:4px 2px;}
+  .pay-spinner{width:14px;height:14px;border-radius:50%;border:2px solid var(--accent-soft);
+    border-top-color:var(--accent);animation:pay-spin .7s linear infinite;flex-shrink:0;}
+  @keyframes pay-spin{to{transform:rotate(360deg);}}
+  .close-venda-btn{display:flex;align-items:center;gap:6px;height:34px;padding:0 13px;border:1px solid var(--green);
+    background:var(--green-bg);color:#0F5C2E;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.12s;}
+  .close-venda-btn:hover{background:#DFF3E4;}
+  .close-venda-btn:disabled{opacity:.4;cursor:default;}
+  .close-venda-btn svg{width:14px;height:14px;}
   .drawer-note{font-size:12px;color:var(--text-tertiary);margin-top:16px;line-height:1.5;display:flex;gap:7px;}
   .drawer-note svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
 
@@ -427,6 +464,64 @@
   .notif-link{font-size:12px;color:var(--accent-dark);font-weight:500;margin-top:8px;display:inline-block;
     cursor:pointer;}
   .notif-link:hover{text-decoration:underline;}
+
+  /* ---------- chamados ---------- */
+  .kpi-card .kpi-sub{font-size:11.5px;color:var(--text-tertiary);margin-top:8px;}
+  .kpi-card .kpi-sub.bad{color:var(--red);font-weight:600;}
+  .kpi-stars{color:#D99A06;font-size:13px;letter-spacing:1px;}
+
+  .filters-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+
+  .charts-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px;}
+  .charts-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+  .chart-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:20px 22px;box-shadow:var(--shadow-card);}
+  .chart-panel h3{font-size:13.5px;font-weight:600;margin:0 0 14px;}
+  .chart-box{position:relative;height:220px;}
+
+  .crit-pill{font-size:11.5px;font-weight:700;}
+  .crit-pill.URGENTE{color:var(--red);}
+  .crit-pill.MEDIA{color:var(--amber);}
+  .crit-pill.BAIXA{color:var(--green);}
+
+  .status-pill.ABERTO,.status-pill.EM_ANDAMENTO{background:var(--amber-bg);color:var(--amber);}
+  .status-pill.ABERTO::before,.status-pill.EM_ANDAMENTO::before{background:var(--amber);}
+  .status-pill.RESOLVIDO{background:var(--green-bg);color:var(--green);}
+  .status-pill.RESOLVIDO::before{background:var(--green);}
+  .status-pill.ESCALADO{background:var(--red-bg);color:var(--red);}
+  .status-pill.ESCALADO::before{background:var(--red);}
+
+  .sla-pill{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;display:inline-block;}
+  .sla-pill.DENTRO,.sla-pill.NO_PRAZO{background:var(--green-bg);color:var(--green);}
+  .sla-pill.ESTOURADO,.sla-pill.VENCIDO{background:var(--red-bg);color:var(--red);}
+  .sla-sub{font-size:11px;color:var(--text-tertiary);display:block;margin-top:3px;}
+
+  .ticket-stars{color:#D99A06;font-size:14px;letter-spacing:1px;}
+
+  .ticket-info-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .ticket-chip{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;background:#F0F1F4;color:var(--text-secondary);}
+  .ticket-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .ticket-actions .btn-primary, .ticket-actions .btn-secondary{height:38px;font-size:12.5px;padding:0 14px;}
+  .whatsapp-btn{background:#1FA855;}
+  .whatsapp-btn:hover{background:#178A45;}
+
+  /* ---------- base de conhecimento ---------- */
+  .doc-cell{display:flex;align-items:center;gap:10px;}
+  .doc-icon{width:32px;height:32px;border-radius:8px;background:var(--red-bg);color:var(--red);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .doc-icon svg{width:15px;height:15px;}
+  .doc-name{font-weight:500;color:var(--text-primary);}
+  .doc-size{font-size:11.5px;color:var(--text-tertiary);display:block;margin-top:1px;}
+  .status-pill.INDEXADO{background:var(--green-bg);color:var(--green);}
+  .status-pill.INDEXADO::before{background:var(--green);}
+  .status-pill.PROCESSANDO{background:var(--amber-bg);color:var(--amber);}
+  .status-pill.PROCESSANDO::before{background:var(--amber);}
+
+  /* ---------- vendas ---------- */
+  .canal-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;display:inline-block;}
+  .canal-pill.IA{background:var(--accent-soft);color:var(--accent-dark);}
+  .canal-pill.Humano{background:#F0F1F4;color:var(--text-secondary);}
+  .desconto-cell{font-family:var(--font-mono);}
 </style>
 </head>
 <body>
@@ -478,9 +573,21 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         <span class="nav-label">Atendimentos</span>
       </div>
+      <div class="nav-item" data-view="chamados" title="Chamados">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13a8 8 0 0116 0v4a2 2 0 01-2 2h-1v-7h3"/><path d="M4 17v-4h3v7H5a2 2 0 01-2-2z" /><path d="M9 21h4"/></svg>
+        <span class="nav-label">Chamados</span>
+      </div>
+      <div class="nav-item" data-view="conhecimento" title="Base de Conhecimento">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        <span class="nav-label">Base de Conhecimento</span>
+      </div>
       <div class="nav-item" data-view="produtos" title="Produtos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>
         <span class="nav-label">Produtos</span>
+      </div>
+      <div class="nav-item" data-view="vendas" title="Vendas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 016 0"/></svg>
+        <span class="nav-label">Vendas</span>
       </div>
       <div class="nav-item disabled" title="Configurações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l1.9-1.5-2-3.4-2.2.6a7.6 7.6 0 00-1.7-1l-.3-2.3H9.9l-.3 2.3a7.6 7.6 0 00-1.7 1l-2.2-.6-2 3.4L5.6 11a7.6 7.6 0 000 2l-1.9 1.5 2 3.4 2.2-.6a7.6 7.6 0 001.7 1l.3 2.3h4.2l.3-2.3a7.6 7.6 0 001.7-1l2.2.6 2-3.4z"/></svg>
@@ -505,6 +612,30 @@
             <h1>Dashboard de atendimentos</h1>
             <p class="subtitle">Visão geral de como a IA está negociando pelo WhatsApp hoje.</p>
           </div>
+        </div>
+
+        <p class="section-label">Atalhos rápidos</p>
+        <div class="shortcuts-bar">
+          <button class="shortcut-btn" id="shortcut-novo-produto">
+            <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg></div>
+            <span>Novo produto</span>
+          </button>
+          <button class="shortcut-btn" id="shortcut-ver-atendimentos">
+            <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+            <span>Ver atendimentos</span>
+          </button>
+          <button class="shortcut-btn" id="shortcut-chamados-urgentes">
+            <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13a8 8 0 0116 0v4a2 2 0 01-2 2h-1v-7h3"/><path d="M4 17v-4h3v7H5a2 2 0 01-2-2z"/></svg></div>
+            <span>Chamados urgentes</span>
+          </button>
+          <button class="shortcut-btn" id="shortcut-add-pdf">
+            <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+            <span>Adicionar PDF</span>
+          </button>
+          <button class="shortcut-btn" id="shortcut-ver-vendas">
+            <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 016 0"/></svg></div>
+            <span>Ver vendas</span>
+          </button>
         </div>
 
         <div class="kpi-grid">
@@ -820,6 +951,145 @@
         </div>
       </section>
 
+      <!-- ===================== VENDAS ===================== -->
+      <section class="view" id="view-vendas">
+        <div class="page-head">
+          <div>
+            <h1>Vendas</h1>
+            <p class="subtitle">Tudo o que a IA já vendeu pelo WhatsApp.</p>
+          </div>
+          <div class="filters-row">
+            <div class="select-wrap" style="width:170px;">
+              <select class="std" id="vendas-period" style="height:40px;font-size:13px;">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+              </select>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="top:50%;"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="vendas-kpis"></div>
+
+        <div class="charts-grid">
+          <div class="chart-panel"><h3>Vendas por dia</h3><div class="chart-box"><canvas id="chart-vendas-dia"></canvas></div></div>
+          <div class="chart-panel"><h3>Vendas por produto</h3><div class="chart-box"><canvas id="chart-vendas-produto"></canvas></div></div>
+        </div>
+
+        <div class="section-block" style="margin-bottom:16px;">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+            <input type="text" id="vendas-search" placeholder="Buscar por cliente ou produto">
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-key="cliente">Cliente<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="produto">Produto<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="valor">Valor<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="desconto">Desconto<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th>Pagamento</th>
+              <th class="sortable" data-key="atendidoPor">Atendido por<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="data">Data<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+            </tr>
+          </thead>
+          <tbody id="vendas-body"></tbody>
+        </table>
+      </section>
+
+      <!-- ===================== CHAMADOS ===================== -->
+      <section class="view" id="view-chamados">
+        <div class="page-head">
+          <div>
+            <h1>Chamados</h1>
+            <p class="subtitle">Suporte de hardware e software conduzido pela IA, com triagem, base de conhecimento e escalonamento.</p>
+          </div>
+          <div class="filters-row">
+            <div class="select-wrap" style="width:170px;">
+              <select class="std" id="chamados-period" style="height:40px;font-size:13px;">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+              </select>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="top:50%;"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <button class="btn-secondary" id="chamados-refresh">Atualizar</button>
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="chamados-kpis" style="grid-template-columns:repeat(6,1fr);"></div>
+
+        <div class="charts-grid">
+          <div class="chart-panel"><h3>Chamados por dia</h3><div class="chart-box"><canvas id="chart-serie"></canvas></div></div>
+          <div class="chart-panel"><h3>Criticidade</h3><div class="chart-box"><canvas id="chart-crit"></canvas></div></div>
+        </div>
+        <div class="charts-grid2">
+          <div class="chart-panel"><h3>Avaliações do atendimento</h3><div class="chart-box"><canvas id="chart-aval"></canvas></div></div>
+          <div class="chart-panel"><h3>Origem</h3><div class="chart-box"><canvas id="chart-origem"></canvas></div></div>
+        </div>
+
+        <div class="section-block" style="margin-bottom:16px;">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+            <input type="text" id="chamados-search" placeholder="Buscar por solicitante, instituição ou descrição">
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-key="id">#<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="nome">Solicitante<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th>Descrição</th>
+              <th class="sortable" data-key="criticidade">Crit.<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="status">Status<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="sla">SLA<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="avaliacao">Avaliação<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th class="sortable" data-key="criado">Aberto em<span class="sort-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+            </tr>
+          </thead>
+          <tbody id="chamados-body"></tbody>
+        </table>
+      </section>
+
+      <!-- ===================== BASE DE CONHECIMENTO ===================== -->
+      <section class="view" id="view-conhecimento">
+        <div class="page-head">
+          <div>
+            <h1>Base de conhecimento</h1>
+            <p class="subtitle">PDFs de manuais, FAQs e procedimentos que a IA usa para resolver chamados sem inventar solução.</p>
+          </div>
+          <button class="btn-primary" id="btn-add-doc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar PDF
+          </button>
+        </div>
+
+        <p class="hint" style="margin-bottom:18px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>
+          Enquanto um PDF não estiver indexado, a IA avisa que não há solução cadastrada e registra o chamado para um atendente.
+        </p>
+
+        <div id="kb-empty" class="empty-state" style="display:none;">
+          <h3>Nenhum documento enviado ainda</h3>
+          <p>Adicione um PDF de manual, FAQ ou procedimento para a IA começar a usá-lo nas respostas.</p>
+          <button class="btn-primary" id="btn-add-doc-empty" style="margin:0 auto;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar PDF
+          </button>
+        </div>
+
+        <table class="data-table" id="kb-table">
+          <thead>
+            <tr><th>Documento</th><th>Categoria</th><th>Status</th><th>Trechos indexados</th><th>Enviado em</th><th></th></tr>
+          </thead>
+          <tbody id="kb-body"></tbody>
+        </table>
+      </section>
+
       <!-- ===================== NOTIFICAÇÕES ===================== -->
       <section class="view" id="view-notificacoes">
         <div class="page-head">
@@ -879,7 +1149,10 @@
       <h3>Simulação de negociação</h3>
       <p>Exemplo de conversa com as regras configuradas</p>
     </div>
-    <button class="close-btn" id="close-neg-preview" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div style="display:flex;align-items:flex-start;gap:8px;">
+      <button class="close-venda-btn" id="neg-close-venda-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda</button>
+      <button class="close-btn" id="close-neg-preview" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
   </div>
   <div class="phone-frame" id="neg-phone-frame"></div>
   <p class="drawer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Esta é uma simulação baseada nas regras configuradas nos cards acima.</p>
@@ -893,7 +1166,10 @@
       <h3 id="atend-drawer-name">Cliente</h3>
       <p id="atend-drawer-meta">Atendimento via WhatsApp</p>
     </div>
-    <button class="close-btn" id="close-atend-drawer" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div style="display:flex;align-items:flex-start;gap:8px;">
+      <button class="close-venda-btn" id="atend-close-venda-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda</button>
+      <button class="close-btn" id="close-atend-drawer" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
   </div>
 
   <div class="mode-row" id="atend-mode-row">
@@ -911,11 +1187,29 @@
   </div>
 </div>
 
+<!-- Drawer: detalhe do chamado -->
+<div class="overlay" id="chamado-drawer-overlay"></div>
+<div class="drawer" id="chamado-drawer">
+  <div class="drawer-head">
+    <div>
+      <h3 id="chamado-drawer-title">Chamado #0</h3>
+      <p id="chamado-drawer-meta">Solicitante · Instituição</p>
+    </div>
+    <button class="close-btn" id="close-chamado-drawer" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+
+  <div class="ticket-info-row" id="chamado-info-row"></div>
+
+  <div class="phone-frame" id="chamado-phone-frame" style="background:#F3F4F6;margin-top:16px;"></div>
+
+  <div class="ticket-actions" id="chamado-actions"></div>
+</div>
+
 <!-- Modal: confirmação de exclusão -->
 <div class="modal-wrap" id="confirm-modal-wrap">
   <div class="modal-box">
-    <h3>Excluir produto?</h3>
-    <p>Essa ação não pode ser desfeita. A IA deixará de negociar este item imediatamente.</p>
+    <h3 id="confirm-modal-title">Excluir produto?</h3>
+    <p id="confirm-modal-text">Essa ação não pode ser desfeita. A IA deixará de negociar este item imediatamente.</p>
     <div class="modal-actions">
       <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
       <button class="btn-primary btn-danger" id="confirm-delete">Excluir</button>
@@ -943,8 +1237,24 @@ function switchView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
   if(name==='produtos'){ showProductList(); }
+  if(name==='chamados'){ refreshChamados(); }
+  if(name==='vendas'){ refreshVendas(); }
 }
 document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
+
+/* ===================== atalhos rápidos ===================== */
+document.getElementById('shortcut-novo-produto').addEventListener('click',()=>{
+  switchView('produtos');
+  openProductForm(null);
+});
+document.getElementById('shortcut-ver-atendimentos').addEventListener('click',()=>switchView('atendimentos'));
+document.getElementById('shortcut-chamados-urgentes').addEventListener('click',()=>{
+  switchView('chamados');
+  chamadosSortState.key='criticidade'; chamadosSortState.dir=-1;
+  refreshChamados();
+});
+document.getElementById('shortcut-add-pdf').addEventListener('click',()=>switchView('conhecimento'));
+document.getElementById('shortcut-ver-vendas').addEventListener('click',()=>switchView('vendas'));
 
 /* ===================== toast ===================== */
 function showToast(msg){
@@ -968,7 +1278,9 @@ const notifTipos={
   sla:{label:'Tempo de resposta',color:'var(--amber)',bg:'var(--amber-bg)',
     icon:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>'},
   sistema:{label:'Sistema',color:'var(--text-secondary)',bg:'#F0F1F4',
-    icon:'<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/>'}
+    icon:'<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/>'},
+  chamado:{label:'Chamado',color:'var(--red)',bg:'var(--red-bg)',
+    icon:'<path d="M4 13a8 8 0 0116 0v4a2 2 0 01-2 2h-1v-7h3"/><path d="M4 17v-4h3v7H5a2 2 0 01-2-2z"/>'}
 };
 
 const notificationsMock=[
@@ -995,7 +1307,13 @@ const notificationsMock=[
     atendId:7,lida:true,minAgo:340},
   {id:8,tipo:'venda',titulo:'Negociação concluída com sucesso',
     descricao:'Eduardo Santos comprou 10 unidades de Cabo USB-C 1m com 10% de desconto automático aplicado.',
-    atendId:6,lida:true,minAgo:1500}
+    atendId:6,lida:true,minAgo:1500},
+  {id:9,tipo:'chamado',titulo:'Chamado urgente com SLA vencido',
+    descricao:'O chamado #1042 de Marcos Tadeu (Prefeitura de Ponta Grossa) está URGENTE e passou do prazo de 4h sem resolução.',
+    chamadoId:1042,lida:false,minAgo:18},
+  {id:10,tipo:'chamado',titulo:'Novo chamado escalado para atendente',
+    descricao:'A IA não conseguiu resolver o chamado #1039 com as soluções da base de conhecimento e encaminhou para um atendente humano via WhatsApp.',
+    chamadoId:1039,lida:false,minAgo:95}
 ];
 
 function notifIconHtml(tipo){
@@ -1122,6 +1440,7 @@ function renderNotifPage(){
         <p class="notif-desc">${n.descricao}</p>
         <span class="notif-time">${notifTimeLabel(n.minAgo)}</span>
         ${n.atendId?`<span class="notif-link" data-atend="${n.atendId}">Ver atendimento →</span>`:''}
+        ${n.chamadoId?`<span class="notif-link" data-chamado="${n.chamadoId}">Ver chamado →</span>`:''}
       </div>
     </div>`).join('');
 
@@ -1132,10 +1451,17 @@ function renderNotifPage(){
       if(n && !n.lida){ n.lida=true; updateBellBadge(); renderNotifPage(); }
     });
   });
-  container.querySelectorAll('.notif-link').forEach(link=>{
+  container.querySelectorAll('.notif-link[data-atend]').forEach(link=>{
     link.addEventListener('click',e=>{
       e.stopPropagation();
       openAtendDrawer(parseInt(link.dataset.atend,10));
+    });
+  });
+  container.querySelectorAll('.notif-link[data-chamado]').forEach(link=>{
+    link.addEventListener('click',e=>{
+      e.stopPropagation();
+      switchView('chamados');
+      setTimeout(()=>openChamadoDrawer(parseInt(link.dataset.chamado,10)),50);
     });
   });
 }
@@ -1149,6 +1475,81 @@ renderNotifPage();
 document.getElementById('client-logo-placeholder').addEventListener('click',()=>{
   showToast('Em breve: envie aqui a logo da sua empresa');
 });
+
+/* ===================== fluxo de pagamento (simulado) ===================== */
+const PAYMENT_METHODS=[
+  {key:'pix',label:'Pix',icon:'<path d="M12 2 4 12l8 10 8-10z"/>'},
+  {key:'cartao',label:'Cartão de crédito',icon:'<rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>'},
+  {key:'boleto',label:'Boleto bancário',icon:'<rect x="4.5" y="5" width="1.6" height="14"/><rect x="8" y="5" width="1" height="14"/><rect x="10.5" y="5" width="2.6" height="14"/><rect x="15.5" y="5" width="1" height="14"/><rect x="18" y="5" width="1.6" height="14"/>'}
+];
+function paymentLabel(key){ const m=PAYMENT_METHODS.find(x=>x.key===key); return m?m.label:key; }
+function paymentTableLabel(key){ return {pix:'PIX',cartao:'Cartão',boleto:'Boleto'}[key]||key; }
+function processingTimeFor(method){ return method==='pix'?1300:method==='cartao'?1700:1100; }
+
+let paymentCardSeq=0;
+function paymentSuccessHtml(method, valorLabel){
+  const m=PAYMENT_METHODS.find(x=>x.key===method);
+  if(method==='boleto'){
+    return `<div class="bubble receipt success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${m.icon}</svg>Boleto gerado · R$ ${valorLabel} · venda registrada, pagamento será confirmado em até 2 dias úteis</div>`;
+  }
+  return `<div class="bubble receipt success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Pagamento aprovado via ${m.label} · R$ ${valorLabel}</div>`;
+}
+
+/* Insere a pergunta + card de pagamento no frame de chat informado, conduz a simulação
+   (escolha do método → processando → aprovado/gerado) e chama onDone(method) ao final. */
+function openPaymentFlow(frameEl, valor, onDone){
+  const valorLabel=formatBRL(valor);
+  frameEl.insertAdjacentHTML('beforeend', `<div class="bubble out">Perfeito! Como você prefere pagar os R$ ${valorLabel}?</div>`);
+  const uid='pay-'+(++paymentCardSeq);
+  const optsHtml=PAYMENT_METHODS.map(m=>`
+    <button class="payment-option" data-method="${m.key}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${m.icon}</svg>
+      <span>${m.label}</span>
+    </button>`).join('');
+  frameEl.insertAdjacentHTML('beforeend', `
+    <div class="payment-card" id="${uid}">
+      <div class="payment-card-title">Forma de pagamento</div>
+      <div class="payment-card-value">R$ ${valorLabel}</div>
+      <div class="payment-options">${optsHtml}</div>
+    </div>`);
+  frameEl.scrollTop=frameEl.scrollHeight;
+  const card=document.getElementById(uid);
+  card.querySelectorAll('.payment-option').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const method=btn.dataset.method;
+      card.querySelectorAll('.payment-option').forEach(b=>b.disabled=true);
+      card.insertAdjacentHTML('beforeend', `<div class="payment-processing"><span class="pay-spinner"></span>Processando pagamento...</div>`);
+      frameEl.scrollTop=frameEl.scrollHeight;
+      setTimeout(()=>{
+        card.remove();
+        frameEl.insertAdjacentHTML('beforeend', paymentSuccessHtml(method, valorLabel));
+        frameEl.scrollTop=frameEl.scrollHeight;
+        onDone(method);
+      }, processingTimeFor(method));
+    });
+  });
+}
+
+/* Registra a venda fechada: tabela de vendas, notificação no sino e toast de confirmação. */
+function registerVenda({cliente, produto, valor, desconto=0, pagamento, atendidoPor='IA', atendId}){
+  const vid='v'+Date.now();
+  vendasMock.unshift({id:vid, cliente, produto, valor, desconto, pagamento:paymentTableLabel(pagamento), atendidoPor, minAgo:0, atendId});
+
+  const notifId=(notificationsMock.length? Math.max(...notificationsMock.map(n=>n.id)):0)+1;
+  notificationsMock.unshift({
+    id:notifId, tipo:'venda', titulo:'Negociação concluída com sucesso',
+    descricao:`${cliente} fechou ${produto} por R$ ${formatBRL(valor)} via ${paymentLabel(pagamento)}.`,
+    atendId, lida:false, minAgo:0
+  });
+  updateBellBadge();
+  renderBellPanel();
+  renderNotifPage();
+  showToast(`Venda fechada com ${cliente} via ${paymentLabel(pagamento)}! 🎉`);
+  refreshDashboardTable();
+  refreshAtendimentosTable();
+  const vendasView=document.getElementById('view-vendas');
+  if(vendasView && vendasView.classList.contains('active')) refreshVendas();
+}
 
 /* ===================== mock: atendimentos ===================== */
 const atendimentosMock=[
@@ -1326,6 +1727,11 @@ function openAtendDrawer(id){
   document.getElementById('atend-phone-frame').innerHTML=a.mensagens.map(m=>
     `<div class="bubble ${m.from}">${m.text}</div>`).join('');
   updateModeUI();
+  const closeVendaBtn=document.getElementById('atend-close-venda-btn');
+  closeVendaBtn.disabled = a.status==='fechado';
+  closeVendaBtn.innerHTML = a.status==='fechado'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda';
   atendOverlay.classList.add('open'); atendDrawer.classList.add('open');
 }
 function closeAtendDrawer(){
@@ -1335,6 +1741,24 @@ function closeAtendDrawer(){
 }
 document.getElementById('close-atend-drawer').addEventListener('click',closeAtendDrawer);
 atendOverlay.addEventListener('click',closeAtendDrawer);
+
+document.getElementById('atend-close-venda-btn').addEventListener('click',()=>{
+  const a=atendimentosMock.find(x=>x.id===currentAtendId);
+  const btn=document.getElementById('atend-close-venda-btn');
+  if(!a || a.status==='fechado' || btn.disabled) return;
+  btn.disabled=true;
+  const frame=document.getElementById('atend-phone-frame');
+  const valor=parseValor(a.valor);
+  openPaymentFlow(frame, valor, (method)=>{
+    a.status='fechado';
+    a.ultimaMsg='Pagamento aprovado via '+paymentLabel(method);
+    a.mensagens.push({from:'out',text:'Como você prefere pagar os R$ '+formatBRL(valor)+'?'});
+    a.mensagens.push({from:'out',text:'Pagamento confirmado via '+paymentLabel(method)+'.'});
+    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada';
+    registerVenda({cliente:a.cliente, produto:a.produto, valor, desconto:0, pagamento:method,
+      atendidoPor: currentMode==='humano'?'Humano':'IA', atendId:a.id});
+  });
+});
 
 /* ===================== produtos: persistência ===================== */
 const STORAGE_KEY='negotia_produtos';
@@ -1364,6 +1788,7 @@ seedIfEmpty();
 
 let editingId=null;
 let pendingDeleteId=null;
+let pendingDeleteContext='produto';
 
 function riskColor(pct){ return pct<=15 ? 'green' : pct<=30 ? 'amber' : 'red'; }
 
@@ -1415,6 +1840,9 @@ function renderProductGrid(filterText){
   grid.querySelectorAll('.delete-btn').forEach(btn=>{
     btn.addEventListener('click',e=>{
       pendingDeleteId=e.target.closest('.product-card').dataset.id;
+      pendingDeleteContext='produto';
+      document.getElementById('confirm-modal-title').textContent='Excluir produto?';
+      document.getElementById('confirm-modal-text').textContent='Essa ação não pode ser desfeita. A IA deixará de negociar este item imediatamente.';
       document.getElementById('confirm-modal-wrap').classList.add('open');
     });
   });
@@ -1606,19 +2034,24 @@ document.getElementById('confirm-cancel').addEventListener('click',()=>{
   document.getElementById('confirm-modal-wrap').classList.remove('open');
 });
 document.getElementById('confirm-delete').addEventListener('click',()=>{
-  if(pendingDeleteId){
+  if(pendingDeleteId && pendingDeleteContext==='produto'){
     const all=loadProducts().filter(p=>p.id!==pendingDeleteId);
     saveProducts(all);
     showToast('Produto excluído');
-    pendingDeleteId=null;
-    renderProductGrid('');
+  } else if(pendingDeleteId && pendingDeleteContext==='documento'){
+    kbDocsMock = kbDocsMock.filter(d=>d.id!==pendingDeleteId);
+    showToast('Documento removido da base de conhecimento');
+    renderKbDocs();
   }
+  pendingDeleteId=null;
+  if(document.getElementById('view-produtos').classList.contains('active')) renderProductGrid('');
   document.getElementById('confirm-modal-wrap').classList.remove('open');
 });
 
 /* ===================== drawer: simulação de negociação (dinâmica) ===================== */
 const negOverlay=document.getElementById('neg-drawer-overlay');
 const negDrawer=document.getElementById('neg-drawer');
+let negSimContext={nome:'Produto', precoPadrao:0, maxDesc:0};
 document.getElementById('open-preview').addEventListener('click',()=>{
   const maxDesc=document.getElementById('f-discount-slider').value;
   const rules=getRules();
@@ -1642,14 +2075,564 @@ document.getElementById('open-preview').addEventListener('click',()=>{
     ];
   }
   document.getElementById('neg-phone-frame').innerHTML=messages.map(m=>`<div class="bubble ${m.from}">${m.text}</div>`).join('');
+  negSimContext={nome, precoPadrao:parseValor(document.getElementById('f-preco-padrao').value), maxDesc:parseFloat(maxDesc)||0};
+  const negBtn=document.getElementById('neg-close-venda-btn');
+  negBtn.disabled=false;
+  negBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda';
   negOverlay.classList.add('open'); negDrawer.classList.add('open');
 });
 function closeNegDrawer(){ negOverlay.classList.remove('open'); negDrawer.classList.remove('open'); }
 document.getElementById('close-neg-preview').addEventListener('click',closeNegDrawer);
 negOverlay.addEventListener('click',closeNegDrawer);
 
+document.getElementById('neg-close-venda-btn').addEventListener('click',()=>{
+  const btn=document.getElementById('neg-close-venda-btn');
+  if(btn.disabled) return;
+  btn.disabled=true;
+  const frame=document.getElementById('neg-phone-frame');
+  const valor=negSimContext.precoPadrao*(1-negSimContext.maxDesc/100);
+  openPaymentFlow(frame, valor, (method)=>{
+    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada';
+    registerVenda({cliente:'Cliente exemplo', produto:negSimContext.nome, valor,
+      desconto:negSimContext.maxDesc, pagamento:method, atendidoPor:'IA'});
+  });
+});
+
+/* ===================== chamados (adaptado do Helpdesk AI) ===================== */
+const SLA_HORAS={URGENTE:4, MEDIA:24, BAIXA:72};
+
+const chamadosMock=[
+  {id:1042,nome:'Marcos Tadeu',instituicao:'Prefeitura de Ponta Grossa',origem:'HARDWARE',criticidade:'URGENTE',
+    descricao:'Impressora multifuncional do protocolo não liga, fila de atendimento parada.',
+    status:'ESCALADO',criadoMinAgo:380,resolvidoMinAgo:null,avaliacao:null,
+    mensagens:[
+      {from:'in',text:'A impressora do protocolo não liga, temos uma fila enorme aqui.'},
+      {from:'out',text:'Entendi a urgência. Pode me confirmar seu nome e a instituição?'},
+      {from:'in',text:'Marcos Tadeu, Prefeitura de Ponta Grossa.'},
+      {from:'out',text:'Não encontrei uma solução rápida na nossa base para esse modelo. Vou escalar para um atendente humano agora.'},
+      {from:'receipt',text:'Chamado #1042 escalado · link de WhatsApp do atendente enviado'}
+    ]},
+  {id:1039,nome:'Ana Beatriz Souza',instituicao:'Secretaria de Educação',origem:'SOFTWARE',criticidade:'MEDIA',
+    descricao:'Sistema SIGA trava ao tentar gerar relatório de frequência.',
+    status:'ESCALADO',criadoMinAgo:1600,resolvidoMinAgo:null,avaliacao:null,
+    mensagens:[
+      {from:'in',text:'O SIGA trava sempre que eu tento gerar o relatório de frequência mensal.'},
+      {from:'out',text:'Você recebe alguma mensagem de erro, ou a tela simplesmente congela?'},
+      {from:'in',text:'A tela fica branca e não volta mais.'},
+      {from:'out',text:'Tentei as soluções da base de conhecimento sem sucesso. Vou escalar para a equipe técnica.'},
+      {from:'receipt',text:'Chamado #1039 escalado · card criado no Jira'}
+    ]},
+  {id:1035,nome:'Carlos Eduardo Lima',instituicao:'Secretaria de Saúde',origem:'SOFTWARE',criticidade:'BAIXA',
+    descricao:'Esqueceu a senha do sistema ACCESS e não recebe o e-mail de redefinição.',
+    status:'RESOLVIDO',criadoMinAgo:1500,resolvidoMinAgo:1440,avaliacao:5,
+    mensagens:[
+      {from:'in',text:'Esqueci minha senha do ACCESS e o e-mail de redefinição não chega.'},
+      {from:'out',text:'Encontrei o procedimento na nossa base: verifique a caixa de spam e confirme se o e-mail cadastrado termina em @pontagrossa.pr.gov.br.'},
+      {from:'in',text:'Era isso, estava na caixa de spam. Obrigado!'},
+      {from:'receipt',text:'Chamado #1035 registrado como RESOLVIDO'}
+    ]},
+  {id:1031,nome:'Fernanda Castro',instituicao:'Câmara Municipal',origem:'HARDWARE',criticidade:'BAIXA',
+    descricao:'Monitor com manchas na tela, possivelmente queimado.',
+    status:'EM_ANDAMENTO',criadoMinAgo:200,resolvidoMinAgo:null,avaliacao:null,
+    mensagens:[
+      {from:'in',text:'Meu monitor está com manchas escuras em um canto da tela.'},
+      {from:'out',text:'Pode ser pixel queimado ou um problema no cabo de vídeo. Já tentou trocar o cabo HDMI?'},
+      {from:'in',text:'Vou tentar e te aviso.'},
+      {from:'receipt',text:'Chamado #1031 registrado como EM ANDAMENTO'}
+    ]},
+  {id:1028,nome:'Rodrigo Pires',instituicao:'Secretaria de Administração',origem:'SOFTWARE',criticidade:'URGENTE',
+    descricao:'Sistema FLOW fora do ar para toda a secretaria.',
+    status:'RESOLVIDO',criadoMinAgo:2200,resolvidoMinAgo:1870,avaliacao:4,
+    mensagens:[
+      {from:'in',text:'O FLOW caiu para todo mundo aqui na secretaria, ninguém consegue acessar.'},
+      {from:'out',text:'Confirmando: é a tela de login que não carrega, ou dá erro depois de entrar?'},
+      {from:'in',text:'Nem a tela de login carrega.'},
+      {from:'out',text:'Identificamos instabilidade no servidor. Já foi normalizado, pode tentar acessar novamente.'},
+      {from:'in',text:'Voltou, obrigado!'},
+      {from:'receipt',text:'Chamado #1028 registrado como RESOLVIDO'}
+    ]},
+  {id:1024,nome:'Juliana Matos',instituicao:'Secretaria de Obras',origem:'HARDWARE',criticidade:'MEDIA',
+    descricao:'Notebook não conecta ao Wi-Fi institucional.',
+    status:'RESOLVIDO',criadoMinAgo:3000,resolvidoMinAgo:2950,avaliacao:5,
+    mensagens:[
+      {from:'in',text:'Meu notebook não conecta mais na rede Wi-Fi da prefeitura.'},
+      {from:'out',text:'Encontrei na base: tente esquecer a rede e reconectar com o certificado atualizado, que mudou semana passada.'},
+      {from:'in',text:'Funcionou, obrigada!'},
+      {from:'receipt',text:'Chamado #1024 registrado como RESOLVIDO'}
+    ]},
+  {id:1019,nome:'Pedro Henrique Alves',instituicao:'Secretaria de Finanças',origem:'SOFTWARE',criticidade:'BAIXA',
+    descricao:'Dúvida de como exportar relatório em PDF no SIGA.',
+    status:'RESOLVIDO',criadoMinAgo:4000,resolvidoMinAgo:3990,avaliacao:3,
+    mensagens:[
+      {from:'in',text:'Como eu exporto um relatório do SIGA em PDF?'},
+      {from:'out',text:'No menu Relatórios, clique em "Exportar" e selecione o formato PDF antes de gerar.'},
+      {from:'in',text:'Ok, consegui.'},
+      {from:'receipt',text:'Chamado #1019 registrado como RESOLVIDO'}
+    ]},
+  {id:1015,nome:'Camila Rocha',instituicao:'Procon Municipal',origem:'HARDWARE',criticidade:'MEDIA',
+    descricao:'Leitor de código de barras não reconhece etiquetas novas.',
+    status:'ABERTO',criadoMinAgo:50,resolvidoMinAgo:null,avaliacao:null,
+    mensagens:[
+      {from:'in',text:'O leitor de código de barras parou de reconhecer as etiquetas novas que chegaram.'},
+      {from:'out',text:'Entendido. Pode me confirmar seu nome e a instituição para eu registrar o chamado?'},
+      {from:'in',text:'Camila Rocha, Procon Municipal.'},
+      {from:'receipt',text:'Chamado #1015 registrado como ABERTO'}
+    ]},
+  {id:1011,nome:'Bruno Tavares',instituicao:'Secretaria de Cultura',origem:'SOFTWARE',criticidade:'URGENTE',
+    descricao:'Sistema AIR não permite anexar documentos digitalizados.',
+    status:'ABERTO',criadoMinAgo:15,resolvidoMinAgo:null,avaliacao:null,
+    mensagens:[
+      {from:'in',text:'O AIR não está deixando eu anexar os documentos digitalizados, dá erro toda vez.'},
+      {from:'out',text:'Qual mensagem de erro aparece exatamente?'},
+      {from:'in',text:'"Falha ao processar arquivo".'},
+      {from:'receipt',text:'Chamado #1011 registrado como ABERTO'}
+    ]},
+  {id:1010,nome:'Patrícia Nunes',instituicao:'Secretaria de Esportes',origem:'HARDWARE',criticidade:'BAIXA',
+    descricao:'Teclado sem resposta em algumas teclas.',
+    status:'RESOLVIDO',criadoMinAgo:5000,resolvidoMinAgo:4900,avaliacao:2,
+    mensagens:[
+      {from:'in',text:'Algumas teclas do meu teclado pararam de responder.'},
+      {from:'out',text:'Pode ser sujeira sob as teclas. Tente limpar com ar comprimido; se persistir, vamos trocar o periférico.'},
+      {from:'in',text:'Limpei e melhorou um pouco, mas ainda falha de vez em quando.'},
+      {from:'receipt',text:'Chamado #1010 registrado como RESOLVIDO'}
+    ]}
+];
+
+function slaInfo(t){
+  const alvo=SLA_HORAS[t.criticidade]||72;
+  const fimMin = (t.resolvidoMinAgo!=null) ? t.resolvidoMinAgo : 0;
+  const horas = Math.max(0,(t.criadoMinAgo - fimMin)/60);
+  let situacao;
+  if(t.status==='RESOLVIDO'){ situacao = horas<=alvo ? 'DENTRO' : 'ESTOURADO'; }
+  else { situacao = horas>alvo ? 'VENCIDO' : 'NO_PRAZO'; }
+  return {alvo, horas: Math.round(horas*10)/10, situacao};
+}
+
+function starsHtml(n){
+  if(!n) return '—';
+  const r=Math.round(n);
+  return '★'.repeat(r) + '☆'.repeat(5-r);
+}
+
+function dashboardMetrics(days){
+  const tickets = chamadosMock.filter(t=>t.criadoMinAgo<=days*1440);
+  const total=tickets.length;
+  const abertos=tickets.filter(t=>t.status==='ABERTO'||t.status==='EM_ANDAMENTO');
+  const resolvidos=tickets.filter(t=>t.status==='RESOLVIDO');
+  const escalados=tickets.filter(t=>t.status==='ESCALADO');
+  const finalizados=resolvidos.length+escalados.length;
+  const taxaSucesso = finalizados ? Math.round(1000*resolvidos.length/finalizados)/10 : null;
+
+  const dentro = resolvidos.filter(t=>slaInfo(t).situacao==='DENTRO');
+  const slaCumprido = resolvidos.length ? Math.round(1000*dentro.length/resolvidos.length)/10 : null;
+  const vencidosAbertos = [...abertos,...escalados].filter(t=>slaInfo(t).situacao==='VENCIDO').length;
+
+  const tempos = resolvidos.map(t=>slaInfo(t).horas);
+  const tempoMedio = tempos.length ? Math.round((tempos.reduce((a,b)=>a+b,0)/tempos.length)*10)/10 : null;
+
+  const avaliacoes = tickets.filter(t=>t.avaliacao).map(t=>t.avaliacao);
+  const avaliacaoMedia = avaliacoes.length ? Math.round((avaliacoes.reduce((a,b)=>a+b,0)/avaliacoes.length)*100)/100 : null;
+  const distAval={1:0,2:0,3:0,4:0,5:0};
+  avaliacoes.forEach(a=>distAval[a]++);
+
+  function contagem(campo){
+    const d={};
+    tickets.forEach(t=>{ d[t[campo]]=(d[t[campo]]||0)+1; });
+    return d;
+  }
+
+  const serieMap={};
+  tickets.forEach(t=>{
+    const diaAgo=Math.floor(t.criadoMinAgo/1440);
+    serieMap[diaAgo]=serieMap[diaAgo]||{criados:0,resolvidos:0};
+    serieMap[diaAgo].criados++;
+    if(t.resolvidoMinAgo!=null){
+      const diaR=Math.floor(t.resolvidoMinAgo/1440);
+      serieMap[diaR]=serieMap[diaR]||{criados:0,resolvidos:0};
+      serieMap[diaR].resolvidos++;
+    }
+  });
+  const dias=Object.keys(serieMap).map(Number).sort((a,b)=>b-a);
+  const serie=dias.map(d=>({label: d===0?'Hoje':d===1?'Ontem':`-${d}d`, ...serieMap[d]}));
+
+  return {tickets, total, abertos:abertos.length, resolvidos:resolvidos.length, escalados:escalados.length,
+    taxaSucesso, slaCumprido, vencidosAbertos, tempoMedio, avaliacaoMedia, avaliacoesTotal:avaliacoes.length,
+    distAval, porCriticidade:contagem('criticidade'), porOrigem:contagem('origem'), serie, slaAlvos:SLA_HORAS};
+}
+
+function kpiCardHtml(label,value,sub,bad){
+  return `<div class="kpi-card"><p class="kpi-label">${label}</p><p class="kpi-value">${value}</p>
+    <p class="kpi-sub${bad?' bad':''}">${sub}</p></div>`;
+}
+
+function renderChamadosKpis(m){
+  const html =
+    kpiCardHtml('Chamados', m.total, `${m.resolvidos} resolvidos · ${m.escalados} escalados`) +
+    kpiCardHtml('Em aberto', m.abertos, m.vencidosAbertos ? `${m.vencidosAbertos} com SLA vencido` : 'todos no prazo', m.vencidosAbertos>0) +
+    kpiCardHtml('Taxa de sucesso', m.taxaSucesso!=null ? m.taxaSucesso+'%' : '—', 'resolvidos sem escalar') +
+    kpiCardHtml('SLA cumprido', m.slaCumprido!=null ? m.slaCumprido+'%' : '—', `alvos: ${m.slaAlvos.URGENTE}h / ${m.slaAlvos.MEDIA}h / ${m.slaAlvos.BAIXA}h`) +
+    kpiCardHtml('Tempo médio', m.tempoMedio!=null ? m.tempoMedio+'h' : '—', 'até a resolução') +
+    kpiCardHtml('Avaliação média', m.avaliacaoMedia!=null ? m.avaliacaoMedia : '—', `<span class="kpi-stars">${starsHtml(m.avaliacaoMedia)}</span> · ${m.avaliacoesTotal} avaliações`);
+  document.getElementById('chamados-kpis').innerHTML=html;
+}
+
+let chamadosCharts={};
+function makeChamadoChart(id,cfg){
+  if(typeof Chart==='undefined') return;
+  if(chamadosCharts[id]) chamadosCharts[id].destroy();
+  chamadosCharts[id]=new Chart(document.getElementById(id), cfg);
+}
+
+function renderChamadosCharts(m){
+  const fontCfg={family:'Inter',size:11};
+  makeChamadoChart('chart-serie',{type:'line',
+    data:{labels:m.serie.map(s=>s.label),
+      datasets:[
+        {label:'Criados',data:m.serie.map(s=>s.criados),borderColor:'#4F46E5',backgroundColor:'rgba(79,70,229,.12)',tension:.3,fill:true},
+        {label:'Resolvidos',data:m.serie.map(s=>s.resolvidos),borderColor:'#16A34A',backgroundColor:'rgba(22,163,74,.12)',tension:.3,fill:true}
+      ]},
+    options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:fontCfg}}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:fontCfg}},x:{ticks:{font:fontCfg}}}}});
+
+  const crit=m.porCriticidade;
+  const critColors={URGENTE:'#DC2626',MEDIA:'#B45309',BAIXA:'#16A34A'};
+  makeChamadoChart('chart-crit',{type:'doughnut',
+    data:{labels:Object.keys(crit),datasets:[{data:Object.values(crit),backgroundColor:Object.keys(crit).map(k=>critColors[k]||'#999')}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:fontCfg}}}}});
+
+  makeChamadoChart('chart-aval',{type:'bar',
+    data:{labels:['1★','2★','3★','4★','5★'],datasets:[{data:[1,2,3,4,5].map(n=>m.distAval[n]||0),backgroundColor:'#D99A06',borderRadius:4}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0,font:fontCfg}},x:{ticks:{font:fontCfg}}}}});
+
+  const ori=m.porOrigem;
+  const oriColors={HARDWARE:'#15171C',SOFTWARE:'#4F46E5'};
+  makeChamadoChart('chart-origem',{type:'doughnut',
+    data:{labels:Object.keys(ori),datasets:[{data:Object.values(ori),backgroundColor:Object.keys(ori).map(k=>oriColors[k]||'#999')}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:fontCfg}}}}});
+}
+
+function chamadosSortValue(t,key){
+  switch(key){
+    case 'id': return t.id;
+    case 'nome': return t.nome;
+    case 'criticidade': return {BAIXA:0,MEDIA:1,URGENTE:2}[t.criticidade];
+    case 'status': return t.status;
+    case 'sla': return slaInfo(t).horas;
+    case 'avaliacao': return t.avaliacao||0;
+    case 'criado': return t.criadoMinAgo;
+    default: return 0;
+  }
+}
+const chamadosSortState={key:null,dir:1};
+
+function renderChamadosTable(list){
+  const body=document.getElementById('chamados-body');
+  body.innerHTML=list.map(t=>{
+    const s=slaInfo(t);
+    return `<tr data-id="${t.id}">
+      <td class="cell-mono">#${t.id}</td>
+      <td>${t.nome}<br><span class="cell-muted" style="font-size:12px;">${t.instituicao}</span></td>
+      <td class="cell-muted" style="max-width:280px;">${t.descricao}</td>
+      <td><span class="crit-pill ${t.criticidade}">${t.criticidade}</span></td>
+      <td><span class="status-pill ${t.status}">${t.status.replace('_',' ')}</span></td>
+      <td><span class="sla-pill ${s.situacao}">${s.situacao.replace('_',' ')}</span><span class="sla-sub">${s.horas}h / ${s.alvo}h</span></td>
+      <td>${t.avaliacao?`<span class="ticket-stars">${starsHtml(t.avaliacao)}</span>`:'—'}</td>
+      <td class="cell-muted">${notifTimeLabel(t.criadoMinAgo)}</td>
+    </tr>`;
+  }).join('');
+  body.querySelectorAll('tr').forEach(tr=>{
+    tr.addEventListener('click',()=>openChamadoDrawer(parseInt(tr.dataset.id,10)));
+  });
+}
+
+function refreshChamados(){
+  const days=parseInt(document.getElementById('chamados-period').value,10);
+  const q=(document.getElementById('chamados-search').value||'').toLowerCase();
+  const m=dashboardMetrics(days);
+  renderChamadosKpis(m);
+  renderChamadosCharts(m);
+
+  let list=m.tickets;
+  if(q) list=list.filter(t=>t.nome.toLowerCase().includes(q)||t.instituicao.toLowerCase().includes(q)||t.descricao.toLowerCase().includes(q));
+  if(chamadosSortState.key){
+    list=[...list].sort((a,b)=>{
+      const va=chamadosSortValue(a,chamadosSortState.key), vb=chamadosSortValue(b,chamadosSortState.key);
+      if(typeof va==='string') return chamadosSortState.dir*String(va).localeCompare(String(vb),'pt-BR');
+      return chamadosSortState.dir*(va-vb);
+    });
+  } else {
+    list=[...list].sort((a,b)=>a.criadoMinAgo-b.criadoMinAgo);
+  }
+  renderChamadosTable(list);
+}
+document.getElementById('chamados-period').addEventListener('change',refreshChamados);
+document.getElementById('chamados-refresh').addEventListener('click',()=>{ refreshChamados(); showToast('Painel de chamados atualizado'); });
+document.getElementById('chamados-search').addEventListener('input',refreshChamados);
+document.querySelectorAll('#view-chamados th.sortable').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const key=th.dataset.key;
+    chamadosSortState.dir = (chamadosSortState.key===key) ? chamadosSortState.dir*-1 : 1;
+    chamadosSortState.key=key;
+    document.querySelectorAll('#view-chamados th.sortable').forEach(t=>t.classList.remove('sort-active','desc'));
+    th.classList.add('sort-active');
+    if(chamadosSortState.dir===-1) th.classList.add('desc');
+    refreshChamados();
+  });
+});
+
+/* --- drawer de detalhe do chamado --- */
+const chamadoOverlay=document.getElementById('chamado-drawer-overlay');
+const chamadoDrawerEl=document.getElementById('chamado-drawer');
+
+function renderChamadoInfo(t){
+  const s=slaInfo(t);
+  const critColor = t.criticidade==='URGENTE' ? 'var(--red)' : t.criticidade==='MEDIA' ? 'var(--amber)' : 'var(--green)';
+  document.getElementById('chamado-info-row').innerHTML=`
+    <span class="ticket-chip">${t.origem}</span>
+    <span class="ticket-chip" style="color:${critColor};">${t.criticidade}</span>
+    <span class="status-pill ${t.status}">${t.status.replace('_',' ')}</span>
+    <span class="sla-pill ${s.situacao}">${s.situacao.replace('_',' ')} · ${s.horas}h / ${s.alvo}h</span>
+    ${t.avaliacao?`<span class="ticket-chip"><span class="ticket-stars">${starsHtml(t.avaliacao)}</span></span>`:''}`;
+}
+
+function renderChamadoActions(t){
+  const wrap=document.getElementById('chamado-actions');
+  let html='';
+  if(t.status!=='RESOLVIDO'){
+    html+=`<button class="btn-primary" id="chamado-resolver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 12 9 17 20 6"/></svg>
+      Marcar como resolvido</button>`;
+  }
+  if(t.status==='ESCALADO' || t.criticidade==='URGENTE'){
+    html+=`<button class="btn-primary whatsapp-btn" id="chamado-whatsapp">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Abrir WhatsApp do atendente</button>`;
+  }
+  wrap.innerHTML=html;
+
+  const resolverBtn=document.getElementById('chamado-resolver');
+  if(resolverBtn) resolverBtn.addEventListener('click',()=>{
+    t.status='RESOLVIDO';
+    t.resolvidoMinAgo=0;
+    t.mensagens.push({from:'receipt',text:`Chamado #${t.id} registrado como RESOLVIDO`});
+    showToast('Chamado #'+t.id+' marcado como resolvido');
+    openChamadoDrawer(t.id);
+    refreshChamados();
+  });
+  const waBtn=document.getElementById('chamado-whatsapp');
+  if(waBtn) waBtn.addEventListener('click',()=>{
+    showToast('Em um app real, isso abriria o WhatsApp do atendente (link wa.me)');
+  });
+}
+
+function openChamadoDrawer(id){
+  const t=chamadosMock.find(x=>x.id===id);
+  if(!t) return;
+  document.getElementById('chamado-drawer-title').textContent='Chamado #'+t.id;
+  document.getElementById('chamado-drawer-meta').textContent=t.nome+' · '+t.instituicao;
+  renderChamadoInfo(t);
+  document.getElementById('chamado-phone-frame').innerHTML=t.mensagens.map(m=>{
+    if(m.from==='receipt'){
+      return `<div class="bubble receipt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>${m.text}</div>`;
+    }
+    return `<div class="bubble ${m.from}${m.from==='out'?' helpdesk':''}">${m.text}</div>`;
+  }).join('');
+  renderChamadoActions(t);
+  chamadoOverlay.classList.add('open'); chamadoDrawerEl.classList.add('open');
+}
+function closeChamadoDrawer(){ chamadoOverlay.classList.remove('open'); chamadoDrawerEl.classList.remove('open'); }
+document.getElementById('close-chamado-drawer').addEventListener('click',closeChamadoDrawer);
+chamadoOverlay.addEventListener('click',closeChamadoDrawer);
+
+/* ===================== base de conhecimento (lista simples de PDFs) ===================== */
+let kbDocsMock=[
+  {id:'kb1',nome:'Manual_Impressoras_HP_2025.pdf',tamanho:'2.4 MB',categoria:'Hardware',status:'INDEXADO',trechos:18,enviadoMinAgo:17280},
+  {id:'kb2',nome:'FAQ_Sistema_SIGA.pdf',tamanho:'860 KB',categoria:'Software',status:'INDEXADO',trechos:34,enviadoMinAgo:11520},
+  {id:'kb3',nome:'Procedimento_Reset_Senha.pdf',tamanho:'310 KB',categoria:'Software',status:'INDEXADO',trechos:6,enviadoMinAgo:11520},
+  {id:'kb4',nome:'Guia_Configuracao_WiFi_Institucional.pdf',tamanho:'1.1 MB',categoria:'Hardware',status:'INDEXADO',trechos:11,enviadoMinAgo:43200},
+  {id:'kb5',nome:'Politica_Seguranca_TI.pdf',tamanho:'540 KB',categoria:'Geral',status:'PROCESSANDO',trechos:0,enviadoMinAgo:2}
+];
+
+function renderKbDocs(){
+  const empty=document.getElementById('kb-empty');
+  const table=document.getElementById('kb-table');
+  if(kbDocsMock.length===0){
+    empty.style.display='block'; table.style.display='none';
+    return;
+  }
+  empty.style.display='none'; table.style.display='table';
+
+  const body=document.getElementById('kb-body');
+  body.innerHTML=kbDocsMock.map(d=>`
+    <tr data-id="${d.id}">
+      <td>
+        <div class="doc-cell">
+          <div class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+          <div><span class="doc-name">${d.nome}</span><span class="doc-size">${d.tamanho}</span></div>
+        </div>
+      </td>
+      <td class="cell-muted">${d.categoria}</td>
+      <td><span class="status-pill ${d.status}">${d.status==='INDEXADO'?'Indexado':'Processando'}</span></td>
+      <td class="cell-mono">${d.status==='INDEXADO'?d.trechos:'—'}</td>
+      <td class="cell-muted">${notifTimeLabel(d.enviadoMinAgo)}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="icon-btn-ghost delete-doc-btn" aria-label="Remover documento" data-id="${d.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+        </button>
+      </td>
+    </tr>`).join('');
+
+  body.querySelectorAll('.delete-doc-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      pendingDeleteId=btn.dataset.id;
+      pendingDeleteContext='documento';
+      document.getElementById('confirm-modal-title').textContent='Remover documento?';
+      document.getElementById('confirm-modal-text').textContent='A IA deixará de usar este PDF como fonte de solução para novos chamados.';
+      document.getElementById('confirm-modal-wrap').classList.add('open');
+    });
+  });
+}
+
+function addKbDocPlaceholder(){
+  showToast('Em breve: envie um PDF para a IA indexar automaticamente');
+}
+document.getElementById('btn-add-doc').addEventListener('click',addKbDocPlaceholder);
+document.getElementById('btn-add-doc-empty').addEventListener('click',addKbDocPlaceholder);
+
+/* ===================== vendas ===================== */
+const vendasMock=[
+  {id:'v1',cliente:'Rafael Almeida',produto:'Plano mensal Premium',valor:199.00,desconto:0,pagamento:'PIX',atendidoPor:'IA',minAgo:70,atendId:2},
+  {id:'v2',cliente:'Eduardo Santos',produto:'Cabo USB-C 1m',valor:359.00,desconto:10,pagamento:'Cartão',atendidoPor:'IA',minAgo:1500,atendId:6},
+  {id:'v3',cliente:'Camila Ferreira',produto:'Consultoria UX',valor:297.50,desconto:15,pagamento:'PIX',atendidoPor:'IA',minAgo:300},
+  {id:'v4',cliente:'Lucas Martins',produto:'Plano mensal Premium',valor:169.15,desconto:15,pagamento:'Boleto',atendidoPor:'Humano',minAgo:600},
+  {id:'v5',cliente:'Sabrina Alves',produto:'Cabo USB-C 1m',valor:35.90,desconto:0,pagamento:'PIX',atendidoPor:'IA',minAgo:900},
+  {id:'v6',cliente:'Diego Souza',produto:'Consultoria UX',valor:350.00,desconto:0,pagamento:'Cartão',atendidoPor:'IA',minAgo:1200},
+  {id:'v7',cliente:'Fernanda Lima',produto:'Plano mensal Premium',valor:199.00,desconto:0,pagamento:'PIX',atendidoPor:'IA',minAgo:2000},
+  {id:'v8',cliente:'Gabriel Rocha',produto:'Cabo USB-C 1m',valor:323.10,desconto:10,pagamento:'Cartão',atendidoPor:'Humano',minAgo:2600},
+  {id:'v9',cliente:'Helena Costa',produto:'Consultoria UX',valor:332.50,desconto:5,pagamento:'PIX',atendidoPor:'IA',minAgo:3200},
+  {id:'v10',cliente:'Igor Pereira',produto:'Plano mensal Premium',valor:179.10,desconto:10,pagamento:'Boleto',atendidoPor:'IA',minAgo:4000}
+];
+
+function formatBRL(v){
+  return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function vendasMetrics(days){
+  const vendas=vendasMock.filter(v=>v.minAgo<=days*1440);
+  const total=vendas.reduce((a,v)=>a+v.valor,0);
+  const count=vendas.length;
+  const ticketMedio=count? total/count : 0;
+  const descontoMedio=count? vendas.reduce((a,v)=>a+v.desconto,0)/count : 0;
+
+  const porProduto={};
+  vendas.forEach(v=>{ porProduto[v.produto]=(porProduto[v.produto]||0)+v.valor; });
+
+  const serieMap={};
+  vendas.forEach(v=>{
+    const dia=Math.floor(v.minAgo/1440);
+    serieMap[dia]=(serieMap[dia]||0)+v.valor;
+  });
+  const dias=Object.keys(serieMap).map(Number).sort((a,b)=>b-a);
+  const serie=dias.map(d=>({label:d===0?'Hoje':d===1?'Ontem':`-${d}d`, valor:Math.round(serieMap[d]*100)/100}));
+
+  return {vendas, total, count, ticketMedio, descontoMedio, porProduto, serie};
+}
+
+function renderVendasKpis(m){
+  document.getElementById('vendas-kpis').innerHTML =
+    kpiCardHtml('Total vendido', 'R$ '+formatBRL(m.total), `${m.count} vendas no período`) +
+    kpiCardHtml('Vendas', m.count, 'fechadas pela IA e por humanos') +
+    kpiCardHtml('Ticket médio', 'R$ '+formatBRL(m.ticketMedio), 'por venda') +
+    kpiCardHtml('Desconto médio', m.descontoMedio.toFixed(1)+'%', 'concedido nas negociações');
+}
+
+let vendasCharts={};
+function makeVendaChart(id,cfg){
+  if(typeof Chart==='undefined') return;
+  if(vendasCharts[id]) vendasCharts[id].destroy();
+  vendasCharts[id]=new Chart(document.getElementById(id), cfg);
+}
+function renderVendasCharts(m){
+  const fontCfg={family:'Inter',size:11};
+  makeVendaChart('chart-vendas-dia',{type:'bar',
+    data:{labels:m.serie.map(s=>s.label),datasets:[{label:'Vendido (R$)',data:m.serie.map(s=>s.valor),backgroundColor:'#4F46E5',borderRadius:4}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{font:fontCfg}},x:{ticks:{font:fontCfg}}}}});
+
+  const prod=m.porProduto;
+  makeVendaChart('chart-vendas-produto',{type:'doughnut',
+    data:{labels:Object.keys(prod),datasets:[{data:Object.values(prod).map(v=>Math.round(v*100)/100),backgroundColor:['#4F46E5','#16A34A','#D97706','#DC2626']}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:fontCfg}}}}});
+}
+
+function vendasSortValue(v,key){
+  switch(key){
+    case 'cliente': return v.cliente;
+    case 'produto': return v.produto;
+    case 'valor': return v.valor;
+    case 'desconto': return v.desconto;
+    case 'atendidoPor': return v.atendidoPor;
+    case 'data': return v.minAgo;
+    default: return 0;
+  }
+}
+const vendasSortState={key:null,dir:1};
+
+function renderVendasTable(list){
+  const body=document.getElementById('vendas-body');
+  body.innerHTML=list.map(v=>`
+    <tr data-id="${v.id}" data-atend="${v.atendId||''}">
+      <td>${v.cliente}</td>
+      <td class="cell-muted">${v.produto}</td>
+      <td class="cell-mono">R$ ${formatBRL(v.valor)}</td>
+      <td class="desconto-cell">${v.desconto>0?v.desconto+'%':'—'}</td>
+      <td class="cell-muted">${v.pagamento}</td>
+      <td><span class="canal-pill ${v.atendidoPor}">${v.atendidoPor}</span></td>
+      <td class="cell-muted">${notifTimeLabel(v.minAgo)}</td>
+    </tr>`).join('');
+  body.querySelectorAll('tr').forEach(tr=>{
+    tr.addEventListener('click',()=>{
+      const atendId=tr.dataset.atend;
+      if(atendId) openAtendDrawer(parseInt(atendId,10));
+    });
+  });
+}
+
+function refreshVendas(){
+  const days=parseInt(document.getElementById('vendas-period').value,10);
+  const q=(document.getElementById('vendas-search').value||'').toLowerCase();
+  const m=vendasMetrics(days);
+  renderVendasKpis(m);
+  renderVendasCharts(m);
+
+  let list=m.vendas;
+  if(q) list=list.filter(v=>v.cliente.toLowerCase().includes(q)||v.produto.toLowerCase().includes(q));
+  if(vendasSortState.key){
+    list=[...list].sort((a,b)=>{
+      const va=vendasSortValue(a,vendasSortState.key), vb=vendasSortValue(b,vendasSortState.key);
+      if(typeof va==='string') return vendasSortState.dir*String(va).localeCompare(String(vb),'pt-BR');
+      return vendasSortState.dir*(va-vb);
+    });
+  } else {
+    list=[...list].sort((a,b)=>a.minAgo-b.minAgo);
+  }
+  renderVendasTable(list);
+}
+document.getElementById('vendas-period').addEventListener('change',refreshVendas);
+document.getElementById('vendas-search').addEventListener('input',refreshVendas);
+document.querySelectorAll('#view-vendas th.sortable').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const key=th.dataset.key;
+    vendasSortState.dir = (vendasSortState.key===key) ? vendasSortState.dir*-1 : 1;
+    vendasSortState.key=key;
+    document.querySelectorAll('#view-vendas th.sortable').forEach(t=>t.classList.remove('sort-active','desc'));
+    th.classList.add('sort-active');
+    if(vendasSortState.dir===-1) th.classList.add('desc');
+    refreshVendas();
+  });
+});
+
 /* ===================== inicialização ===================== */
 showProductList();
+renderKbDocs();
 </script>
 </body>
 </html>

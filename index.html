@@ -249,6 +249,7 @@
   input[type="text"]::placeholder{color:var(--text-tertiary);}
 
   .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 
   .segmented{display:inline-flex;background:#F0F1F4;border-radius:var(--radius-sm);padding:4px;gap:2px;width:280px;}
   .segmented button{flex:1;height:34px;border:none;background:transparent;border-radius:7px;font-size:13.5px;
@@ -300,6 +301,9 @@
   .auth-submit{width:100%;height:44px;margin-top:4px;}
   .auth-error{font-size:12.5px;color:var(--red);margin:-6px 0 10px;min-height:0;display:none;}
   .auth-error.show{display:block;}
+  .auth-success{font-size:12.5px;color:#0F5C2E;background:var(--green-bg);border:1px solid #BBE5C8;
+    border-radius:8px;padding:9px 11px;margin:0 0 16px;display:none;}
+  .auth-success.show{display:block;}
   .auth-hint{font-size:11.5px;color:var(--text-tertiary);text-align:center;margin:20px 0 0;line-height:1.5;}
   .logout-btn{margin-left:auto;background:none;border:none;color:var(--text-tertiary);cursor:pointer;padding:6px;
     border-radius:7px;display:flex;}
@@ -593,8 +597,30 @@
   .llm-key-row .auth-input{margin-bottom:0;}
   .llm-key-row .ghost-action{height:42px;width:42px;padding:0;justify-content:center;flex-shrink:0;}
   .llm-key-row .ghost-action svg{width:17px;height:17px;margin:0;}
+  .llm-provider-link{font-size:12px;color:var(--accent-dark);text-decoration:none;font-weight:500;}
+  .llm-provider-link:hover{text-decoration:underline;}
   .llm-key-status{font-size:12.5px;color:var(--text-secondary);margin:8px 0 0;min-height:0;}
   .llm-key-status.configured{color:var(--green);font-weight:500;}
+
+  /* ---------- produtos: fotos e arquivo de conhecimento ---------- */
+  .photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
+  .photo-thumb{position:relative;width:84px;height:84px;border-radius:10px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .photo-remove{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;
+    background:rgba(20,20,24,.65);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+  .photo-remove svg{width:11px;height:11px;}
+  .photo-remove:hover{background:rgba(220,40,40,.85);}
+  .photo-add-btn{width:84px;height:84px;border-radius:10px;border:1.5px dashed var(--border-strong);background:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;
+    color:var(--text-tertiary);font-size:11px;font-weight:500;flex-shrink:0;transition:.12s;}
+  .photo-add-btn:hover{border-color:var(--accent);color:var(--accent-dark);background:var(--accent-soft);}
+  .photo-add-btn svg{width:18px;height:18px;}
+
+  .product-doc-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+  .product-doc-row{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:9px 11px;}
+  .product-doc-row svg{width:17px;height:17px;color:var(--accent-dark);flex-shrink:0;}
+  .product-doc-name{flex:1;font-size:13px;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .product-doc-row .icon-btn-ghost{flex-shrink:0;}
 
   /* ---------- vendas ---------- */
   .canal-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;display:inline-block;}
@@ -616,6 +642,8 @@
       <button class="auth-tab" id="tab-signup">Criar conta</button>
     </div>
 
+    <p class="auth-success" id="auth-success-banner"></p>
+
     <!-- Login -->
     <form id="form-login" class="auth-form">
       <label class="field-label" for="login-email">E-mail</label>
@@ -636,6 +664,8 @@
       <input type="email" id="signup-email" class="auth-input" placeholder="voce@empresa.com" required autocomplete="username">
       <label class="field-label" for="signup-senha">Senha</label>
       <input type="password" id="signup-senha" class="auth-input" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+      <label class="field-label" for="signup-senha-confirm">Confirmar senha</label>
+      <input type="password" id="signup-senha-confirm" class="auth-input" placeholder="Repita a senha" required minlength="6" autocomplete="new-password">
       <p class="auth-error" id="signup-error"></p>
       <button type="submit" class="btn-primary auth-submit" id="signup-submit" style="justify-content:center;">Criar conta gratuita</button>
     </form>
@@ -896,6 +926,11 @@
             </div>
 
             <div class="field">
+              <label class="field-label" for="f-descricao">Descrição</label>
+              <textarea id="f-descricao" placeholder="O que é, para quem serve, principais características..." style="min-height:80px;"></textarea>
+            </div>
+
+            <div class="field">
               <span class="field-label">Tipo</span>
               <div class="segmented" id="tipo-segmented">
                 <button type="button" class="active" data-value="produto">Produto</button>
@@ -903,19 +938,12 @@
               </div>
             </div>
 
-            <div class="row-3">
+            <div class="row-2">
               <div class="field" style="margin-bottom:0;">
                 <label class="field-label" for="f-preco-padrao">Preço padrão</label>
                 <div class="money-input">
                   <span class="money-prefix">R$</span>
                   <input type="text" id="f-preco-padrao" class="money-value" value="350,00" inputmode="decimal">
-                </div>
-              </div>
-              <div class="field" style="margin-bottom:0;">
-                <label class="field-label" for="f-preco-minimo">Preço mínimo</label>
-                <div class="money-input">
-                  <span class="money-prefix">R$</span>
-                  <input type="text" id="f-preco-minimo" class="money-value" value="297,00" inputmode="decimal">
                 </div>
               </div>
               <div class="field" style="margin-bottom:0;">
@@ -934,6 +962,17 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
               </div>
+            </div>
+
+            <div class="field" style="margin-bottom:0;">
+              <label class="field-label">Fotos do produto</label>
+              <div class="photo-grid" id="product-photo-grid">
+                <button type="button" class="photo-add-btn" id="product-photo-add">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+                  <span>Adicionar</span>
+                </button>
+              </div>
+              <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Essas fotos podem ser enviadas pela IA durante a negociação no WhatsApp.</p>
             </div>
           </section>
 
@@ -954,7 +993,7 @@
                 <span class="slider-value" id="f-discount-value" style="color:var(--green);">15%</span>
               </div>
               <div class="slider-scale"><span>0%</span><span>25%</span><span>50%</span></div>
-              <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>A IA nunca poderá ultrapassar esse desconto.</p>
+              <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>A IA nunca poderá ultrapassar esse desconto. O preço mínimo de venda já é calculado automaticamente a partir desse limite.</p>
             </div>
 
             <div class="field" style="margin-bottom:0;">
@@ -1056,6 +1095,25 @@
 • Caso o cliente peça um desconto maior que o permitido, informe educadamente que este é o melhor valor disponível."></textarea>
               <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Essas instruções ajudam a IA a negociar de forma mais inteligente.</p>
             </div>
+          </section>
+
+          <!-- CARD 6 — Manual / arquivo de conhecimento do produto -->
+          <section class="card">
+            <div class="card-header">
+              <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div>
+                <p class="card-title">Manual ou arquivo de conhecimento</p>
+                <p class="card-sub">Um PDF que a IA pode consultar para tirar dúvidas específicas sobre este produto</p>
+              </div>
+            </div>
+
+            <p class="hint" id="product-doc-empty" style="margin:0 0 12px;">Salve o produto antes de anexar um arquivo.</p>
+            <div id="product-doc-list" class="product-doc-list"></div>
+
+            <button type="button" class="btn-secondary" id="product-doc-add">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Adicionar PDF
+            </button>
           </section>
 
           <div class="footer-actions">
@@ -1308,11 +1366,13 @@
 
           <div style="margin-top:18px;">
             <label class="field-label" for="llm-provider-select">Provedor</label>
-            <select id="llm-provider-select" class="auth-input" style="margin-bottom:16px;">
+            <select id="llm-provider-select" class="auth-input" style="margin-bottom:6px;">
               <option value="anthropic">Anthropic (Claude)</option>
               <option value="openai">OpenAI (GPT)</option>
+              <option value="gemini">Google (Gemini)</option>
               <option value="outro">Outro</option>
             </select>
+            <p style="margin:0 0 16px;"><a href="#" id="llm-provider-key-link" target="_blank" rel="noopener" class="llm-provider-link">Criar uma chave no console da Anthropic ↗</a></p>
 
             <label class="field-label" for="llm-key-input">Chave de API</label>
             <div class="llm-key-row">
@@ -1435,18 +1495,28 @@ function showAuthError(elId, msg){
 function clearAuthError(elId){
   document.getElementById(elId).classList.remove('show');
 }
+function showAuthSuccess(msg){
+  const el=document.getElementById('auth-success-banner');
+  el.textContent=msg;
+  el.classList.add('show');
+}
+function clearAuthSuccess(){
+  document.getElementById('auth-success-banner').classList.remove('show');
+}
 
 document.getElementById('tab-login').addEventListener('click',()=>{
   document.getElementById('tab-login').classList.add('active');
   document.getElementById('tab-signup').classList.remove('active');
   document.getElementById('form-login').style.display='flex';
   document.getElementById('form-signup').style.display='none';
+  clearAuthSuccess();
 });
 document.getElementById('tab-signup').addEventListener('click',()=>{
   document.getElementById('tab-signup').classList.add('active');
   document.getElementById('tab-login').classList.remove('active');
   document.getElementById('form-signup').style.display='flex';
   document.getElementById('form-login').style.display='none';
+  clearAuthSuccess();
 });
 
 document.getElementById('form-login').addEventListener('submit', async (e)=>{
@@ -1462,6 +1532,7 @@ document.getElementById('form-login').addEventListener('submit', async (e)=>{
     showAuthError('login-error', error.message==='Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message);
     return;
   }
+  clearAuthSuccess();
   await onAuthReady(data.session);
 });
 
@@ -1472,11 +1543,19 @@ document.getElementById('form-signup').addEventListener('submit', async (e)=>{
   const nome=document.getElementById('signup-nome').value.trim();
   const email=document.getElementById('signup-email').value.trim();
   const senha=document.getElementById('signup-senha').value;
+  const senhaConfirm=document.getElementById('signup-senha-confirm').value;
+
+  if(senha !== senhaConfirm){
+    showAuthError('signup-error', 'As senhas não coincidem.');
+    return;
+  }
+
   const btn=document.getElementById('signup-submit');
   btn.disabled=true; btn.textContent='Criando conta...';
   const {data, error}=await sb.auth.signUp({
     email, password:senha,
-    options:{ data:{ company_name:empresa, full_name:nome } }
+    options:{ data:{ company_name:empresa, full_name:nome },
+              emailRedirectTo: window.location.href.split('#')[0] }
   });
   btn.disabled=false; btn.textContent='Criar conta gratuita';
   if(error){
@@ -1484,7 +1563,10 @@ document.getElementById('form-signup').addEventListener('submit', async (e)=>{
     return;
   }
   if(!data.session){
-    showAuthError('signup-error', 'Conta criada! Confirme seu e-mail (verifique a caixa de entrada) e depois faça login.');
+    document.getElementById('form-signup').reset();
+    document.getElementById('login-email').value=email;
+    document.getElementById('tab-login').click();
+    showAuthSuccess('Conta criada com sucesso! Verifique seu e-mail para confirmar e depois faça login.');
     return;
   }
   await onAuthReady(data.session);
@@ -1828,6 +1910,26 @@ document.querySelectorAll('#view-configuracoes .toggle-switch input[data-method]
 });
 
 /* ---------- configurações: chave de API da IA ---------- */
+const LLM_PROVIDER_KEY_LINKS={
+  anthropic:{url:'https://console.anthropic.com/settings/keys', label:'Criar uma chave no console da Anthropic ↗'},
+  openai:{url:'https://platform.openai.com/api-keys', label:'Criar uma chave na plataforma da OpenAI ↗'},
+  gemini:{url:'https://aistudio.google.com/app/apikey', label:'Criar uma chave no Google AI Studio ↗'},
+  outro:{url:null, label:''}
+};
+function updateLlmProviderKeyLink(){
+  const provider=document.getElementById('llm-provider-select').value;
+  const info=LLM_PROVIDER_KEY_LINKS[provider]||LLM_PROVIDER_KEY_LINKS.outro;
+  const linkEl=document.getElementById('llm-provider-key-link');
+  if(info.url){
+    linkEl.href=info.url;
+    linkEl.textContent=info.label;
+    linkEl.style.display='inline';
+  }else{
+    linkEl.style.display='none';
+  }
+}
+document.getElementById('llm-provider-select').addEventListener('change', updateLlmProviderKeyLink);
+
 async function syncLlmKeyUI(){
   document.getElementById('llm-key-input').value='';
   document.getElementById('llm-key-input').type='password';
@@ -1839,6 +1941,7 @@ async function syncLlmKeyUI(){
   if(error){
     statusEl.textContent='Não foi possível carregar o status da chave.';
     statusEl.classList.remove('configured');
+    updateLlmProviderKeyLink();
     return;
   }
   if(status && status.configured){
@@ -1851,6 +1954,7 @@ async function syncLlmKeyUI(){
     statusEl.classList.remove('configured');
     removeBtn.style.display='none';
   }
+  updateLlmProviderKeyLink();
 }
 
 document.getElementById('llm-key-toggle-visibility').addEventListener('click',()=>{
@@ -2158,13 +2262,12 @@ let productsCache=[];
 
 function dbProductToForm(p){
   return {
-    id:p.id, nome:p.nome, tipo:p.tipo,
+    id:p.id, nome:p.nome, tipo:p.tipo, descricao:p.descricao||'',
     precoPadrao:Number(p.preco_padrao).toFixed(2).replace('.',','),
-    precoMinimo:Number(p.preco_minimo).toFixed(2).replace('.',','),
     unidade:p.unidade, descontoMax:Number(p.desconto_max),
     estrategia:p.estrategia, regras:p.regras||[],
     restricoes:p.restricoes||[], restricaoOutro:p.restricao_outro||'',
-    instrucoes:p.instrucoes||''
+    instrucoes:p.instrucoes||'', imagens:p.imagens||[]
   };
 }
 
@@ -2180,14 +2283,17 @@ async function seedProductsIfEmpty(){
   if(error || (count && count>0)) return;
   const companyId=currentProfile.company_id;
   const seed=[
-    {company_id:companyId, nome:'Consultoria UX', tipo:'produto', preco_padrao:350.00, preco_minimo:297.00, unidade:'Hora',
+    {company_id:companyId, nome:'Consultoria UX', tipo:'produto', preco_padrao:350.00, unidade:'Hora',
+      descricao:'Sessão de consultoria de UX para revisão de produtos digitais.',
       desconto_max:15, estrategia:'se-pedir', regras:[{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}],
       restricoes:['Frete','Prazo'], restricao_outro:'',
       instrucoes:'Nunca ofereça desconto logo na primeira mensagem. Priorize pagamento via PIX.'},
-    {company_id:companyId, nome:'Plano mensal Premium', tipo:'servico', preco_padrao:199.00, preco_minimo:169.00, unidade:'mensalidade',
+    {company_id:companyId, nome:'Plano mensal Premium', tipo:'servico', preco_padrao:199.00, unidade:'mensalidade',
+      descricao:'Plano de assinatura mensal com acesso completo à plataforma.',
       desconto_max:20, estrategia:'imediato', regras:[], restricoes:['Forma de pagamento'], restricao_outro:'',
       instrucoes:'Se o cliente pedir o plano anual, ofereça 15% de desconto.'},
-    {company_id:companyId, nome:'Cabo USB-C 1m', tipo:'produto', preco_padrao:39.90, preco_minimo:29.90, unidade:'Unidade',
+    {company_id:companyId, nome:'Cabo USB-C 1m', tipo:'produto', preco_padrao:39.90, unidade:'Unidade',
+      descricao:'Cabo USB-C de 1 metro, alta velocidade de carregamento e dados.',
       desconto_max:25, estrategia:'imediato', regras:[{qtd:10,desconto:10},{qtd:50,desconto:20}], restricoes:['Garantia'], restricao_outro:'',
       instrucoes:'Se o cliente comprar mais de 10 unidades, ofereça frete grátis.'}
   ];
@@ -2197,6 +2303,131 @@ async function seedProductsIfEmpty(){
 let editingId=null;
 let pendingDeleteId=null;
 let pendingDeleteContext='produto';
+
+/* ---------- produtos: fotos ---------- */
+let productImages=[]; // {path, url}
+let productImageFolder=null;
+
+function renderProductPhotoGrid(){
+  const grid=document.getElementById('product-photo-grid');
+  const addBtn=document.getElementById('product-photo-add');
+  grid.querySelectorAll('.photo-thumb').forEach(el=>el.remove());
+  productImages.forEach((img,idx)=>{
+    const div=document.createElement('div');
+    div.className='photo-thumb';
+    div.innerHTML=`<img src="${img.url}" alt="Foto do produto"><button type="button" class="photo-remove" data-idx="${idx}" aria-label="Remover foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+    grid.insertBefore(div, addBtn);
+  });
+  grid.querySelectorAll('.photo-remove').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const idx=parseInt(btn.dataset.idx,10);
+      const img=productImages[idx];
+      await sb.storage.from('product-images').remove([img.path]);
+      productImages.splice(idx,1);
+      renderProductPhotoGrid();
+    });
+  });
+}
+
+const productPhotoInput=document.createElement('input');
+productPhotoInput.type='file'; productPhotoInput.accept='image/*'; productPhotoInput.multiple=true; productPhotoInput.style.display='none'; productPhotoInput.id='product-photo-file-input';
+document.body.appendChild(productPhotoInput);
+document.getElementById('product-photo-add').addEventListener('click',()=>productPhotoInput.click());
+productPhotoInput.addEventListener('change', async ()=>{
+  const files=[...productPhotoInput.files];
+  productPhotoInput.value='';
+  if(!files.length) return;
+  if(!productImageFolder) productImageFolder=editingId || crypto.randomUUID();
+  for(const file of files){
+    if(!file.type.startsWith('image/')){ showToast(file.name+' não é uma imagem, pulado.'); continue; }
+    if(file.size > 8*1024*1024){ showToast(file.name+' é maior que 8MB, pulado.'); continue; }
+    const path=`${currentProfile.company_id}/${productImageFolder}/${Date.now()}-${file.name}`;
+    const {error}=await sb.storage.from('product-images').upload(path, file);
+    if(error){ showToast('Erro ao enviar '+file.name+': '+error.message); continue; }
+    const {data:pub}=sb.storage.from('product-images').getPublicUrl(path);
+    productImages.push({path, url:pub.publicUrl});
+  }
+  renderProductPhotoGrid();
+});
+
+/* ---------- produtos: manual / arquivo de conhecimento ---------- */
+async function refreshProductDocs(productId){
+  const listEl=document.getElementById('product-doc-list');
+  const emptyEl=document.getElementById('product-doc-empty');
+  const addBtn=document.getElementById('product-doc-add');
+  if(!productId){
+    listEl.innerHTML='';
+    emptyEl.textContent='Salve o produto antes de anexar um arquivo.';
+    emptyEl.style.display='block';
+    addBtn.disabled=true;
+    return;
+  }
+  addBtn.disabled=false;
+  const {data, error}=await sb.from('knowledge_documents').select('*').eq('product_id', productId).order('created_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar arquivos do produto: '+error.message); return; }
+  const docs=data||[];
+  if(docs.length===0){
+    listEl.innerHTML='';
+    emptyEl.textContent='Nenhum arquivo enviado ainda para este produto.';
+    emptyEl.style.display='block';
+    return;
+  }
+  emptyEl.style.display='none';
+  listEl.innerHTML=docs.map(d=>{
+    const st=kbStatusInfo(d.status);
+    return `
+    <div class="product-doc-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      <span class="product-doc-name">${d.filename}</span>
+      <span class="status-pill ${st.cls}">${st.label}</span>
+      <button class="icon-btn-ghost product-doc-delete" data-id="${d.id}" data-path="${d.storage_path}" aria-label="Remover arquivo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+  listEl.querySelectorAll('.product-doc-delete').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      await sb.storage.from('knowledge').remove([btn.dataset.path]);
+      await sb.from('knowledge_documents').delete().eq('id', btn.dataset.id);
+      showToast('Arquivo removido do produto');
+      await refreshProductDocs(productId);
+    });
+  });
+}
+
+const productDocInput=document.createElement('input');
+productDocInput.type='file'; productDocInput.accept='application/pdf'; productDocInput.style.display='none'; productDocInput.id='product-doc-file-input';
+document.body.appendChild(productDocInput);
+document.getElementById('product-doc-add').addEventListener('click',()=>{
+  if(!editingId){ showToast('Salve o produto antes de anexar um arquivo.'); return; }
+  productDocInput.click();
+});
+productDocInput.addEventListener('change', async ()=>{
+  const file=productDocInput.files[0];
+  productDocInput.value='';
+  if(!file || !editingId) return;
+  if(file.type!=='application/pdf'){ showToast('Envie um arquivo em PDF.'); return; }
+  if(file.size > 20*1024*1024){ showToast('Arquivo maior que 20MB não é suportado.'); return; }
+
+  showToast('Enviando '+file.name+'...');
+  const path=`${currentProfile.company_id}/${Date.now()}-${file.name}`;
+  const {error:upErr}=await sb.storage.from('knowledge').upload(path, file);
+  if(upErr){ showToast('Erro no upload: '+upErr.message); return; }
+
+  const {data:newDoc, error:insErr}=await sb.from('knowledge_documents')
+    .insert({company_id:currentProfile.company_id, product_id:editingId, filename:file.name, storage_path:path, status:'processing'})
+    .select().single();
+  if(insErr){ showToast('Erro ao registrar arquivo: '+insErr.message); return; }
+
+  await refreshProductDocs(editingId);
+  const {data:fnData, error:fnErr}=await sb.functions.invoke('process-document', {body:{document_id:newDoc.id}});
+  if(fnErr || fnData?.error){
+    showToast('Não foi possível indexar o PDF: '+(fnData?.error || fnErr.message));
+  }else{
+    showToast(`"${file.name}" indexado com sucesso (${fnData.chunks} trechos).`);
+  }
+  await refreshProductDocs(editingId);
+});
 
 function riskColor(pct){ return pct<=15 ? 'green' : pct<=30 ? 'amber' : 'red'; }
 
@@ -2227,7 +2458,7 @@ function renderProductGrid(filterText){
       </div>
       <div>
         <div class="product-price">R$ ${p.precoPadrao}</div>
-        <div class="product-price-min">mín. R$ ${p.precoMinimo} · por ${p.unidade}</div>
+        <div class="product-price-min">a partir de R$ ${formatBRL(parseValor(p.precoPadrao)*(1-p.descontoMax/100))} · por ${p.unidade}</div>
       </div>
       <div class="product-meta-row">
         <span class="discount-badge" style="background:${bg};color:${col};">Desconto máx. ${p.descontoMax}%</span>
@@ -2274,15 +2505,18 @@ function resetForm(){
   document.getElementById('form-title').textContent='Novo produto para negociação IA';
   document.getElementById('btn-salvar-label').textContent='Salvar produto';
   document.getElementById('f-nome').value='';
+  document.getElementById('f-descricao').value='';
   setTipo('produto');
   document.getElementById('f-preco-padrao').value='';
-  document.getElementById('f-preco-minimo').value='';
   document.getElementById('f-unidade').value='Unidade';
   setSlider(15);
   setStrategy('se-pedir');
   setRules([{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}]);
   setRestrictions([], '');
   document.getElementById('f-instrucoes').value='';
+  productImages=[]; productImageFolder=null;
+  renderProductPhotoGrid();
+  refreshProductDocs(null);
 }
 
 function setTipo(value){
@@ -2381,15 +2615,19 @@ function openProductForm(product){
     document.getElementById('form-title').textContent='Editar produto';
     document.getElementById('btn-salvar-label').textContent='Salvar alterações';
     document.getElementById('f-nome').value=product.nome;
+    document.getElementById('f-descricao').value=product.descricao||'';
     setTipo(product.tipo);
     document.getElementById('f-preco-padrao').value=product.precoPadrao;
-    document.getElementById('f-preco-minimo').value=product.precoMinimo;
     document.getElementById('f-unidade').value=product.unidade;
     setSlider(product.descontoMax);
     setStrategy(product.estrategia);
     setRules(product.regras&&product.regras.length ? product.regras : [{}]);
     setRestrictions(product.restricoes||[], product.restricaoOutro||'');
     document.getElementById('f-instrucoes').value=product.instrucoes||'';
+    productImageFolder=product.id;
+    productImages=(product.imagens||[]).map(path=>({path, url:sb.storage.from('product-images').getPublicUrl(path).data.publicUrl}));
+    renderProductPhotoGrid();
+    refreshProductDocs(product.id);
   }
   showProductForm();
 }
@@ -2414,29 +2652,33 @@ document.getElementById('btn-salvar-produto').addEventListener('click', async ()
 
   const payload={
     nome,
+    descricao:document.getElementById('f-descricao').value.trim(),
     tipo:getTipo(),
     preco_padrao:parseValor(document.getElementById('f-preco-padrao').value),
-    preco_minimo:parseValor(document.getElementById('f-preco-minimo').value),
     unidade:document.getElementById('f-unidade').value,
     desconto_max:parseInt(document.getElementById('f-discount-slider').value,10),
     estrategia:getStrategy(),
     regras:getRules(),
     restricoes:restr.list,
     restricao_outro:restr.outro,
-    instrucoes:document.getElementById('f-instrucoes').value
+    instrucoes:document.getElementById('f-instrucoes').value,
+    imagens:productImages.map(img=>img.path)
   };
 
+  const wasEditing=!!editingId;
   let error;
   if(editingId){
     ({error}=await sb.from('products').update(payload).eq('id', editingId));
   }else{
     payload.company_id=currentProfile.company_id;
-    ({error}=await sb.from('products').insert(payload));
+    const {data:created, error:insErr}=await sb.from('products').insert(payload).select().single();
+    error=insErr;
+    if(created) editingId=created.id;
   }
   btnSalvar.disabled=false;
 
   if(error){ showToast('Erro ao salvar: '+error.message); return; }
-  showToast(editingId ? 'Produto atualizado com sucesso' : 'Produto salvo com sucesso');
+  showToast(wasEditing ? 'Produto atualizado com sucesso' : 'Produto salvo com sucesso');
   await refreshProductsFromDb();
   showProductList();
 });
@@ -2927,6 +3169,7 @@ const kbFileInput=document.createElement('input');
 kbFileInput.type='file';
 kbFileInput.accept='application/pdf';
 kbFileInput.style.display='none';
+kbFileInput.id='kb-global-file-input';
 document.body.appendChild(kbFileInput);
 
 function triggerKbUpload(){ kbFileInput.click(); }

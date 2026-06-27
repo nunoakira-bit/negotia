@@ -280,6 +280,32 @@
     margin-top:8px;padding:0 1px;}
   .hint{font-size:13px;color:var(--text-tertiary);margin:14px 0 0;display:flex;align-items:center;gap:6px;}
 
+  /* ---------- autenticação ---------- */
+  body:not(.authed) .topbar, body:not(.authed) .app-row{display:none;}
+  #auth-screen{display:none;}
+  body:not(.authed) #auth-screen{display:flex;}
+  #auth-screen{min-height:100vh;align-items:center;justify-content:center;background:var(--bg-page);padding:24px;}
+  .auth-card{width:100%;max-width:380px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+    padding:30px 28px;box-shadow:var(--shadow-card);}
+  .auth-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;margin-bottom:22px;}
+  .auth-logo .dot{width:9px;height:9px;border-radius:50%;background:var(--green);display:inline-block;}
+  .auth-tabs{display:flex;background:#F2F3F5;border-radius:10px;padding:3px;margin-bottom:20px;}
+  .auth-tab{flex:1;height:34px;border:none;background:transparent;border-radius:8px;font-size:13px;font-weight:600;
+    color:var(--text-secondary);cursor:pointer;font-family:var(--font-sans);transition:.15s;}
+  .auth-tab.active{background:#fff;color:var(--text-primary);box-shadow:0 1px 2px rgba(16,24,40,.08);}
+  .auth-form{display:flex;flex-direction:column;gap:4px;}
+  .auth-input{height:42px;border:1px solid var(--border-strong);border-radius:9px;padding:0 13px;font-size:13.5px;
+    font-family:var(--font-sans);outline:none;margin-bottom:14px;width:100%;}
+  .auth-input:focus{border-color:var(--accent);}
+  .auth-submit{width:100%;height:44px;margin-top:4px;}
+  .auth-error{font-size:12.5px;color:var(--red);margin:-6px 0 10px;min-height:0;display:none;}
+  .auth-error.show{display:block;}
+  .auth-hint{font-size:11.5px;color:var(--text-tertiary);text-align:center;margin:20px 0 0;line-height:1.5;}
+  .logout-btn{margin-left:auto;background:none;border:none;color:var(--text-tertiary);cursor:pointer;padding:6px;
+    border-radius:7px;display:flex;}
+  .logout-btn:hover{background:#F2F3F5;color:var(--text-secondary);}
+  .logout-btn svg{width:16px;height:16px;}
+
   /* ---------- configurações: linhas com toggle ---------- */
   .settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
   .settings-row:last-of-type{border-bottom:none;}
@@ -546,6 +572,29 @@
   .status-pill.INDEXADO::before{background:var(--green);}
   .status-pill.PROCESSANDO{background:var(--amber-bg);color:var(--amber);}
   .status-pill.PROCESSANDO::before{background:var(--amber);}
+  .status-pill.ERRO{background:var(--red-bg);color:var(--red);}
+  .status-pill.ERRO::before{background:var(--red);}
+
+  /* ---------- base de conhecimento: testar busca semântica ---------- */
+  .kb-search-card{margin-top:20px;max-width:720px;}
+  .kb-search-bar{display:flex;gap:10px;margin-top:14px;}
+  .kb-search-bar input{flex:1;height:42px;border:1px solid var(--border-strong);border-radius:9px;padding:0 13px;
+    font-size:13.5px;font-family:var(--font-sans);outline:none;}
+  .kb-search-bar input:focus{border-color:var(--accent);}
+  .kb-search-bar button{height:42px;padding:0 20px;}
+  #kb-search-results{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+  .kb-search-result{background:var(--accent-soft);border:1px solid #DCD9FB;border-radius:10px;padding:11px 13px;}
+  .kb-search-result p{margin:4px 0 0;font-size:13px;color:var(--text-primary);line-height:1.5;}
+  .kb-search-score{font-size:11px;font-weight:700;color:var(--accent-dark);text-transform:uppercase;letter-spacing:.03em;}
+  .kb-search-empty, .kb-search-loading{font-size:13px;color:var(--text-tertiary);margin:0;}
+
+  /* ---------- configurações: chave de API da IA ---------- */
+  .llm-key-row{display:flex;gap:8px;align-items:center;}
+  .llm-key-row .auth-input{margin-bottom:0;}
+  .llm-key-row .ghost-action{height:42px;width:42px;padding:0;justify-content:center;flex-shrink:0;}
+  .llm-key-row .ghost-action svg{width:17px;height:17px;margin:0;}
+  .llm-key-status{font-size:12.5px;color:var(--text-secondary);margin:8px 0 0;min-height:0;}
+  .llm-key-status.configured{color:var(--green);font-weight:500;}
 
   /* ---------- vendas ---------- */
   .canal-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;display:inline-block;}
@@ -553,8 +602,48 @@
   .canal-pill.Humano{background:#F0F1F4;color:var(--text-secondary);}
   .desconto-cell{font-family:var(--font-mono);}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+<!-- ===================== AUTENTICAÇÃO ===================== -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo"><span class="dot"></span><span>Negotia AI</span></div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login">Entrar</button>
+      <button class="auth-tab" id="tab-signup">Criar conta</button>
+    </div>
+
+    <!-- Login -->
+    <form id="form-login" class="auth-form">
+      <label class="field-label" for="login-email">E-mail</label>
+      <input type="email" id="login-email" class="auth-input" placeholder="voce@empresa.com" required autocomplete="username">
+      <label class="field-label" for="login-senha">Senha</label>
+      <input type="password" id="login-senha" class="auth-input" placeholder="••••••••" required autocomplete="current-password">
+      <p class="auth-error" id="login-error"></p>
+      <button type="submit" class="btn-primary auth-submit" id="login-submit" style="justify-content:center;">Entrar</button>
+    </form>
+
+    <!-- Cadastro -->
+    <form id="form-signup" class="auth-form" style="display:none;">
+      <label class="field-label" for="signup-empresa">Nome da empresa</label>
+      <input type="text" id="signup-empresa" class="auth-input" placeholder="Ex: Negotia Store" required>
+      <label class="field-label" for="signup-nome">Seu nome</label>
+      <input type="text" id="signup-nome" class="auth-input" placeholder="Seu nome completo" required>
+      <label class="field-label" for="signup-email">E-mail</label>
+      <input type="email" id="signup-email" class="auth-input" placeholder="voce@empresa.com" required autocomplete="username">
+      <label class="field-label" for="signup-senha">Senha</label>
+      <input type="password" id="signup-senha" class="auth-input" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+      <p class="auth-error" id="signup-error"></p>
+      <button type="submit" class="btn-primary auth-submit" id="signup-submit" style="justify-content:center;">Criar conta gratuita</button>
+    </form>
+
+    <p class="auth-hint">Cada empresa tem seus próprios produtos e base de conhecimento, isolados por login.</p>
+  </div>
+</div>
+
 <div class="shell">
 
   <header class="topbar">
@@ -625,8 +714,11 @@
       </div>
     </div>
     <div class="sidebar-footer">
-      <div class="avatar-sm">NC</div>
-      <div class="who"><p>Nuno Costa</p><span>Conta Premium</span></div>
+      <div class="avatar-sm" id="sidebar-avatar">--</div>
+      <div class="who"><p id="sidebar-username">—</p><span id="sidebar-companyname">—</span></div>
+      <button class="logout-btn" id="logout-btn" title="Sair" aria-label="Sair">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
   </aside>
 
@@ -1110,10 +1202,20 @@
 
         <table class="data-table" id="kb-table">
           <thead>
-            <tr><th>Documento</th><th>Categoria</th><th>Status</th><th>Trechos indexados</th><th>Enviado em</th><th></th></tr>
+            <tr><th>Documento</th><th>Tipo</th><th>Status</th><th>Trechos indexados</th><th>Enviado em</th><th></th></tr>
           </thead>
           <tbody id="kb-body"></tbody>
         </table>
+
+        <div class="card kb-search-card">
+          <p class="card-title">Testar busca semântica</p>
+          <p class="card-sub">Digite uma pergunta como um cliente faria e veja quais trechos dos PDFs indexados a IA encontraria.</p>
+          <div class="kb-search-bar">
+            <input type="text" id="kb-search-input" placeholder="Ex: posso trocar um produto com defeito?">
+            <button class="btn-primary" id="kb-search-btn">Buscar</button>
+          </div>
+          <div id="kb-search-results"></div>
+        </div>
       </section>
 
       <!-- ===================== NOTIFICAÇÕES ===================== -->
@@ -1198,6 +1300,36 @@
           </div>
 
           <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Pelo menos um meio de pagamento precisa ficar ativo. A IA só oferece aos clientes os métodos marcados aqui.</p>
+        </div>
+
+        <div class="card" style="max-width:640px;margin-top:20px;">
+          <p class="card-title">Chave de API da IA</p>
+          <p class="card-sub">Conecte a chave do modelo de linguagem que vai conduzir as negociações pelo WhatsApp. Cada empresa usa sua própria chave.</p>
+
+          <div style="margin-top:18px;">
+            <label class="field-label" for="llm-provider-select">Provedor</label>
+            <select id="llm-provider-select" class="auth-input" style="margin-bottom:16px;">
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openai">OpenAI (GPT)</option>
+              <option value="outro">Outro</option>
+            </select>
+
+            <label class="field-label" for="llm-key-input">Chave de API</label>
+            <div class="llm-key-row">
+              <input type="password" id="llm-key-input" class="auth-input" placeholder="sk-ant-..." autocomplete="off" style="margin-bottom:0;">
+              <button class="ghost-action" id="llm-key-toggle-visibility" type="button" title="Mostrar/ocultar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <p class="llm-key-status" id="llm-key-status"></p>
+
+            <div style="display:flex;gap:10px;margin-top:14px;">
+              <button class="btn-primary" id="llm-key-save">Salvar chave</button>
+              <button class="btn-secondary" id="llm-key-remove" style="display:none;">Remover chave</button>
+            </div>
+          </div>
+
+          <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>A chave fica guardada só para a sua empresa e nunca é exibida novamente depois de salva — apenas os últimos 4 caracteres.</p>
         </div>
       </section>
 
@@ -1287,7 +1419,110 @@
 <div id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="4 12 9 17 20 6"/></svg><span id="toast-msg">Salvo</span></div>
 
 <script>
-/* ===================== sidebar: contrair/expandir ===================== */
+/* ===================== supabase: cliente e autenticação ===================== */
+const SUPABASE_URL='https://qskvqnpmxblbgsgjqyex.supabase.co';
+const SUPABASE_KEY='sb_publishable_dg-7n3Bgc7E3rqvNuyR-Yg_t_vC3sN-';
+const sb=supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentSession=null;
+let currentProfile=null; // {id, company_id, nome, companies:{name}}
+
+function showAuthError(elId, msg){
+  const el=document.getElementById(elId);
+  el.textContent=msg;
+  el.classList.add('show');
+}
+function clearAuthError(elId){
+  document.getElementById(elId).classList.remove('show');
+}
+
+document.getElementById('tab-login').addEventListener('click',()=>{
+  document.getElementById('tab-login').classList.add('active');
+  document.getElementById('tab-signup').classList.remove('active');
+  document.getElementById('form-login').style.display='flex';
+  document.getElementById('form-signup').style.display='none';
+});
+document.getElementById('tab-signup').addEventListener('click',()=>{
+  document.getElementById('tab-signup').classList.add('active');
+  document.getElementById('tab-login').classList.remove('active');
+  document.getElementById('form-signup').style.display='flex';
+  document.getElementById('form-login').style.display='none';
+});
+
+document.getElementById('form-login').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  clearAuthError('login-error');
+  const email=document.getElementById('login-email').value.trim();
+  const senha=document.getElementById('login-senha').value;
+  const btn=document.getElementById('login-submit');
+  btn.disabled=true; btn.textContent='Entrando...';
+  const {data, error}=await sb.auth.signInWithPassword({email, password:senha});
+  btn.disabled=false; btn.textContent='Entrar';
+  if(error){
+    showAuthError('login-error', error.message==='Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message);
+    return;
+  }
+  await onAuthReady(data.session);
+});
+
+document.getElementById('form-signup').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  clearAuthError('signup-error');
+  const empresa=document.getElementById('signup-empresa').value.trim();
+  const nome=document.getElementById('signup-nome').value.trim();
+  const email=document.getElementById('signup-email').value.trim();
+  const senha=document.getElementById('signup-senha').value;
+  const btn=document.getElementById('signup-submit');
+  btn.disabled=true; btn.textContent='Criando conta...';
+  const {data, error}=await sb.auth.signUp({
+    email, password:senha,
+    options:{ data:{ company_name:empresa, full_name:nome } }
+  });
+  btn.disabled=false; btn.textContent='Criar conta gratuita';
+  if(error){
+    showAuthError('signup-error', error.message);
+    return;
+  }
+  if(!data.session){
+    showAuthError('signup-error', 'Conta criada! Confirme seu e-mail (verifique a caixa de entrada) e depois faça login.');
+    return;
+  }
+  await onAuthReady(data.session);
+});
+
+document.getElementById('logout-btn').addEventListener('click', async ()=>{
+  await sb.auth.signOut();
+  currentSession=null; currentProfile=null;
+  document.body.classList.remove('authed');
+});
+
+async function onAuthReady(session){
+  currentSession=session;
+  const {data:profile, error}=await sb
+    .from('profiles')
+    .select('id, nome, company_id, companies(name)')
+    .eq('id', session.user.id)
+    .single();
+  if(error || !profile){
+    showAuthError('login-error', 'Não foi possível carregar seu perfil. Tente novamente.');
+    return;
+  }
+  currentProfile=profile;
+  document.getElementById('sidebar-username').textContent=profile.nome || session.user.email;
+  document.getElementById('sidebar-companyname').textContent=profile.companies ? profile.companies.name : '';
+  document.getElementById('sidebar-avatar').textContent=(profile.nome||session.user.email).trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  document.body.classList.add('authed');
+  await seedProductsIfEmpty();
+  await refreshProductsFromDb();
+  await refreshKbDocsFromDb();
+}
+
+(async function initSession(){
+  const {data}=await sb.auth.getSession();
+  if(data.session){ await onAuthReady(data.session); }
+})();
+
+
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
 sidebarToggleBtn.addEventListener('click',()=>{
@@ -1306,7 +1541,7 @@ function switchView(name){
   if(name==='produtos'){ showProductList(); }
   if(name==='chamados'){ refreshChamados(); }
   if(name==='vendas'){ refreshVendas(); }
-  if(name==='configuracoes'){ syncPaymentTogglesUI(); }
+  if(name==='configuracoes'){ syncPaymentTogglesUI(); syncLlmKeyUI(); }
 }
 document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
 
@@ -1592,6 +1827,57 @@ document.querySelectorAll('#view-configuracoes .toggle-switch input[data-method]
   });
 });
 
+/* ---------- configurações: chave de API da IA ---------- */
+async function syncLlmKeyUI(){
+  document.getElementById('llm-key-input').value='';
+  document.getElementById('llm-key-input').type='password';
+  const {data, error}=await sb.rpc('get_llm_key_status');
+  const status=data && data[0];
+  const statusEl=document.getElementById('llm-key-status');
+  const removeBtn=document.getElementById('llm-key-remove');
+
+  if(error){
+    statusEl.textContent='Não foi possível carregar o status da chave.';
+    statusEl.classList.remove('configured');
+    return;
+  }
+  if(status && status.configured){
+    document.getElementById('llm-provider-select').value=status.provider;
+    statusEl.textContent=`Chave configurada (terminando em ${status.last4}). Cole uma nova chave abaixo para substituí-la.`;
+    statusEl.classList.add('configured');
+    removeBtn.style.display='inline-flex';
+  }else{
+    statusEl.textContent='Nenhuma chave configurada ainda — a IA não pode negociar de verdade sem isso.';
+    statusEl.classList.remove('configured');
+    removeBtn.style.display='none';
+  }
+}
+
+document.getElementById('llm-key-toggle-visibility').addEventListener('click',()=>{
+  const input=document.getElementById('llm-key-input');
+  input.type = input.type==='password' ? 'text' : 'password';
+});
+
+document.getElementById('llm-key-save').addEventListener('click', async ()=>{
+  const key=document.getElementById('llm-key-input').value.trim();
+  const provider=document.getElementById('llm-provider-select').value;
+  if(!key){ showToast('Cole a chave de API antes de salvar.'); return; }
+  const btn=document.getElementById('llm-key-save');
+  btn.disabled=true;
+  const {error}=await sb.from('companies').update({llm_api_key:key, llm_provider:provider}).eq('id', currentProfile.company_id);
+  btn.disabled=false;
+  if(error){ showToast('Erro ao salvar a chave: '+error.message); return; }
+  showToast('Chave de API salva com sucesso');
+  await syncLlmKeyUI();
+});
+
+document.getElementById('llm-key-remove').addEventListener('click', async ()=>{
+  const {error}=await sb.from('companies').update({llm_api_key:null}).eq('id', currentProfile.company_id);
+  if(error){ showToast('Erro ao remover a chave: '+error.message); return; }
+  showToast('Chave de API removida');
+  await syncLlmKeyUI();
+});
+
 let paymentCardSeq=0;
 function paymentSuccessHtml(method, valorLabel){
   const m=PAYMENT_METHODS.find(x=>x.key===method);
@@ -1867,31 +2153,46 @@ document.getElementById('atend-close-venda-btn').addEventListener('click',()=>{
   });
 });
 
-/* ===================== produtos: persistência ===================== */
-const STORAGE_KEY='negotia_produtos';
+/* ===================== produtos: persistência (Supabase) ===================== */
+let productsCache=[];
 
-function loadProducts(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]; }catch(e){ return []; }
+function dbProductToForm(p){
+  return {
+    id:p.id, nome:p.nome, tipo:p.tipo,
+    precoPadrao:Number(p.preco_padrao).toFixed(2).replace('.',','),
+    precoMinimo:Number(p.preco_minimo).toFixed(2).replace('.',','),
+    unidade:p.unidade, descontoMax:Number(p.desconto_max),
+    estrategia:p.estrategia, regras:p.regras||[],
+    restricoes:p.restricoes||[], restricaoOutro:p.restricao_outro||'',
+    instrucoes:p.instrucoes||''
+  };
 }
-function saveProducts(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
 
-function seedIfEmpty(){
-  if(loadProducts().length>0) return;
+async function refreshProductsFromDb(){
+  const {data, error}=await sb.from('products').select('*').order('created_at',{ascending:true});
+  if(error){ showToast('Erro ao carregar produtos: '+error.message); return; }
+  productsCache=(data||[]).map(dbProductToForm);
+  renderProductGrid('');
+}
+
+async function seedProductsIfEmpty(){
+  const {count, error}=await sb.from('products').select('id',{count:'exact', head:true});
+  if(error || (count && count>0)) return;
+  const companyId=currentProfile.company_id;
   const seed=[
-    {id:'p1',nome:'Consultoria UX',tipo:'produto',precoPadrao:'350,00',precoMinimo:'297,00',unidade:'Hora',
-      descontoMax:15,estrategia:'se-pedir',regras:[{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}],
-      restricoes:['Frete','Prazo'],restricaoOutro:'',
+    {company_id:companyId, nome:'Consultoria UX', tipo:'produto', preco_padrao:350.00, preco_minimo:297.00, unidade:'Hora',
+      desconto_max:15, estrategia:'se-pedir', regras:[{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}],
+      restricoes:['Frete','Prazo'], restricao_outro:'',
       instrucoes:'Nunca ofereça desconto logo na primeira mensagem. Priorize pagamento via PIX.'},
-    {id:'p2',nome:'Plano mensal Premium',tipo:'servico',precoPadrao:'199,00',precoMinimo:'169,00',unidade:'mensalidade',
-      descontoMax:20,estrategia:'imediato',regras:[],restricoes:['Forma de pagamento'],restricaoOutro:'',
+    {company_id:companyId, nome:'Plano mensal Premium', tipo:'servico', preco_padrao:199.00, preco_minimo:169.00, unidade:'mensalidade',
+      desconto_max:20, estrategia:'imediato', regras:[], restricoes:['Forma de pagamento'], restricao_outro:'',
       instrucoes:'Se o cliente pedir o plano anual, ofereça 15% de desconto.'},
-    {id:'p3',nome:'Cabo USB-C 1m',tipo:'produto',precoPadrao:'39,90',precoMinimo:'29,90',unidade:'Unidade',
-      descontoMax:25,estrategia:'imediato',regras:[{qtd:10,desconto:10},{qtd:50,desconto:20}],restricoes:['Garantia'],restricaoOutro:'',
+    {company_id:companyId, nome:'Cabo USB-C 1m', tipo:'produto', preco_padrao:39.90, preco_minimo:29.90, unidade:'Unidade',
+      desconto_max:25, estrategia:'imediato', regras:[{qtd:10,desconto:10},{qtd:50,desconto:20}], restricoes:['Garantia'], restricao_outro:'',
       instrucoes:'Se o cliente comprar mais de 10 unidades, ofereça frete grátis.'}
   ];
-  saveProducts(seed);
+  await sb.from('products').insert(seed);
 }
-seedIfEmpty();
 
 let editingId=null;
 let pendingDeleteId=null;
@@ -1900,7 +2201,7 @@ let pendingDeleteContext='produto';
 function riskColor(pct){ return pct<=15 ? 'green' : pct<=30 ? 'amber' : 'red'; }
 
 function renderProductGrid(filterText){
-  const all=loadProducts();
+  const all=productsCache;
   const list=filterText ? all.filter(p=>p.nome.toLowerCase().includes(filterText.toLowerCase())) : all;
   const grid=document.getElementById('produtos-grid');
   const empty=document.getElementById('produtos-empty');
@@ -1941,7 +2242,7 @@ function renderProductGrid(filterText){
   grid.querySelectorAll('.edit-btn').forEach(btn=>{
     btn.addEventListener('click',e=>{
       const id=e.target.closest('.product-card').dataset.id;
-      openProductForm(loadProducts().find(p=>p.id===id));
+      openProductForm(productsCache.find(p=>p.id===id));
     });
   });
   grid.querySelectorAll('.delete-btn').forEach(btn=>{
@@ -2097,7 +2398,7 @@ document.getElementById('btn-novo-produto').addEventListener('click',()=>openPro
 document.getElementById('btn-novo-produto-empty').addEventListener('click',()=>openProductForm(null));
 document.getElementById('btn-cancelar-form').addEventListener('click',showProductList);
 
-document.getElementById('btn-salvar-produto').addEventListener('click',()=>{
+document.getElementById('btn-salvar-produto').addEventListener('click', async ()=>{
   const nome=document.getElementById('f-nome').value.trim();
   if(!nome){
     document.getElementById('f-nome').focus();
@@ -2108,30 +2409,35 @@ document.getElementById('btn-salvar-produto').addEventListener('click',()=>{
   document.getElementById('f-nome').style.borderColor='';
 
   const restr=getRestrictions();
-  const data={
-    id: editingId || ('p'+Date.now()),
+  const btnSalvar=document.getElementById('btn-salvar-produto');
+  btnSalvar.disabled=true;
+
+  const payload={
     nome,
     tipo:getTipo(),
-    precoPadrao:document.getElementById('f-preco-padrao').value.trim(),
-    precoMinimo:document.getElementById('f-preco-minimo').value.trim(),
+    preco_padrao:parseValor(document.getElementById('f-preco-padrao').value),
+    preco_minimo:parseValor(document.getElementById('f-preco-minimo').value),
     unidade:document.getElementById('f-unidade').value,
-    descontoMax:parseInt(document.getElementById('f-discount-slider').value,10),
+    desconto_max:parseInt(document.getElementById('f-discount-slider').value,10),
     estrategia:getStrategy(),
     regras:getRules(),
     restricoes:restr.list,
-    restricaoOutro:restr.outro,
+    restricao_outro:restr.outro,
     instrucoes:document.getElementById('f-instrucoes').value
   };
 
-  const all=loadProducts();
+  let error;
   if(editingId){
-    const idx=all.findIndex(p=>p.id===editingId);
-    if(idx>-1) all[idx]=data;
+    ({error}=await sb.from('products').update(payload).eq('id', editingId));
   }else{
-    all.push(data);
+    payload.company_id=currentProfile.company_id;
+    ({error}=await sb.from('products').insert(payload));
   }
-  saveProducts(all);
+  btnSalvar.disabled=false;
+
+  if(error){ showToast('Erro ao salvar: '+error.message); return; }
   showToast(editingId ? 'Produto atualizado com sucesso' : 'Produto salvo com sucesso');
+  await refreshProductsFromDb();
   showProductList();
 });
 
@@ -2140,18 +2446,15 @@ document.getElementById('confirm-cancel').addEventListener('click',()=>{
   pendingDeleteId=null;
   document.getElementById('confirm-modal-wrap').classList.remove('open');
 });
-document.getElementById('confirm-delete').addEventListener('click',()=>{
+document.getElementById('confirm-delete').addEventListener('click', async ()=>{
   if(pendingDeleteId && pendingDeleteContext==='produto'){
-    const all=loadProducts().filter(p=>p.id!==pendingDeleteId);
-    saveProducts(all);
-    showToast('Produto excluído');
+    const {error}=await sb.from('products').delete().eq('id', pendingDeleteId);
+    if(error){ showToast('Erro ao excluir: '+error.message); }
+    else{ showToast('Produto excluído'); await refreshProductsFromDb(); }
   } else if(pendingDeleteId && pendingDeleteContext==='documento'){
-    kbDocsMock = kbDocsMock.filter(d=>d.id!==pendingDeleteId);
-    showToast('Documento removido da base de conhecimento');
-    renderKbDocs();
+    await deleteKbDocument(pendingDeleteId);
   }
   pendingDeleteId=null;
-  if(document.getElementById('view-produtos').classList.contains('active')) renderProductGrid('');
   document.getElementById('confirm-modal-wrap').classList.remove('open');
 });
 
@@ -2551,42 +2854,53 @@ document.getElementById('close-chamado-drawer').addEventListener('click',closeCh
 chamadoOverlay.addEventListener('click',closeChamadoDrawer);
 
 /* ===================== base de conhecimento (lista simples de PDFs) ===================== */
-let kbDocsMock=[
-  {id:'kb1',nome:'Manual_Impressoras_HP_2025.pdf',tamanho:'2.4 MB',categoria:'Hardware',status:'INDEXADO',trechos:18,enviadoMinAgo:17280},
-  {id:'kb2',nome:'FAQ_Sistema_SIGA.pdf',tamanho:'860 KB',categoria:'Software',status:'INDEXADO',trechos:34,enviadoMinAgo:11520},
-  {id:'kb3',nome:'Procedimento_Reset_Senha.pdf',tamanho:'310 KB',categoria:'Software',status:'INDEXADO',trechos:6,enviadoMinAgo:11520},
-  {id:'kb4',nome:'Guia_Configuracao_WiFi_Institucional.pdf',tamanho:'1.1 MB',categoria:'Hardware',status:'INDEXADO',trechos:11,enviadoMinAgo:43200},
-  {id:'kb5',nome:'Politica_Seguranca_TI.pdf',tamanho:'540 KB',categoria:'Geral',status:'PROCESSANDO',trechos:0,enviadoMinAgo:2}
-];
+let kbDocsCache=[];
+
+function kbStatusInfo(status){
+  if(status==='ready') return {label:'Indexado', cls:'INDEXADO'};
+  if(status==='error') return {label:'Erro ao processar', cls:'ERRO'};
+  return {label:'Aguardando indexação', cls:'PROCESSANDO'};
+}
+
+async function refreshKbDocsFromDb(){
+  const {data, error}=await sb.from('knowledge_documents').select('*').order('created_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar base de conhecimento: '+error.message); return; }
+  kbDocsCache=data||[];
+  renderKbDocs();
+}
 
 function renderKbDocs(){
   const empty=document.getElementById('kb-empty');
   const table=document.getElementById('kb-table');
-  if(kbDocsMock.length===0){
+  if(kbDocsCache.length===0){
     empty.style.display='block'; table.style.display='none';
     return;
   }
   empty.style.display='none'; table.style.display='table';
 
   const body=document.getElementById('kb-body');
-  body.innerHTML=kbDocsMock.map(d=>`
+  body.innerHTML=kbDocsCache.map(d=>{
+    const st=kbStatusInfo(d.status);
+    const minAgo=Math.max(0, Math.round((Date.now()-new Date(d.created_at).getTime())/60000));
+    return `
     <tr data-id="${d.id}">
       <td>
         <div class="doc-cell">
           <div class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
-          <div><span class="doc-name">${d.nome}</span><span class="doc-size">${d.tamanho}</span></div>
+          <div><span class="doc-name">${d.filename}</span></div>
         </div>
       </td>
-      <td class="cell-muted">${d.categoria}</td>
-      <td><span class="status-pill ${d.status}">${d.status==='INDEXADO'?'Indexado':'Processando'}</span></td>
-      <td class="cell-mono">${d.status==='INDEXADO'?d.trechos:'—'}</td>
-      <td class="cell-muted">${notifTimeLabel(d.enviadoMinAgo)}</td>
+      <td class="cell-muted">PDF</td>
+      <td><span class="status-pill ${st.cls}">${st.label}</span></td>
+      <td class="cell-mono">${d.status==='ready' ? (d.chunk_count ?? '—') : '—'}</td>
+      <td class="cell-muted">${notifTimeLabel(minAgo)}</td>
       <td onclick="event.stopPropagation()">
         <button class="icon-btn-ghost delete-doc-btn" aria-label="Remover documento" data-id="${d.id}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
         </button>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   body.querySelectorAll('.delete-doc-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -2599,11 +2913,81 @@ function renderKbDocs(){
   });
 }
 
-function addKbDocPlaceholder(){
-  showToast('Em breve: envie um PDF para a IA indexar automaticamente');
+async function deleteKbDocument(id){
+  const doc=kbDocsCache.find(d=>d.id===id);
+  if(!doc) return;
+  await sb.storage.from('knowledge').remove([doc.storage_path]);
+  const {error}=await sb.from('knowledge_documents').delete().eq('id', id);
+  if(error){ showToast('Erro ao remover documento: '+error.message); return; }
+  showToast('Documento removido da base de conhecimento');
+  await refreshKbDocsFromDb();
 }
-document.getElementById('btn-add-doc').addEventListener('click',addKbDocPlaceholder);
-document.getElementById('btn-add-doc-empty').addEventListener('click',addKbDocPlaceholder);
+
+const kbFileInput=document.createElement('input');
+kbFileInput.type='file';
+kbFileInput.accept='application/pdf';
+kbFileInput.style.display='none';
+document.body.appendChild(kbFileInput);
+
+function triggerKbUpload(){ kbFileInput.click(); }
+document.getElementById('btn-add-doc').addEventListener('click',triggerKbUpload);
+document.getElementById('btn-add-doc-empty').addEventListener('click',triggerKbUpload);
+
+kbFileInput.addEventListener('change', async ()=>{
+  const file=kbFileInput.files[0];
+  kbFileInput.value='';
+  if(!file) return;
+  if(file.type!=='application/pdf'){ showToast('Envie um arquivo em PDF.'); return; }
+  if(file.size > 20*1024*1024){ showToast('Arquivo maior que 20MB não é suportado.'); return; }
+
+  showToast('Enviando '+file.name+'...');
+  const path=`${currentProfile.company_id}/${Date.now()}-${file.name}`;
+  const {error:upErr}=await sb.storage.from('knowledge').upload(path, file);
+  if(upErr){ showToast('Erro no upload: '+upErr.message); return; }
+
+  const {data:newDoc, error:insErr}=await sb.from('knowledge_documents')
+    .insert({company_id:currentProfile.company_id, filename:file.name, storage_path:path, status:'processing'})
+    .select().single();
+  if(insErr){ showToast('Erro ao registrar documento: '+insErr.message); return; }
+
+  showToast('PDF enviado! Indexando para busca semântica...');
+  await refreshKbDocsFromDb();
+
+  const {data:fnData, error:fnErr}=await sb.functions.invoke('process-document', {body:{document_id:newDoc.id}});
+  if(fnErr || fnData?.error){
+    showToast('Não foi possível indexar o PDF: '+(fnData?.error || fnErr.message));
+  }else{
+    showToast(`"${file.name}" indexado com sucesso (${fnData.chunks} trechos). Já pode testar a busca.`);
+  }
+  await refreshKbDocsFromDb();
+});
+
+/* ===================== teste de busca semântica ===================== */
+document.getElementById('kb-search-btn').addEventListener('click', async ()=>{
+  const input=document.getElementById('kb-search-input');
+  const query=input.value.trim();
+  const resultsEl=document.getElementById('kb-search-results');
+  if(!query) return;
+  resultsEl.innerHTML='<p class="kb-search-loading">Buscando...</p>';
+  const {data, error}=await sb.functions.invoke('search-knowledge', {body:{query, match_count:4}});
+  if(error || data?.error){
+    resultsEl.innerHTML=`<p class="kb-search-empty">Erro na busca: ${data?.error || error.message}</p>`;
+    return;
+  }
+  const matches=data.matches||[];
+  if(matches.length===0){
+    resultsEl.innerHTML='<p class="kb-search-empty">Nenhum trecho relevante encontrado nos PDFs indexados.</p>';
+    return;
+  }
+  resultsEl.innerHTML=matches.map(m=>`
+    <div class="kb-search-result">
+      <span class="kb-search-score">${Math.round(m.similarity*100)}% relevante</span>
+      <p>${m.content}</p>
+    </div>`).join('');
+});
+document.getElementById('kb-search-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter') document.getElementById('kb-search-btn').click();
+});
 
 /* ===================== vendas ===================== */
 const vendasMock=[

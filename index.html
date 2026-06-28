@@ -406,6 +406,11 @@
   .bubble.receipt svg{width:13px;height:13px;flex-shrink:0;}
   .bubble-time{font-size:10px;color:var(--text-tertiary);margin-top:4px;display:block;}
   .bubble.receipt.success{background:var(--green-bg);border-color:#BBE5C8;color:#0F5C2E;}
+  .bubble.typing-bubble{display:flex;gap:4px;padding:12px 14px;}
+  .bubble.typing-bubble .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text-tertiary);animation:typing-bounce-admin 1.2s infinite;}
+  .bubble.typing-bubble .typing-dot:nth-child(2){animation-delay:.15s;}
+  .bubble.typing-bubble .typing-dot:nth-child(3){animation-delay:.3s;}
+  @keyframes typing-bounce-admin{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-4px);opacity:1;}}
 
   /* ---------- card de pagamento (dentro do chat) ---------- */
   .payment-card{align-self:flex-start;max-width:88%;background:#fff;border:1px solid var(--border);
@@ -837,6 +842,10 @@
             <h1>Atendimentos</h1>
             <p class="subtitle">Todas as conversas que a IA está conduzindo no WhatsApp.</p>
           </div>
+          <button class="btn-primary" id="btn-testar-ia">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.6 5.6L19 9l-5.4 1.4L12 16l-1.6-5.6L5 9l5.4-1.4L12 2z"/></svg>
+            Testar com a IA
+          </button>
         </div>
 
         <div class="section-block" style="margin-bottom:16px;">
@@ -1391,6 +1400,18 @@
 
           <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>A chave fica guardada só para a sua empresa e nunca é exibida novamente depois de salva — apenas os últimos 4 caracteres.</p>
         </div>
+
+        <div class="card" style="max-width:640px;margin-top:20px;">
+          <p class="card-title">Link de teste — lado do cliente</p>
+          <p class="card-sub">Abra esse link pra testar a conversa como se fosse um cliente real conversando pelo WhatsApp, com a IA respondendo de verdade.</p>
+          <div class="llm-key-row" style="margin-top:14px;">
+            <input type="text" id="client-test-link" class="auth-input" readonly style="margin-bottom:0;font-family:var(--font-mono);font-size:12.5px;">
+            <button class="ghost-action" id="client-test-link-copy" type="button" title="Copiar link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </button>
+          </div>
+          <p class="hint" style="margin-top:10px;"><a href="#" id="client-test-link-open" target="_blank" rel="noopener" class="llm-provider-link">Abrir em uma nova aba ↗</a></p>
+        </div>
       </section>
 
     </div>
@@ -1441,6 +1462,38 @@
   <div class="composer">
     <input type="text" id="atend-composer-input" placeholder="Assuma a conversa para responder manualmente">
     <button id="atend-composer-send" aria-label="Enviar" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Drawer: testar conversa real com a IA -->
+<div class="overlay" id="ia-test-drawer-overlay"></div>
+<div class="drawer" id="ia-test-drawer">
+  <div class="drawer-head">
+    <div>
+      <h3>Testar com a IA</h3>
+      <p>Você digita como se fosse o cliente; a IA responde de verdade</p>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:8px;">
+      <button class="close-venda-btn" id="ia-test-close-venda-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda</button>
+      <button class="close-btn" id="close-ia-test-drawer" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+  </div>
+
+  <div style="padding:0 28px 14px;">
+    <label class="field-label" for="ia-test-product-select">Produto</label>
+    <div class="select-wrap">
+      <select class="std" id="ia-test-product-select"></select>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+
+  <div class="phone-frame" id="ia-test-phone-frame"></div>
+
+  <div class="composer">
+    <input type="text" id="ia-test-composer-input" placeholder="Digite como se fosse o cliente...">
+    <button id="ia-test-composer-send" aria-label="Enviar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
@@ -1623,7 +1676,7 @@ function switchView(name){
   if(name==='produtos'){ showProductList(); }
   if(name==='chamados'){ refreshChamados(); }
   if(name==='vendas'){ refreshVendas(); }
-  if(name==='configuracoes'){ syncPaymentTogglesUI(); syncLlmKeyUI(); }
+  if(name==='configuracoes'){ syncPaymentTogglesUI(); syncLlmKeyUI(); syncClientTestLink(); }
 }
 document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
 
@@ -1982,6 +2035,24 @@ document.getElementById('llm-key-remove').addEventListener('click', async ()=>{
   await syncLlmKeyUI();
 });
 
+/* ---------- configurações: link de teste do lado do cliente ---------- */
+function syncClientTestLink(){
+  if(!currentProfile) return;
+  const url=new URL('cliente.html?company='+currentProfile.company_id, window.location.href).href;
+  document.getElementById('client-test-link').value=url;
+  document.getElementById('client-test-link-open').href=url;
+}
+document.getElementById('client-test-link-copy').addEventListener('click', async ()=>{
+  const input=document.getElementById('client-test-link');
+  try{
+    await navigator.clipboard.writeText(input.value);
+    showToast('Link copiado!');
+  }catch(e){
+    input.select();
+    showToast('Selecione e copie o link manualmente (Ctrl/Cmd+C)');
+  }
+});
+
 let paymentCardSeq=0;
 function paymentSuccessHtml(method, valorLabel){
   const m=PAYMENT_METHODS.find(x=>x.key===method);
@@ -2254,6 +2325,134 @@ document.getElementById('atend-close-venda-btn').addEventListener('click',()=>{
     btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada';
     registerVenda({cliente:a.cliente, produto:a.produto, valor, desconto:0, pagamento:method,
       atendidoPor: currentMode==='humano'?'Humano':'IA', atendId:a.id});
+  });
+});
+
+/* ===================== testar com a IA (conversa real) ===================== */
+const iaTestOverlay=document.getElementById('ia-test-drawer-overlay');
+const iaTestDrawer=document.getElementById('ia-test-drawer');
+let iaTestProduct=null;
+let iaTestHistory=[]; // {role, content}
+let iaTestClosed=false;
+let iaTestSending=false;
+
+function iaTestShowTyping(){
+  const frame=document.getElementById('ia-test-phone-frame');
+  const id='ia-typing-'+Date.now();
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble out typing-bubble" id="${id}"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`);
+  frame.scrollTop=frame.scrollHeight;
+  return id;
+}
+function iaTestRemoveTyping(id){ const el=document.getElementById(id); if(el) el.remove(); }
+
+function iaTestSetSending(sending){
+  iaTestSending=sending;
+  document.getElementById('ia-test-composer-input').disabled=sending||iaTestClosed;
+  document.getElementById('ia-test-composer-send').disabled=sending||iaTestClosed;
+}
+
+async function iaTestCallNegotiate(message){
+  const {data, error}=await sb.functions.invoke('negotiate', {
+    body:{product_id:iaTestProduct.id, history:iaTestHistory, message}
+  });
+  if(error){
+    let msg=error.message;
+    try{ const body=await error.context.json(); if(body?.error) msg=body.error; }catch(_e){}
+    throw new Error(msg);
+  }
+  if(data?.error) throw new Error(data.error);
+  iaTestHistory.push({role:'user', content:message});
+  iaTestHistory.push({role:'assistant', content:data.reply});
+  return data.reply;
+}
+
+async function iaTestSend(text){
+  if(!text.trim() || iaTestSending || iaTestClosed || !iaTestProduct) return;
+  const frame=document.getElementById('ia-test-phone-frame');
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble in">${text}</div>`);
+  frame.scrollTop=frame.scrollHeight;
+  iaTestSetSending(true);
+  const typingId=iaTestShowTyping();
+  try{
+    const reply=await iaTestCallNegotiate(text);
+    iaTestRemoveTyping(typingId);
+    frame.insertAdjacentHTML('beforeend', `<div class="bubble out">${reply}</div>`);
+    frame.scrollTop=frame.scrollHeight;
+  }catch(e){
+    iaTestRemoveTyping(typingId);
+    frame.insertAdjacentHTML('beforeend', `<div class="bubble out">Desculpe, tive um problema para responder agora.</div>`);
+    showToast('Erro ao falar com a IA: '+e.message);
+  }
+  iaTestSetSending(false);
+}
+
+document.getElementById('ia-test-composer-send').addEventListener('click',()=>{
+  const input=document.getElementById('ia-test-composer-input');
+  iaTestSend(input.value);
+  input.value='';
+});
+document.getElementById('ia-test-composer-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    iaTestSend(e.target.value);
+    e.target.value='';
+  }
+});
+
+document.getElementById('ia-test-product-select').addEventListener('change',(e)=>{
+  iaTestProduct=productsCache.find(p=>p.id===e.target.value);
+  iaTestHistory=[];
+  iaTestClosed=false;
+  iaTestSetSending(false);
+  const frame=document.getElementById('ia-test-phone-frame');
+  frame.innerHTML='';
+  const btn=document.getElementById('ia-test-close-venda-btn');
+  btn.disabled=false;
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda';
+  if(iaTestProduct){
+    frame.insertAdjacentHTML('beforeend', `<div class="bubble in">Olá, vi o anúncio de ${iaTestProduct.nome}, pode me ajudar?</div>`);
+  }
+});
+
+function openIaTestDrawer(){
+  const select=document.getElementById('ia-test-product-select');
+  select.innerHTML=productsCache.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+  iaTestOverlay.classList.add('open'); iaTestDrawer.classList.add('open');
+  select.dispatchEvent(new Event('change'));
+}
+document.getElementById('btn-testar-ia').addEventListener('click', openIaTestDrawer);
+function closeIaTestDrawer(){ iaTestOverlay.classList.remove('open'); iaTestDrawer.classList.remove('open'); }
+document.getElementById('close-ia-test-drawer').addEventListener('click', closeIaTestDrawer);
+iaTestOverlay.addEventListener('click', closeIaTestDrawer);
+
+document.getElementById('ia-test-close-venda-btn').addEventListener('click', async ()=>{
+  const btn=document.getElementById('ia-test-close-venda-btn');
+  if(!iaTestProduct || iaTestClosed || iaTestSending || btn.disabled) return;
+  btn.disabled=true;
+  iaTestSetSending(true);
+  const frame=document.getElementById('ia-test-phone-frame');
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble in">Quero fechar o pedido, pode confirmar o valor final?</div>`);
+  frame.scrollTop=frame.scrollHeight;
+  const typingId=iaTestShowTyping();
+  let reply;
+  try{
+    reply=await iaTestCallNegotiate('Quero fechar o pedido, pode confirmar o valor final?');
+    iaTestRemoveTyping(typingId);
+    frame.insertAdjacentHTML('beforeend', `<div class="bubble out">${reply}</div>`);
+    frame.scrollTop=frame.scrollHeight;
+  }catch(e){
+    iaTestRemoveTyping(typingId);
+    showToast('Erro ao falar com a IA: '+e.message);
+    btn.disabled=false;
+    iaTestSetSending(false);
+    return;
+  }
+  iaTestClosed=true;
+  iaTestSetSending(true);
+  const precoMatch=reply.match(/R\$\s?([\d.,]+)/);
+  const valor=precoMatch ? parseValor(precoMatch[1]) : parseValor(iaTestProduct.precoPadrao);
+  openPaymentFlow(frame, valor, (method)=>{
+    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada';
+    registerVenda({cliente:'Cliente de teste (IA)', produto:iaTestProduct.nome, valor, desconto:0, pagamento:method, atendidoPor:'IA'});
   });
 });
 

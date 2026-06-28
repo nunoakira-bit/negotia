@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Conversa com a loja — simulação do cliente</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg-page:#EDEDED;
+    --wa-green:#1FA855;
+    --wa-green-dark:#16793D;
+    --bg-card:#FFFFFF;
+    --border:#E8EAED;
+    --border-strong:#D9DCE1;
+    --text-primary:#15171C;
+    --text-secondary:#6B7280;
+    --text-tertiary:#9CA3AF;
+    --accent:#4F46E5;
+    --accent-dark:#3A33B0;
+    --accent-soft:#EEECFE;
+    --green-bg:#E9F8EE;
+    --radius-lg:20px;
+    --font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-mono:'DM Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;font-family:var(--font-sans);background:var(--bg-page);color:var(--text-primary);-webkit-font-smoothing:antialiased;}
+  .page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;}
+  .tag{position:fixed;top:14px;left:14px;font-size:11px;font-weight:600;color:var(--text-secondary);
+    background:#fff;border:1px solid var(--border);padding:5px 10px;border-radius:999px;display:flex;align-items:center;gap:6px;}
+  .tag .dot{width:7px;height:7px;border-radius:50%;background:#9CA3AF;}
+
+  .phone{width:390px;height:760px;background:#fff;border-radius:32px;box-shadow:0 2px 6px rgba(16,24,40,.08),0 30px 60px -15px rgba(16,24,40,.25);
+    border:8px solid #1C1C1E;display:flex;flex-direction:column;overflow:hidden;}
+
+  .wa-head{background:var(--wa-green);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:11px;flex-shrink:0;}
+  .wa-back{font-size:20px;line-height:1;opacity:.9;}
+  .wa-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;
+    justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;}
+  .wa-id{flex:1;min-width:0;}
+  .wa-id h4{margin:0;font-size:14.5px;font-weight:600;}
+  .wa-id p{margin:1px 0 0;font-size:11.5px;opacity:.85;}
+  .wa-icons{display:flex;gap:14px;opacity:.9;}
+  .wa-icons svg{width:18px;height:18px;}
+
+  .setup{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:26px 22px;overflow-y:auto;}
+  .setup h3{margin:0 0 2px;font-size:16px;}
+  .setup p.sub{margin:0 0 10px;font-size:12.5px;color:var(--text-secondary);line-height:1.5;}
+  .demo-product{display:flex;align-items:center;gap:12px;border:1.5px solid var(--border-strong);border-radius:13px;
+    padding:12px 13px;cursor:pointer;transition:.12s;background:#fff;}
+  .demo-product:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .demo-product.active{border-color:var(--accent);background:var(--accent-soft);}
+  .demo-product .pname{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+  .demo-product .pprice{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-dark);margin-top:2px;}
+  .start-btn{height:46px;border:none;background:var(--wa-green);color:#fff;border-radius:12px;font-size:14px;
+    font-weight:600;cursor:pointer;margin-top:6px;}
+  .start-btn:hover{background:var(--wa-green-dark);}
+
+  .chat-wrap{flex:1;display:none;flex-direction:column;min-height:0;}
+  .chat-wrap.active{display:flex;}
+  .chat-bg{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px;
+    background:#E5DDD5 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" fill="%23E5DDD5"/></svg>');}
+
+  .bubble{max-width:78%;padding:9px 12px;border-radius:11px;font-size:13px;line-height:1.45;box-shadow:0 1px 1px rgba(0,0,0,.06);}
+  .bubble.them{align-self:flex-start;background:#fff;border-top-left-radius:3px;color:var(--text-primary);}
+  .bubble.me{align-self:flex-end;background:#DCF8C6;border-top-right-radius:3px;color:#1C3A1C;}
+  .bubble.sys{align-self:center;background:#FFF3CE;color:#7A5B06;font-size:11.5px;padding:5px 11px;border-radius:9px;}
+
+  .payment-card{align-self:flex-start;max-width:86%;background:#fff;border:1px solid var(--border);
+    border-radius:12px;border-top-left-radius:3px;padding:12px;box-shadow:0 1px 3px rgba(16,24,40,.08);}
+  .payment-card-title{font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;}
+  .payment-card-value{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent-dark);margin-bottom:9px;}
+  .payment-options{display:flex;flex-direction:column;gap:6px;}
+  .payment-option{display:flex;align-items:center;gap:9px;width:100%;height:38px;padding:0 11px;
+    border:1px solid var(--border-strong);background:#fff;border-radius:8px;font-size:12.5px;font-weight:500;
+    color:var(--text-primary);cursor:pointer;transition:.12s;text-align:left;}
+  .payment-option:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);}
+  .payment-option:disabled{opacity:.45;cursor:default;}
+  .payment-option svg{width:16px;height:16px;flex-shrink:0;color:var(--accent-dark);}
+  .payment-processing{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-secondary);padding:4px 1px;}
+  .pay-spinner{width:13px;height:13px;border-radius:50%;border:2px solid var(--accent-soft);
+    border-top-color:var(--accent);animation:pay-spin .7s linear infinite;flex-shrink:0;}
+  @keyframes pay-spin{to{transform:rotate(360deg);}}
+  .bubble.receipt-ok{align-self:flex-start;background:var(--green-bg);border:1px solid #BBE5C8;color:#0F5C2E;
+    display:flex;align-items:flex-start;gap:7px;border-top-left-radius:3px;}
+  .bubble.receipt-ok svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
+
+  .quick-actions{display:flex;gap:7px;flex-wrap:wrap;padding:9px 12px;border-top:1px solid var(--border);background:#F7F7F7;}
+  .quick-btn{height:30px;padding:0 11px;border:1px solid var(--border-strong);background:#fff;border-radius:999px;
+    font-size:11.5px;font-weight:500;color:var(--text-secondary);cursor:pointer;}
+  .quick-btn:hover{border-color:var(--wa-green);color:var(--wa-green-dark);}
+  .quick-btn.finalizar{border-color:var(--wa-green);color:var(--wa-green-dark);font-weight:600;background:var(--green-bg);}
+  .quick-btn:disabled, .composer input:disabled, .composer button:disabled{opacity:.4;cursor:default;}
+
+  .composer{display:flex;align-items:center;gap:8px;padding:9px 10px;border-top:1px solid var(--border);background:#fff;flex-shrink:0;}
+  .composer input{flex:1;height:38px;border:1px solid var(--border-strong);border-radius:999px;padding:0 14px;
+    font-size:13px;outline:none;font-family:var(--font-sans);}
+  .composer input:focus{border-color:var(--wa-green);}
+  .composer button{width:38px;height:38px;border-radius:50%;border:none;background:var(--wa-green);color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .composer button:hover{background:var(--wa-green-dark);}
+  .composer button svg{width:17px;height:17px;}
+  .restart-link{position:absolute;top:14px;right:14px;font-size:11px;font-weight:600;color:var(--text-secondary);
+    background:#fff;border:1px solid var(--border);padding:5px 10px;border-radius:999px;cursor:pointer;}
+  .restart-link:hover{color:var(--accent-dark);border-color:var(--accent);}
+
+  .typing-bubble{display:flex;gap:4px;padding:12px 14px;}
+  .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text-tertiary);animation:typing-bounce 1.2s infinite;}
+  .typing-dot:nth-child(2){animation-delay:.15s;}
+  .typing-dot:nth-child(3){animation-delay:.3s;}
+  @keyframes typing-bounce{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-4px);opacity:1;}}
+  .setup-error{padding:24px 22px;font-size:13px;color:var(--text-secondary);line-height:1.6;}
+  .setup-error code{background:#F2F3F5;padding:2px 6px;border-radius:5px;font-family:var(--font-mono);font-size:12px;}
+</style>
+</head>
+<body>
+
+<div class="tag"><span class="dot" style="background:#1FA855;"></span>Conectado · respostas geradas por IA em tempo real</div>
+<button class="restart-link" id="restart-btn" style="display:none;">↺ Reiniciar conversa</button>
+
+<div class="page">
+  <div class="phone">
+    <div class="wa-head">
+      <span class="wa-back">‹</span>
+      <div class="wa-avatar" id="wa-avatar">NA</div>
+      <div class="wa-id">
+        <h4 id="wa-name">Negotia Store</h4>
+        <p id="wa-status">online</p>
+      </div>
+      <div class="wa-icons">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></svg>
+      </div>
+    </div>
+
+    <!-- Tela 1: escolher o produto de demonstração -->
+    <div class="setup" id="setup-screen">
+      <h3>Escolha um produto para testar</h3>
+      <p class="sub">Você vai conversar como se fosse o cliente. A IA responde com base nas regras configuradas para este produto.</p>
+      <div id="demo-products"></div>
+      <button class="start-btn" id="start-chat-btn">Iniciar conversa no WhatsApp</button>
+    </div>
+
+    <!-- Tela 2: chat -->
+    <div class="chat-wrap" id="chat-screen">
+      <div class="chat-bg" id="chat-frame"></div>
+      <div class="quick-actions" id="quick-actions">
+        <button class="quick-btn" data-q="preco">Qual o preço?</button>
+        <button class="quick-btn" data-q="desconto">Tem desconto?</button>
+        <button class="quick-btn finalizar" data-q="fechar">✅ Fechar pedido</button>
+      </div>
+      <div class="composer">
+        <input type="text" id="composer-input" placeholder="Digite uma mensagem...">
+        <button id="composer-send" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== supabase: cliente público ===================== */
+const SUPABASE_URL='https://qskvqnpmxblbgsgjqyex.supabase.co';
+const SUPABASE_KEY='sb_publishable_dg-7n3Bgc7E3rqvNuyR-Yg_t_vC3sN-';
+const sb=supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const COMPANY_ID=new URLSearchParams(window.location.search).get('company');
+
+function formatBRL(v){ return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+let REAL_PRODUCTS=[];
+let selectedProduct=null;
+let negState={ closed:false, sending:false };
+let conversationHistory=[]; // {role:'user'|'assistant', content}
+
+function renderDemoProducts(){
+  const wrap=document.getElementById('demo-products');
+  wrap.innerHTML=REAL_PRODUCTS.map(p=>`
+    <div class="demo-product ${p.id===selectedProduct.id?'active':''}" data-id="${p.id}">
+      <div style="flex:1;">
+        <div class="pname">${p.nome}</div>
+        <div class="pprice">R$ ${formatBRL(p.precoPadrao)} / ${p.unidade}</div>
+      </div>
+    </div>`).join('');
+  wrap.querySelectorAll('.demo-product').forEach(el=>{
+    el.addEventListener('click',()=>{
+      selectedProduct=REAL_PRODUCTS.find(p=>p.id===el.dataset.id);
+      renderDemoProducts();
+    });
+  });
+}
+
+async function initSetup(){
+  const setupScreen=document.getElementById('setup-screen');
+  if(!COMPANY_ID){
+    setupScreen.innerHTML=`<div class="setup-error">
+      <h3 style="margin-top:0;">Link incompleto</h3>
+      <p>Essa página precisa de uma empresa na URL para saber quais produtos mostrar.</p>
+      <p>Use: <code>cliente.html?company=ID_DA_EMPRESA</code></p>
+      <p>Você encontra esse link pronto em <strong>Configurações</strong> no painel admin.</p>
+    </div>`;
+    return;
+  }
+  const [{data:companyName}, {data:products, error}]=await Promise.all([
+    sb.rpc('get_public_company_name', {p_company_id:COMPANY_ID}),
+    sb.rpc('get_public_products', {p_company_id:COMPANY_ID})
+  ]);
+  if(error || !products || products.length===0){
+    setupScreen.innerHTML=`<div class="setup-error">
+      <h3 style="margin-top:0;">Nenhum produto disponível</h3>
+      <p>Essa empresa ainda não tem produtos ativos para testar, ou o link está incorreto.</p>
+    </div>`;
+    return;
+  }
+  document.getElementById('wa-name').textContent=companyName || 'Loja';
+  document.getElementById('wa-avatar').textContent=(companyName||'NA').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  REAL_PRODUCTS=products.map(p=>({id:p.id, nome:p.nome, descricao:p.descricao, precoPadrao:Number(p.preco_padrao), unidade:p.unidade, imagens:p.imagens||[]}));
+  selectedProduct=REAL_PRODUCTS[0];
+  renderDemoProducts();
+}
+initSetup();
+
+/* ===================== fluxo de pagamento (mesma lógica do painel admin) ===================== */
+const PAYMENT_METHODS=[
+  {key:'pix',label:'Pix',icon:'<path d="M12 2 4 12l8 10 8-10z"/>'},
+  {key:'cartao',label:'Cartão de crédito',icon:'<rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>'},
+  {key:'boleto',label:'Boleto bancário',icon:'<rect x="4.5" y="5" width="1.6" height="14"/><rect x="8" y="5" width="1" height="14"/><rect x="10.5" y="5" width="2.6" height="14"/><rect x="15.5" y="5" width="1" height="14"/><rect x="18" y="5" width="1.6" height="14"/>'}
+];
+function paymentLabel(key){ const m=PAYMENT_METHODS.find(x=>x.key===key); return m?m.label:key; }
+function processingTimeFor(method){ return method==='pix'?1300:method==='cartao'?1700:1100; }
+let paySeq=0;
+
+function paymentSuccessHtml(method, valorLabel){
+  const m=PAYMENT_METHODS.find(x=>x.key===method);
+  if(method==='boleto'){
+    return `<div class="bubble receipt-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${m.icon}</svg><span>Boleto gerado · R$ ${valorLabel}<br>Pagamento será confirmado em até 2 dias úteis.</span></div>`;
+  }
+  return `<div class="bubble receipt-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg><span>Pagamento aprovado via ${m.label}<br>R$ ${valorLabel}</span></div>`;
+}
+
+function openPaymentFlow(frameEl, valor, onDone){
+  const valorLabel=formatBRL(valor);
+  appendBubble('them', `Perfeito! Como você prefere pagar os R$ ${valorLabel}?`);
+  const uid='pay-'+(++paySeq);
+  const optsHtml=PAYMENT_METHODS.map(m=>`
+    <button class="payment-option" data-method="${m.key}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${m.icon}</svg>
+      <span>${m.label}</span>
+    </button>`).join('');
+  frameEl.insertAdjacentHTML('beforeend', `
+    <div class="payment-card" id="${uid}">
+      <div class="payment-card-title">Forma de pagamento</div>
+      <div class="payment-card-value">R$ ${valorLabel}</div>
+      <div class="payment-options">${optsHtml}</div>
+    </div>`);
+  frameEl.scrollTop=frameEl.scrollHeight;
+  const card=document.getElementById(uid);
+  card.querySelectorAll('.payment-option').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const method=btn.dataset.method;
+      card.querySelectorAll('.payment-option').forEach(b=>b.disabled=true);
+      card.insertAdjacentHTML('beforeend', `<div class="payment-processing"><span class="pay-spinner"></span>Processando pagamento...</div>`);
+      frameEl.scrollTop=frameEl.scrollHeight;
+      setTimeout(()=>{
+        card.remove();
+        frameEl.insertAdjacentHTML('beforeend', paymentSuccessHtml(method, valorLabel));
+        frameEl.scrollTop=frameEl.scrollHeight;
+        onDone(method);
+      }, processingTimeFor(method));
+    });
+  });
+}
+
+/* ===================== chat ===================== */
+function appendBubble(who, text){
+  const frame=document.getElementById('chat-frame');
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble ${who}">${text}</div>`);
+  frame.scrollTop=frame.scrollHeight;
+}
+function appendSys(text){
+  const frame=document.getElementById('chat-frame');
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble sys">${text}</div>`);
+  frame.scrollTop=frame.scrollHeight;
+}
+
+function setQuickActionsEnabled(enabled){
+  document.querySelectorAll('.quick-btn').forEach(b=>b.disabled=!enabled);
+  document.getElementById('composer-input').disabled=!enabled;
+  document.getElementById('composer-send').disabled=!enabled;
+}
+
+function showTyping(){
+  const frame=document.getElementById('chat-frame');
+  const id='typing-'+Date.now();
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble them typing-bubble" id="${id}"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`);
+  frame.scrollTop=frame.scrollHeight;
+  return id;
+}
+function removeTyping(id){ const el=document.getElementById(id); if(el) el.remove(); }
+
+async function callNegotiate(message){
+  const res=await fetch(`${SUPABASE_URL}/functions/v1/negotiate`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
+    body:JSON.stringify({product_id:selectedProduct.id, history:conversationHistory, message})
+  });
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok || data.error) throw new Error(data.error || 'Não consegui falar com a IA agora.');
+  conversationHistory.push({role:'user', content:message});
+  conversationHistory.push({role:'assistant', content:data.reply});
+  return data.reply;
+}
+
+function extractPriceFromText(text, fallback){
+  const m=text.match(/R\$\s?([\d.,]+)/);
+  if(!m) return fallback;
+  const num=parseFloat(m[1].replace(/\./g,'').replace(',','.'));
+  return isNaN(num) ? fallback : num;
+}
+
+async function sendMine(text){
+  if(!text.trim() || negState.closed || negState.sending) return;
+  appendBubble('me', text);
+  negState.sending=true;
+  setQuickActionsEnabled(false);
+  const typingId=showTyping();
+  try{
+    const reply=await callNegotiate(text);
+    removeTyping(typingId);
+    appendBubble('them', reply);
+  }catch(e){
+    removeTyping(typingId);
+    appendBubble('them', 'Desculpe, tive um problema para responder agora.');
+    appendSys(e.message);
+  }
+  negState.sending=false;
+  if(!negState.closed) setQuickActionsEnabled(true);
+}
+
+async function closeSale(){
+  if(negState.closed || negState.sending) return;
+  negState.sending=true;
+  setQuickActionsEnabled(false);
+  appendBubble('me', 'Quero fechar o pedido, pode confirmar o valor final?');
+  const typingId=showTyping();
+  let reply;
+  try{
+    reply=await callNegotiate('Quero fechar o pedido, pode confirmar o valor final?');
+    removeTyping(typingId);
+    appendBubble('them', reply);
+  }catch(e){
+    removeTyping(typingId);
+    appendBubble('them', 'Desculpe, tive um problema para responder agora.');
+    negState.sending=false;
+    setQuickActionsEnabled(true);
+    return;
+  }
+  negState.closed=true;
+  const valor=extractPriceFromText(reply, selectedProduct.precoPadrao);
+  setTimeout(()=>{
+    const frame=document.getElementById('chat-frame');
+    openPaymentFlow(frame, valor, (method)=>{
+      appendSys(`Pedido de ${selectedProduct.nome} confirmado via ${paymentLabel(method)} · R$ ${formatBRL(valor)}`);
+      document.getElementById('restart-btn').style.display='block';
+    });
+  }, 500);
+}
+
+document.getElementById('composer-send').addEventListener('click',()=>{
+  const input=document.getElementById('composer-input');
+  sendMine(input.value);
+  input.value='';
+});
+document.getElementById('composer-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    sendMine(e.target.value);
+    e.target.value='';
+  }
+});
+document.querySelectorAll('.quick-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(btn.dataset.q==='fechar'){ closeSale(); return; }
+    const map={preco:'Qual o preço?', desconto:'Tem desconto?'};
+    sendMine(map[btn.dataset.q]);
+  });
+});
+
+/* ===================== iniciar / reiniciar ===================== */
+function startChat(){
+  negState={closed:false, sending:false};
+  conversationHistory=[];
+  document.getElementById('chat-frame').innerHTML='';
+  setQuickActionsEnabled(true);
+  document.getElementById('restart-btn').style.display='none';
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('chat-screen').classList.add('active');
+  appendBubble('them', `Olá! Bem-vindo(a). Vi seu interesse em ${selectedProduct.nome}. Posso te ajudar com o preço, desconto, ou já fechar o pedido.`);
+}
+document.getElementById('start-chat-btn').addEventListener('click', startChat);
+document.getElementById('restart-btn').addEventListener('click', ()=>{
+  document.getElementById('chat-screen').classList.remove('active');
+  document.getElementById('setup-screen').style.display='flex';
+  document.getElementById('restart-btn').style.display='none';
+});
+</script>
+</body>
+</html>

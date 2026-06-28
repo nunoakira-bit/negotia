@@ -57,6 +57,18 @@
 
   .sidebar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:8px;}
   .sidebar.collapsed .sidebar-top{flex-direction:column;gap:14px;}
+  .ia-status-toggle{display:flex;align-items:center;gap:9px;width:100%;height:38px;padding:0 12px;margin-bottom:18px;
+    border:1px solid var(--border);background:var(--green-bg);border-radius:9px;cursor:pointer;transition:.15s;
+    font-family:var(--font-sans);}
+  .ia-status-toggle:hover{border-color:var(--green);}
+  .ia-status-toggle.paused{background:#F2F3F5;}
+  .ia-status-toggle.paused:hover{border-color:var(--border-strong);}
+  .ia-status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;transition:.15s;}
+  .ia-status-toggle.paused .ia-status-dot{background:var(--text-tertiary);}
+  .ia-status-label{font-size:12.5px;font-weight:600;color:#0F5C2E;white-space:nowrap;overflow:hidden;}
+  .ia-status-toggle.paused .ia-status-label{color:var(--text-secondary);}
+  .sidebar.collapsed .ia-status-toggle{width:38px;height:38px;padding:0;justify-content:center;}
+  .sidebar.collapsed .ia-status-label{display:none;}
   .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text-primary);min-width:0;}
   .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0;}
   .logo-text{white-space:nowrap;overflow:hidden;}
@@ -252,6 +264,8 @@
   .row-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 
   .segmented{display:inline-flex;background:#F0F1F4;border-radius:var(--radius-sm);padding:4px;gap:2px;width:280px;}
+  .segmented.wide{width:auto;max-width:100%;flex-wrap:wrap;}
+  .segmented.wide button{flex:none;padding:0 14px;}
   .segmented button{flex:1;height:34px;border:none;background:transparent;border-radius:7px;font-size:13.5px;
     font-weight:500;color:var(--text-secondary);cursor:pointer;transition:.15s;font-family:var(--font-sans);}
   .segmented button.active{background:#fff;color:var(--accent-dark);box-shadow:0 1px 2px rgba(16,24,40,.08);}
@@ -604,6 +618,10 @@
   .llm-key-row .ghost-action svg{width:17px;height:17px;margin:0;}
   .llm-provider-link{font-size:12px;color:var(--accent-dark);text-decoration:none;font-weight:500;}
   .llm-provider-link:hover{text-decoration:underline;}
+  .ia-avatar-preview{width:60px;height:60px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;
+    overflow:hidden;}
+  .ia-avatar-preview img{width:100%;height:100%;object-fit:cover;}
   .llm-key-status{font-size:12.5px;color:var(--text-secondary);margin:8px 0 0;min-height:0;}
   .llm-key-status.configured{color:var(--green);font-weight:500;}
 
@@ -718,6 +736,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
     </div>
+
+    <button class="ia-status-toggle" id="ia-status-toggle" title="Ligar/desligar atendimento por IA">
+      <span class="ia-status-dot" id="ia-status-dot"></span>
+      <span class="ia-status-label" id="ia-status-label">Atendimento ativo</span>
+    </button>
     <div class="nav-section">
       <div class="nav-item active" data-view="dashboard" title="Dashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
@@ -1339,6 +1362,47 @@
         </div>
 
         <div class="card" style="max-width:640px;">
+          <p class="card-title">Configurações da IA</p>
+          <p class="card-sub">Defina a identidade e o jeito de conversar do atendente virtual.</p>
+
+          <div style="display:flex;gap:16px;align-items:center;margin-top:18px;">
+            <div class="ia-avatar-preview" id="ia-avatar-preview">IA</div>
+            <div>
+              <button class="btn-secondary" id="ia-avatar-upload-btn" type="button">Alterar foto</button>
+              <p class="hint" style="margin:6px 0 0;">PNG ou JPG, até 4MB.</p>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:18px;margin-bottom:0;">
+            <label class="field-label" for="ia-nome-input">Nome da IA</label>
+            <input type="text" id="ia-nome-input" class="auth-input" placeholder="Ex: Sofia" style="margin-bottom:0;">
+          </div>
+
+          <div class="field" style="margin-top:16px;margin-bottom:0;">
+            <span class="field-label">Como a IA se refere a si mesma</span>
+            <div class="segmented wide" id="ia-sexo-segmented">
+              <button type="button" data-value="feminino">Feminino</button>
+              <button type="button" data-value="masculino">Masculino</button>
+              <button type="button" class="active" data-value="neutro">Neutro</button>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:16px;margin-bottom:0;">
+            <span class="field-label">Tom de conversa</span>
+            <div class="segmented wide" id="ia-tom-segmented">
+              <button type="button" data-value="formal">Formal</button>
+              <button type="button" class="active" data-value="amigavel">Amigável</button>
+              <button type="button" data-value="casual">Casual</button>
+              <button type="button" data-value="direto">Direto e objetivo</button>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <button class="btn-primary" id="ia-persona-save">Salvar configurações da IA</button>
+          </div>
+        </div>
+
+        <div class="card" style="max-width:640px;margin-top:20px;">
           <p class="card-title">Meios de pagamento</p>
           <p class="card-sub">Escolha quais formas de pagamento a IA pode oferecer aos seus clientes ao fechar uma venda.</p>
 
@@ -1650,12 +1714,43 @@ async function onAuthReady(session){
   await seedProductsIfEmpty();
   await refreshProductsFromDb();
   await refreshKbDocsFromDb();
+  await syncAtendimentoStatus();
 }
 
 (async function initSession(){
   const {data}=await sb.auth.getSession();
   if(data.session){ await onAuthReady(data.session); }
 })();
+
+/* ===================== ligar/desligar atendimento por IA ===================== */
+let atendimentoAtivo=true;
+
+function renderAtendimentoStatus(){
+  const btn=document.getElementById('ia-status-toggle');
+  const label=document.getElementById('ia-status-label');
+  btn.classList.toggle('paused', !atendimentoAtivo);
+  label.textContent = atendimentoAtivo ? 'Atendimento ativo' : 'Atendimento pausado';
+  btn.title = atendimentoAtivo ? 'Clique para pausar o atendimento por IA' : 'Clique para reativar o atendimento por IA';
+}
+
+async function syncAtendimentoStatus(){
+  const {data, error}=await sb.from('companies').select('atendimento_ativo').eq('id', currentProfile.company_id).single();
+  if(error || !data) return;
+  atendimentoAtivo = data.atendimento_ativo !== false;
+  renderAtendimentoStatus();
+}
+
+document.getElementById('ia-status-toggle').addEventListener('click', async ()=>{
+  const novoStatus=!atendimentoAtivo;
+  const btn=document.getElementById('ia-status-toggle');
+  btn.disabled=true;
+  const {error}=await sb.from('companies').update({atendimento_ativo:novoStatus}).eq('id', currentProfile.company_id);
+  btn.disabled=false;
+  if(error){ showToast('Erro ao atualizar: '+error.message); return; }
+  atendimentoAtivo=novoStatus;
+  renderAtendimentoStatus();
+  showToast(novoStatus ? 'Atendimento por IA reativado' : 'Atendimento por IA pausado — a IA vai avisar que um humano vai responder');
+});
 
 
 const sidebarEl=document.getElementById('sidebar');
@@ -1676,7 +1771,7 @@ function switchView(name){
   if(name==='produtos'){ showProductList(); }
   if(name==='chamados'){ refreshChamados(); }
   if(name==='vendas'){ refreshVendas(); }
-  if(name==='configuracoes'){ syncPaymentTogglesUI(); syncLlmKeyUI(); syncClientTestLink(); }
+  if(name==='configuracoes'){ syncPaymentTogglesUI(); syncLlmKeyUI(); syncClientTestLink(); syncIaPersonaUI(); }
 }
 document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
 
@@ -1982,6 +2077,73 @@ function updateLlmProviderKeyLink(){
   }
 }
 document.getElementById('llm-provider-select').addEventListener('change', updateLlmProviderKeyLink);
+
+/* ---------- configurações: persona da IA (foto, nome, sexo, tom) ---------- */
+function setSegmented(id, value){
+  document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('active', b.dataset.value===value));
+}
+function getSegmented(id){
+  const el=document.querySelector('#'+id+' button.active');
+  return el ? el.dataset.value : null;
+}
+document.getElementById('ia-sexo-segmented').addEventListener('click', e=>{
+  const btn=e.target.closest('button');
+  if(btn) setSegmented('ia-sexo-segmented', btn.dataset.value);
+});
+document.getElementById('ia-tom-segmented').addEventListener('click', e=>{
+  const btn=e.target.closest('button');
+  if(btn) setSegmented('ia-tom-segmented', btn.dataset.value);
+});
+
+let iaAvatarPendingPath=null;
+const iaAvatarInput=document.createElement('input');
+iaAvatarInput.type='file'; iaAvatarInput.accept='image/*'; iaAvatarInput.style.display='none';
+document.body.appendChild(iaAvatarInput);
+document.getElementById('ia-avatar-upload-btn').addEventListener('click',()=>iaAvatarInput.click());
+iaAvatarInput.addEventListener('change', async ()=>{
+  const file=iaAvatarInput.files[0];
+  iaAvatarInput.value='';
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ showToast('Envie uma imagem.'); return; }
+  if(file.size > 4*1024*1024){ showToast('Imagem maior que 4MB.'); return; }
+  const path=`${currentProfile.company_id}/ia-avatar/${Date.now()}-${file.name}`;
+  const {error}=await sb.storage.from('product-images').upload(path, file);
+  if(error){ showToast('Erro ao enviar foto: '+error.message); return; }
+  const {data:pub}=sb.storage.from('product-images').getPublicUrl(path);
+  iaAvatarPendingPath=path;
+  document.getElementById('ia-avatar-preview').innerHTML=`<img src="${pub.publicUrl}" alt="Foto da IA">`;
+});
+
+async function syncIaPersonaUI(){
+  const {data, error}=await sb.from('companies').select('ia_nome, ia_foto, ia_sexo, ia_tom').eq('id', currentProfile.company_id).single();
+  if(error || !data) return;
+  document.getElementById('ia-nome-input').value=data.ia_nome || '';
+  setSegmented('ia-sexo-segmented', data.ia_sexo || 'neutro');
+  setSegmented('ia-tom-segmented', data.ia_tom || 'amigavel');
+  iaAvatarPendingPath=data.ia_foto || null;
+  const preview=document.getElementById('ia-avatar-preview');
+  if(data.ia_foto){
+    const {data:pub}=sb.storage.from('product-images').getPublicUrl(data.ia_foto);
+    preview.innerHTML=`<img src="${pub.publicUrl}" alt="Foto da IA">`;
+  }else{
+    preview.textContent=(data.ia_nome||'IA').trim().slice(0,2).toUpperCase();
+  }
+}
+
+document.getElementById('ia-persona-save').addEventListener('click', async ()=>{
+  const btn=document.getElementById('ia-persona-save');
+  btn.disabled=true;
+  const payload={
+    ia_nome:document.getElementById('ia-nome-input').value.trim() || 'Assistente',
+    ia_sexo:getSegmented('ia-sexo-segmented'),
+    ia_tom:getSegmented('ia-tom-segmented'),
+    ia_foto:iaAvatarPendingPath
+  };
+  const {error}=await sb.from('companies').update(payload).eq('id', currentProfile.company_id);
+  btn.disabled=false;
+  if(error){ showToast('Erro ao salvar: '+error.message); return; }
+  showToast('Configurações da IA salvas com sucesso');
+});
 
 async function syncLlmKeyUI(){
   document.getElementById('llm-key-input').value='';
@@ -2351,9 +2513,9 @@ function iaTestSetSending(sending){
   document.getElementById('ia-test-composer-send').disabled=sending||iaTestClosed;
 }
 
-async function iaTestCallNegotiate(message){
+async function iaTestCallNegotiate(message, start){
   const {data, error}=await sb.functions.invoke('negotiate', {
-    body:{product_id:iaTestProduct.id, history:iaTestHistory, message}
+    body: start ? {product_id:iaTestProduct.id, history:iaTestHistory, start:true} : {product_id:iaTestProduct.id, history:iaTestHistory, message}
   });
   if(error){
     let msg=error.message;
@@ -2361,9 +2523,26 @@ async function iaTestCallNegotiate(message){
     throw new Error(msg);
   }
   if(data?.error) throw new Error(data.error);
-  iaTestHistory.push({role:'user', content:message});
+  iaTestHistory.push({role:'user', content:data.userTurn});
   iaTestHistory.push({role:'assistant', content:data.reply});
   return data.reply;
+}
+
+async function iaTestStartConversation(){
+  const frame=document.getElementById('ia-test-phone-frame');
+  iaTestSetSending(true);
+  const typingId=iaTestShowTyping();
+  try{
+    const reply=await iaTestCallNegotiate(null, true);
+    iaTestRemoveTyping(typingId);
+    frame.insertAdjacentHTML('beforeend', `<div class="bubble out">${reply}</div>`);
+    frame.scrollTop=frame.scrollHeight;
+  }catch(e){
+    iaTestRemoveTyping(typingId);
+    frame.insertAdjacentHTML('beforeend', `<div class="bubble out">Desculpe, tive um problema para iniciar a conversa.</div>`);
+    showToast('Erro ao falar com a IA: '+e.message);
+  }
+  iaTestSetSending(false);
 }
 
 async function iaTestSend(text){
@@ -2409,7 +2588,7 @@ document.getElementById('ia-test-product-select').addEventListener('change',(e)=
   btn.disabled=false;
   btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda';
   if(iaTestProduct){
-    frame.insertAdjacentHTML('beforeend', `<div class="bubble in">Olá, vi o anúncio de ${iaTestProduct.nome}, pode me ajudar?</div>`);
+    iaTestStartConversation();
   }
 });
 

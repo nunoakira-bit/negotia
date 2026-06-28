@@ -57,18 +57,6 @@
 
   .sidebar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:8px;}
   .sidebar.collapsed .sidebar-top{flex-direction:column;gap:14px;}
-  .ia-status-toggle{display:flex;align-items:center;gap:9px;width:100%;height:38px;padding:0 12px;margin-bottom:18px;
-    border:1px solid var(--border);background:var(--green-bg);border-radius:9px;cursor:pointer;transition:.15s;
-    font-family:var(--font-sans);}
-  .ia-status-toggle:hover{border-color:var(--green);}
-  .ia-status-toggle.paused{background:#F2F3F5;}
-  .ia-status-toggle.paused:hover{border-color:var(--border-strong);}
-  .ia-status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;transition:.15s;}
-  .ia-status-toggle.paused .ia-status-dot{background:var(--text-tertiary);}
-  .ia-status-label{font-size:12.5px;font-weight:600;color:#0F5C2E;white-space:nowrap;overflow:hidden;}
-  .ia-status-toggle.paused .ia-status-label{color:var(--text-secondary);}
-  .sidebar.collapsed .ia-status-toggle{width:38px;height:38px;padding:0;justify-content:center;}
-  .sidebar.collapsed .ia-status-label{display:none;}
   .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text-primary);min-width:0;}
   .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0;}
   .logo-text{white-space:nowrap;overflow:hidden;}
@@ -494,7 +482,29 @@
   #toast svg{width:15px;height:15px;color:var(--green);}
 
   /* ---------- notificações ---------- */
+  .topbar-right{display:flex;align-items:center;gap:12px;}
   .bell-wrap{position:relative;}
+
+  /* ---------- status do atendimento por IA (topbar) ---------- */
+  .ia-status-btn{display:flex;align-items:center;gap:10px;height:42px;padding:0 8px 0 12px;
+    border:1px solid var(--border-strong);background:#fff;border-radius:10px;cursor:pointer;
+    transition:.15s;font-family:var(--font-sans);}
+  .ia-status-btn:hover{border-color:var(--accent);box-shadow:0 1px 3px rgba(16,24,40,.06);}
+  .ia-status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;transition:.15s;}
+  .ia-status-text{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;}
+  .ia-status-title{font-size:12.5px;font-weight:600;color:var(--text-primary);}
+  .ia-status-sub{font-size:11px;color:var(--text-tertiary);white-space:nowrap;}
+  .ia-status-switch{width:30px;height:18px;border-radius:999px;background:var(--green);position:relative;
+    flex-shrink:0;transition:.15s;margin-left:2px;}
+  .ia-status-switch-knob{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;
+    transition:.15s;box-shadow:0 1px 2px rgba(16,24,40,.25);}
+  .ia-status-btn.paused .ia-status-dot{background:var(--text-tertiary);}
+  .ia-status-btn.paused .ia-status-switch{background:#D9DCE1;}
+  .ia-status-btn.paused .ia-status-switch .ia-status-switch-knob{left:14px;}
+  .ia-status-btn.unconfigured{border-color:#F3D9A6;background:var(--amber-bg);}
+  .ia-status-btn.unconfigured .ia-status-dot{background:var(--amber);}
+  .ia-status-btn.unconfigured .ia-status-sub{color:var(--amber);font-weight:600;}
+  .ia-status-btn.unconfigured .ia-status-switch{display:none;}
   .bell-btn{position:relative;width:42px;height:42px;border-radius:50%;background:#fff;
     border:1px solid var(--border-strong);box-shadow:var(--shadow-card);display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--text-secondary);transition:.15s;}
@@ -708,22 +718,33 @@
       <span>LOGO DO CLIENTE</span>
     </div>
 
-    <div class="bell-wrap" id="bell-wrap">
-      <button class="bell-btn" id="bell-btn" aria-label="Notificações">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 3.2-1 5-2 7h16c-1-2-2-3.8-2-7z"/><path d="M9.5 19.5a2.5 2.5 0 005 0"/></svg>
-        <span class="bell-badge" id="bell-badge">0</span>
+    <div class="topbar-right">
+      <button class="ia-status-btn" id="ia-status-toggle">
+        <span class="ia-status-dot" id="ia-status-dot"></span>
+        <span class="ia-status-text">
+          <span class="ia-status-title" id="ia-status-title">Atendimento por IA</span>
+          <span class="ia-status-sub" id="ia-status-sub">Carregando...</span>
+        </span>
+        <span class="ia-status-switch" id="ia-status-switch"><span class="ia-status-switch-knob"></span></span>
       </button>
 
-      <div class="notif-panel" id="notif-panel">
-        <div class="notif-panel-head">
-          <p>Notificações</p>
-          <button class="link-btn" id="mark-all-read-panel">Marcar todas como lidas</button>
+      <div class="bell-wrap" id="bell-wrap">
+        <button class="bell-btn" id="bell-btn" aria-label="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 3.2-1 5-2 7h16c-1-2-2-3.8-2-7z"/><path d="M9.5 19.5a2.5 2.5 0 005 0"/></svg>
+          <span class="bell-badge" id="bell-badge">0</span>
+        </button>
+
+        <div class="notif-panel" id="notif-panel">
+          <div class="notif-panel-head">
+            <p>Notificações</p>
+            <button class="link-btn" id="mark-all-read-panel">Marcar todas como lidas</button>
         </div>
         <div class="notif-panel-list" id="notif-panel-list"></div>
         <div class="notif-panel-foot">
           <button class="btn-secondary" id="see-all-notifs" style="width:100%;justify-content:center;display:flex;">Ver todas as notificações</button>
         </div>
       </div>
+    </div>
     </div>
   </header>
 
@@ -736,11 +757,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
     </div>
-
-    <button class="ia-status-toggle" id="ia-status-toggle" title="Ligar/desligar atendimento por IA">
-      <span class="ia-status-dot" id="ia-status-dot"></span>
-      <span class="ia-status-label" id="ia-status-label">Atendimento ativo</span>
-    </button>
     <div class="nav-section">
       <div class="nav-item active" data-view="dashboard" title="Dashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
@@ -1722,25 +1738,42 @@ async function onAuthReady(session){
   if(data.session){ await onAuthReady(data.session); }
 })();
 
-/* ===================== ligar/desligar atendimento por IA ===================== */
+/* ===================== status do atendimento por IA (topbar) ===================== */
 let atendimentoAtivo=true;
+let iaConfigurada=false;
 
 function renderAtendimentoStatus(){
   const btn=document.getElementById('ia-status-toggle');
-  const label=document.getElementById('ia-status-label');
+  const sub=document.getElementById('ia-status-sub');
+  btn.classList.remove('paused','unconfigured');
+
+  if(!iaConfigurada){
+    btn.classList.add('unconfigured');
+    sub.textContent='Chave de IA não configurada';
+    btn.title='Clique para configurar a chave de IA em Configurações';
+    return;
+  }
   btn.classList.toggle('paused', !atendimentoAtivo);
-  label.textContent = atendimentoAtivo ? 'Atendimento ativo' : 'Atendimento pausado';
+  sub.textContent = atendimentoAtivo ? 'Ativo — a IA está respondendo' : 'Pausado — um humano responde';
   btn.title = atendimentoAtivo ? 'Clique para pausar o atendimento por IA' : 'Clique para reativar o atendimento por IA';
 }
 
 async function syncAtendimentoStatus(){
-  const {data, error}=await sb.from('companies').select('atendimento_ativo').eq('id', currentProfile.company_id).single();
-  if(error || !data) return;
-  atendimentoAtivo = data.atendimento_ativo !== false;
+  const [{data:companyData}, {data:keyStatus}]=await Promise.all([
+    sb.from('companies').select('atendimento_ativo').eq('id', currentProfile.company_id).single(),
+    sb.rpc('get_llm_key_status')
+  ]);
+  if(companyData) atendimentoAtivo = companyData.atendimento_ativo !== false;
+  iaConfigurada = !!(keyStatus && keyStatus[0] && keyStatus[0].configured);
   renderAtendimentoStatus();
 }
 
 document.getElementById('ia-status-toggle').addEventListener('click', async ()=>{
+  if(!iaConfigurada){
+    showToast('Configure a chave de IA antes de ativar o atendimento.');
+    switchView('configuracoes');
+    return;
+  }
   const novoStatus=!atendimentoAtivo;
   const btn=document.getElementById('ia-status-toggle');
   btn.disabled=true;
@@ -1749,7 +1782,7 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
   if(error){ showToast('Erro ao atualizar: '+error.message); return; }
   atendimentoAtivo=novoStatus;
   renderAtendimentoStatus();
-  showToast(novoStatus ? 'Atendimento por IA reativado' : 'Atendimento por IA pausado — a IA vai avisar que um humano vai responder');
+  showToast(novoStatus ? 'Atendimento por IA reativado' : 'Atendimento por IA pausado — um humano vai precisar responder no WhatsApp');
 });
 
 
@@ -2188,6 +2221,7 @@ document.getElementById('llm-key-save').addEventListener('click', async ()=>{
   if(error){ showToast('Erro ao salvar a chave: '+error.message); return; }
   showToast('Chave de API salva com sucesso');
   await syncLlmKeyUI();
+  await syncAtendimentoStatus();
 });
 
 document.getElementById('llm-key-remove').addEventListener('click', async ()=>{
@@ -2195,6 +2229,7 @@ document.getElementById('llm-key-remove').addEventListener('click', async ()=>{
   if(error){ showToast('Erro ao remover a chave: '+error.message); return; }
   showToast('Chave de API removida');
   await syncLlmKeyUI();
+  await syncAtendimentoStatus();
 });
 
 /* ---------- configurações: link de teste do lado do cliente ---------- */

@@ -41,7 +41,9 @@
   .wa-head{background:var(--wa-green);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:11px;flex-shrink:0;}
   .wa-back{font-size:20px;line-height:1;opacity:.9;}
   .wa-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;
+    overflow:hidden;
     justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;}
+  .wa-avatar img{width:100%;height:100%;object-fit:cover;}
   .wa-id{flex:1;min-width:0;}
   .wa-id h4{margin:0;font-size:14.5px;font-weight:600;}
   .wa-id p{margin:1px 0 0;font-size:11.5px;opacity:.85;}
@@ -207,8 +209,8 @@ async function initSetup(){
     </div>`;
     return;
   }
-  const [{data:companyName}, {data:products, error}]=await Promise.all([
-    sb.rpc('get_public_company_name', {p_company_id:COMPANY_ID}),
+  const [{data:profile}, {data:products, error}]=await Promise.all([
+    sb.rpc('get_public_company_profile', {p_company_id:COMPANY_ID}),
     sb.rpc('get_public_products', {p_company_id:COMPANY_ID})
   ]);
   if(error || !products || products.length===0){
@@ -218,8 +220,17 @@ async function initSetup(){
     </div>`;
     return;
   }
+  const companyName=profile?.[0]?.name;
+  const iaFoto=profile?.[0]?.ia_foto;
+  companyPaymentMethods=(profile&&profile[0]&&profile[0].payment_methods) || {pix:true,cartao:true,boleto:true};
   document.getElementById('wa-name').textContent=companyName || 'Loja';
-  document.getElementById('wa-avatar').textContent=(companyName||'NA').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const avatarEl=document.getElementById('wa-avatar');
+  if(iaFoto){
+    const {data:pub}=sb.storage.from('product-images').getPublicUrl(iaFoto);
+    avatarEl.innerHTML=`<img src="${pub.publicUrl}" alt="">`;
+  }else{
+    avatarEl.textContent=(companyName||'NA').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  }
   REAL_PRODUCTS=products.map(p=>({id:p.id, nome:p.nome, descricao:p.descricao, precoPadrao:Number(p.preco_padrao), unidade:p.unidade, imagens:p.imagens||[]}));
   selectedProduct=REAL_PRODUCTS[0];
   renderDemoProducts();
@@ -227,11 +238,16 @@ async function initSetup(){
 initSetup();
 
 /* ===================== fluxo de pagamento (mesma lógica do painel admin) ===================== */
+let companyPaymentMethods={pix:true,cartao:true,boleto:true};
 const PAYMENT_METHODS=[
   {key:'pix',label:'Pix',icon:'<path d="M12 2 4 12l8 10 8-10z"/>'},
   {key:'cartao',label:'Cartão de crédito',icon:'<rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>'},
   {key:'boleto',label:'Boleto bancário',icon:'<rect x="4.5" y="5" width="1.6" height="14"/><rect x="8" y="5" width="1" height="14"/><rect x="10.5" y="5" width="2.6" height="14"/><rect x="15.5" y="5" width="1" height="14"/><rect x="18" y="5" width="1.6" height="14"/>'}
 ];
+function getEnabledPaymentMethods(){
+  const enabled=PAYMENT_METHODS.filter(m=>companyPaymentMethods[m.key]!==false);
+  return enabled.length ? enabled : PAYMENT_METHODS;
+}
 function paymentLabel(key){ const m=PAYMENT_METHODS.find(x=>x.key===key); return m?m.label:key; }
 function processingTimeFor(method){ return method==='pix'?1300:method==='cartao'?1700:1100; }
 let paySeq=0;
@@ -248,7 +264,7 @@ function openPaymentFlow(frameEl, valor, onDone){
   const valorLabel=formatBRL(valor);
   appendBubble('them', `Perfeito! Como você prefere pagar os R$ ${valorLabel}?`);
   const uid='pay-'+(++paySeq);
-  const optsHtml=PAYMENT_METHODS.map(m=>`
+  const optsHtml=getEnabledPaymentMethods().map(m=>`
     <button class="payment-option" data-method="${m.key}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${m.icon}</svg>
       <span>${m.label}</span>
@@ -304,15 +320,17 @@ function showTyping(){
 }
 function removeTyping(id){ const el=document.getElementById(id); if(el) el.remove(); }
 
-async function callNegotiate(message){
+async function callNegotiate(message, start){
   const res=await fetch(`${SUPABASE_URL}/functions/v1/negotiate`, {
     method:'POST',
     headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
-    body:JSON.stringify({product_id:selectedProduct.id, history:conversationHistory, message})
+    body:JSON.stringify(start
+      ? {product_id:selectedProduct.id, history:conversationHistory, start:true}
+      : {product_id:selectedProduct.id, history:conversationHistory, message})
   });
   const data=await res.json().catch(()=>({}));
   if(!res.ok || data.error) throw new Error(data.error || 'Não consegui falar com a IA agora.');
-  conversationHistory.push({role:'user', content:message});
+  conversationHistory.push({role:'user', content:data.userTurn});
   conversationHistory.push({role:'assistant', content:data.reply});
   return data.reply;
 }
@@ -392,15 +410,25 @@ document.querySelectorAll('.quick-btn').forEach(btn=>{
 });
 
 /* ===================== iniciar / reiniciar ===================== */
-function startChat(){
+async function startChat(){
   negState={closed:false, sending:false};
   conversationHistory=[];
   document.getElementById('chat-frame').innerHTML='';
-  setQuickActionsEnabled(true);
+  setQuickActionsEnabled(false);
   document.getElementById('restart-btn').style.display='none';
   document.getElementById('setup-screen').style.display='none';
   document.getElementById('chat-screen').classList.add('active');
-  appendBubble('them', `Olá! Bem-vindo(a). Vi seu interesse em ${selectedProduct.nome}. Posso te ajudar com o preço, desconto, ou já fechar o pedido.`);
+  const typingId=showTyping();
+  try{
+    const reply=await callNegotiate(null, true);
+    removeTyping(typingId);
+    appendBubble('them', reply);
+  }catch(e){
+    removeTyping(typingId);
+    appendBubble('them', `Olá! Bem-vindo(a). Vi seu interesse em ${selectedProduct.nome}. Posso te ajudar com o preço, desconto, ou já fechar o pedido.`);
+    appendSys(e.message);
+  }
+  setQuickActionsEnabled(true);
 }
 document.getElementById('start-chat-btn').addEventListener('click', startChat);
 document.getElementById('restart-btn').addEventListener('click', ()=>{

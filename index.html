@@ -505,6 +505,23 @@
   .ia-status-btn.unconfigured .ia-status-dot{background:var(--amber);}
   .ia-status-btn.unconfigured .ia-status-sub{color:var(--amber);font-weight:600;}
   .ia-status-btn.unconfigured .ia-status-switch{display:none;}
+  .nav-admin-only{display:none;}
+  body.is-admin-user .nav-admin-only{display:flex;}
+
+  /* ---------- painel admin: drawer com abas ---------- */
+  .admin-drawer{width:480px;}
+  .admin-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:4px -28px 0;padding:0 28px;flex-shrink:0;}
+  .admin-tab{height:40px;padding:0 4px;margin-right:18px;border:none;background:transparent;font-size:13.5px;
+    font-weight:500;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;
+    font-family:var(--font-sans);transition:.12s;}
+  .admin-tab:hover{color:var(--text-secondary);}
+  .admin-tab.active{color:var(--accent-dark);border-bottom-color:var(--accent);font-weight:600;}
+  .admin-tab-panels{margin:0 -28px;padding:20px 28px;overflow-y:auto;flex:1;min-height:0;}
+  .admin-tab-content{display:none;}
+  .admin-tab-content.active{display:block;}
+  .admin-readonly-value{margin:4px 0 14px;font-size:13.5px;color:var(--text-primary);font-weight:500;}
+  .admin-readonly-value.mono{font-family:var(--font-mono);font-size:12.5px;color:var(--text-secondary);}
+  .admin-persona-readonly{border-top:1px solid var(--border);margin-top:6px;}
   .bell-btn{position:relative;width:42px;height:42px;border-radius:50%;background:#fff;
     border:1px solid var(--border-strong);box-shadow:var(--shadow-card);display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--text-secondary);transition:.15s;}
@@ -785,6 +802,10 @@
       <div class="nav-item" data-view="configuracoes" title="Configurações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l1.9-1.5-2-3.4-2.2.6a7.6 7.6 0 00-1.7-1l-.3-2.3H9.9l-.3 2.3a7.6 7.6 0 00-1.7 1l-2.2-.6-2 3.4L5.6 11a7.6 7.6 0 000 2l-1.9 1.5 2 3.4 2.2-.6a7.6 7.6 0 001.7 1l.3 2.3h4.2l.3-2.3a7.6 7.6 0 001.7-1l2.2.6 2-3.4z"/></svg>
         <span class="nav-label">Configurações</span>
+      </div>
+      <div class="nav-item nav-admin-only" data-view="admin" title="Administração">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span class="nav-label">Administração</span>
       </div>
     </div>
     <div class="sidebar-footer">
@@ -1373,7 +1394,7 @@
         <div class="page-head">
           <div>
             <h1>Configurações</h1>
-            <p class="subtitle">Defina como a IA negocia e recebe pagamentos pelo WhatsApp.</p>
+            <p class="subtitle">Defina a identidade e o jeito de conversar da sua IA.</p>
           </div>
         </div>
 
@@ -1417,80 +1438,30 @@
             <button class="btn-primary" id="ia-persona-save">Salvar configurações da IA</button>
           </div>
         </div>
+      </section>
 
-        <div class="card" style="max-width:640px;margin-top:20px;">
-          <p class="card-title">Meios de pagamento</p>
-          <p class="card-sub">Escolha quais formas de pagamento a IA pode oferecer aos seus clientes ao fechar uma venda.</p>
-
-          <div style="margin-top:18px;">
-            <div class="settings-row">
-              <div class="settings-row-left">
-                <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 12l8 10 8-10z"/></svg></div>
-                <div class="settings-row-text"><p class="s-title">Pix</p><p class="s-desc">Aprovação em segundos</p></div>
-              </div>
-              <label class="toggle-switch"><input type="checkbox" id="pay-toggle-pix" data-method="pix" checked><span class="toggle-slider"></span></label>
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-left">
-                <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-                <div class="settings-row-text"><p class="s-title">Cartão de crédito</p><p class="s-desc">Aprovação imediata</p></div>
-              </div>
-              <label class="toggle-switch"><input type="checkbox" id="pay-toggle-cartao" data-method="cartao" checked><span class="toggle-slider"></span></label>
-            </div>
-            <div class="settings-row">
-              <div class="settings-row-left">
-                <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="5" width="1.6" height="14"/><rect x="8" y="5" width="1" height="14"/><rect x="10.5" y="5" width="2.6" height="14"/><rect x="15.5" y="5" width="1" height="14"/><rect x="18" y="5" width="1.6" height="14"/></svg></div>
-                <div class="settings-row-text"><p class="s-title">Boleto bancário</p><p class="s-desc">Confirmação em até 2 dias úteis</p></div>
-              </div>
-              <label class="toggle-switch"><input type="checkbox" id="pay-toggle-boleto" data-method="boleto" checked><span class="toggle-slider"></span></label>
-            </div>
+      <!-- ===================== ADMINISTRAÇÃO (somente admin) ===================== -->
+      <section class="view" id="view-admin">
+        <div class="page-head">
+          <div>
+            <h1>Administração</h1>
+            <p class="subtitle">Gerencie todos os clientes da plataforma Negotia AI.</p>
           </div>
-
-          <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Pelo menos um meio de pagamento precisa ficar ativo. A IA só oferece aos clientes os métodos marcados aqui.</p>
         </div>
 
-        <div class="card" style="max-width:640px;margin-top:20px;">
-          <p class="card-title">Chave de API da IA</p>
-          <p class="card-sub">Conecte a chave do modelo de linguagem que vai conduzir as negociações pelo WhatsApp. Cada empresa usa sua própria chave.</p>
-
-          <div style="margin-top:18px;">
-            <label class="field-label" for="llm-provider-select">Provedor</label>
-            <select id="llm-provider-select" class="auth-input" style="margin-bottom:6px;">
-              <option value="anthropic">Anthropic (Claude)</option>
-              <option value="openai">OpenAI (GPT)</option>
-              <option value="gemini">Google (Gemini)</option>
-              <option value="outro">Outro</option>
-            </select>
-            <p style="margin:0 0 16px;"><a href="#" id="llm-provider-key-link" target="_blank" rel="noopener" class="llm-provider-link">Criar uma chave no console da Anthropic ↗</a></p>
-
-            <label class="field-label" for="llm-key-input">Chave de API</label>
-            <div class="llm-key-row">
-              <input type="password" id="llm-key-input" class="auth-input" placeholder="sk-ant-..." autocomplete="off" style="margin-bottom:0;">
-              <button class="ghost-action" id="llm-key-toggle-visibility" type="button" title="Mostrar/ocultar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-            <p class="llm-key-status" id="llm-key-status"></p>
-
-            <div style="display:flex;gap:10px;margin-top:14px;">
-              <button class="btn-primary" id="llm-key-save">Salvar chave</button>
-              <button class="btn-secondary" id="llm-key-remove" style="display:none;">Remover chave</button>
-            </div>
-          </div>
-
-          <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>A chave fica guardada só para a sua empresa e nunca é exibida novamente depois de salva — apenas os últimos 4 caracteres.</p>
+        <div style="margin-bottom:16px;max-width:340px;">
+          <input type="text" id="admin-search" class="auth-input" placeholder="Buscar empresa..." style="margin-bottom:0;">
         </div>
 
-        <div class="card" style="max-width:640px;margin-top:20px;">
-          <p class="card-title">Link de teste — lado do cliente</p>
-          <p class="card-sub">Abra esse link pra testar a conversa como se fosse um cliente real conversando pelo WhatsApp, com a IA respondendo de verdade.</p>
-          <div class="llm-key-row" style="margin-top:14px;">
-            <input type="text" id="client-test-link" class="auth-input" readonly style="margin-bottom:0;font-family:var(--font-mono);font-size:12.5px;">
-            <button class="ghost-action" id="client-test-link-copy" type="button" title="Copiar link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            </button>
-          </div>
-          <p class="hint" style="margin-top:10px;"><a href="#" id="client-test-link-open" target="_blank" rel="noopener" class="llm-provider-link">Abrir em uma nova aba ↗</a></p>
+        <table class="data-table" id="admin-clients-table">
+          <thead>
+            <tr><th>Empresa</th><th>Responsável</th><th>Cadastro</th><th>Atendimento</th><th>IA</th><th>Produtos</th><th></th></tr>
+          </thead>
+          <tbody id="admin-clients-body"></tbody>
+        </table>
+        <div id="admin-clients-empty" class="empty-state" style="display:none;">
+          <h3>Nenhum cliente encontrado</h3>
+          <p>Ainda não há empresas cadastradas na plataforma.</p>
         </div>
       </section>
 
@@ -1576,6 +1547,133 @@
     <button id="ia-test-composer-send" aria-label="Enviar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
+  </div>
+</div>
+
+<!-- Drawer: detalhes do cliente (admin) -->
+<div class="overlay" id="admin-drawer-overlay"></div>
+<div class="drawer admin-drawer" id="admin-drawer">
+  <div class="drawer-head">
+    <div>
+      <h3 id="admin-drawer-company-name">Empresa</h3>
+      <p id="admin-drawer-company-sub">—</p>
+    </div>
+    <button class="close-btn" id="close-admin-drawer" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="cadastro">Cadastro</button>
+    <button class="admin-tab" data-tab="pagamento">Pagamento</button>
+    <button class="admin-tab" data-tab="ia">IA</button>
+  </div>
+
+  <div class="admin-tab-panels">
+    <!-- ABA 1: cadastro -->
+    <div class="admin-tab-content active" id="admin-tab-cadastro">
+      <div class="field">
+        <span class="field-label">Nome da empresa</span>
+        <p class="admin-readonly-value" id="admin-info-empresa">—</p>
+      </div>
+      <div class="field">
+        <span class="field-label">Responsável</span>
+        <p class="admin-readonly-value" id="admin-info-responsavel">—</p>
+      </div>
+      <div class="field">
+        <span class="field-label">E-mail de cadastro</span>
+        <p class="admin-readonly-value" id="admin-info-email">—</p>
+      </div>
+      <div class="field">
+        <span class="field-label">Cliente desde</span>
+        <p class="admin-readonly-value" id="admin-info-data">—</p>
+      </div>
+      <div class="field">
+        <span class="field-label">ID da empresa</span>
+        <p class="admin-readonly-value mono" id="admin-info-id">—</p>
+      </div>
+
+      <div class="field" style="margin-top:18px;">
+        <label class="field-label">Link de teste — lado do cliente</label>
+        <div class="llm-key-row">
+          <input type="text" id="admin-test-link" class="auth-input" readonly style="margin-bottom:0;font-family:var(--font-mono);font-size:12.5px;">
+          <button class="ghost-action" id="admin-test-link-copy" type="button" title="Copiar link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 2: pagamento -->
+    <div class="admin-tab-content" id="admin-tab-pagamento">
+      <p class="card-sub" style="margin-bottom:16px;">Escolha quais formas de pagamento a IA pode oferecer aos clientes desta empresa.</p>
+      <div class="settings-row">
+        <div class="settings-row-left">
+          <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 12l8 10 8-10z"/></svg></div>
+          <div class="settings-row-text"><p class="s-title">Pix</p><p class="s-desc">Aprovação em segundos</p></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="admin-pay-toggle-pix" data-method="pix" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-left">
+          <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div class="settings-row-text"><p class="s-title">Cartão de crédito</p><p class="s-desc">Aprovação imediata</p></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="admin-pay-toggle-cartao" data-method="cartao" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-left">
+          <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="5" width="1.6" height="14"/><rect x="8" y="5" width="1" height="14"/><rect x="10.5" y="5" width="2.6" height="14"/><rect x="15.5" y="5" width="1" height="14"/><rect x="18" y="5" width="1.6" height="14"/></svg></div>
+          <div class="settings-row-text"><p class="s-title">Boleto bancário</p><p class="s-desc">Confirmação em até 2 dias úteis</p></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="admin-pay-toggle-boleto" data-method="boleto" checked><span class="toggle-slider"></span></label>
+      </div>
+      <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Pelo menos um meio de pagamento precisa ficar ativo.</p>
+    </div>
+
+    <!-- ABA 3: IA -->
+    <div class="admin-tab-content" id="admin-tab-ia">
+      <div class="settings-row" style="border-bottom:none;padding-top:0;">
+        <div class="settings-row-left">
+          <div class="settings-row-text"><p class="s-title">Atendimento por IA</p><p class="s-desc" id="admin-ia-status-sub">—</p></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="admin-atendimento-toggle"><span class="toggle-slider"></span></label>
+      </div>
+
+      <div class="field" style="margin-top:8px;">
+        <label class="field-label" for="admin-llm-provider-select">Provedor</label>
+        <select id="admin-llm-provider-select" class="auth-input" style="margin-bottom:6px;">
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="openai">OpenAI (GPT)</option>
+          <option value="gemini">Google (Gemini)</option>
+          <option value="outro">Outro</option>
+        </select>
+        <p style="margin:0 0 16px;"><a href="#" id="admin-llm-provider-key-link" target="_blank" rel="noopener" class="llm-provider-link">Criar uma chave no console da Anthropic ↗</a></p>
+
+        <label class="field-label" for="admin-llm-key-input">Chave de API</label>
+        <div class="llm-key-row">
+          <input type="password" id="admin-llm-key-input" class="auth-input" placeholder="sk-ant-..." autocomplete="off" style="margin-bottom:0;">
+          <button class="ghost-action" id="admin-llm-key-toggle-visibility" type="button" title="Mostrar/ocultar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <p class="llm-key-status" id="admin-llm-key-status"></p>
+
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button class="btn-primary" id="admin-llm-key-save">Salvar chave</button>
+          <button class="btn-secondary" id="admin-llm-key-remove" style="display:none;">Remover chave</button>
+        </div>
+      </div>
+
+      <div class="admin-persona-readonly" id="admin-persona-readonly">
+        <p class="card-sub" style="margin:18px 0 10px;">Persona da IA (definida pelo cliente)</p>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div class="ia-avatar-preview" id="admin-ia-avatar-preview">IA</div>
+          <div>
+            <p class="admin-readonly-value" id="admin-ia-nome" style="margin:0;">—</p>
+            <p class="s-desc" id="admin-ia-sexo-tom">—</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1715,7 +1813,7 @@ async function onAuthReady(session){
   currentSession=session;
   const {data:profile, error}=await sb
     .from('profiles')
-    .select('id, nome, company_id, companies(name)')
+    .select('id, nome, company_id, is_admin, companies(name)')
     .eq('id', session.user.id)
     .single();
   if(error || !profile){
@@ -1727,10 +1825,12 @@ async function onAuthReady(session){
   document.getElementById('sidebar-companyname').textContent=profile.companies ? profile.companies.name : '';
   document.getElementById('sidebar-avatar').textContent=(profile.nome||session.user.email).trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
   document.body.classList.add('authed');
+  document.body.classList.toggle('is-admin-user', !!profile.is_admin);
   await seedProductsIfEmpty();
   await refreshProductsFromDb();
   await refreshKbDocsFromDb();
   await syncAtendimentoStatus();
+  await loadCompanyPaymentMethods();
 }
 
 (async function initSession(){
@@ -1804,7 +1904,8 @@ function switchView(name){
   if(name==='produtos'){ showProductList(); }
   if(name==='chamados'){ refreshChamados(); }
   if(name==='vendas'){ refreshVendas(); }
-  if(name==='configuracoes'){ syncPaymentTogglesUI(); syncLlmKeyUI(); syncClientTestLink(); syncIaPersonaUI(); }
+  if(name==='configuracoes'){ syncIaPersonaUI(); }
+  if(name==='admin'){ refreshAdminClientList(); }
 }
 document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
 
@@ -2052,65 +2153,18 @@ function paymentLabel(key){ const m=PAYMENT_METHODS.find(x=>x.key===key); return
 function paymentTableLabel(key){ return {pix:'PIX',cartao:'Cartão',boleto:'Boleto'}[key]||key; }
 function processingTimeFor(method){ return method==='pix'?1300:method==='cartao'?1700:1100; }
 
-/* ---------- configuração de meios de pagamento (por conta/cliente, salva em localStorage) ---------- */
-const PAYMENT_CONFIG_KEY='negotia_payment_config';
-function loadPaymentConfig(){
-  try{
-    const saved=JSON.parse(localStorage.getItem(PAYMENT_CONFIG_KEY));
-    if(saved && typeof saved==='object') return {pix:true,cartao:true,boleto:true,...saved};
-  }catch(e){}
-  return {pix:true,cartao:true,boleto:true};
+/* ---------- meios de pagamento (por empresa, vem do banco) ---------- */
+let companyPaymentMethods={pix:true,cartao:true,boleto:true};
+async function loadCompanyPaymentMethods(){
+  const {data, error}=await sb.from('companies').select('payment_methods').eq('id', currentProfile.company_id).single();
+  if(!error && data && data.payment_methods) companyPaymentMethods={pix:true,cartao:true,boleto:true,...data.payment_methods};
 }
-function savePaymentConfig(cfg){ localStorage.setItem(PAYMENT_CONFIG_KEY, JSON.stringify(cfg)); }
 function getEnabledPaymentMethods(){
-  const cfg=loadPaymentConfig();
-  const enabled=PAYMENT_METHODS.filter(m=>cfg[m.key]!==false);
+  const enabled=PAYMENT_METHODS.filter(m=>companyPaymentMethods[m.key]!==false);
   return enabled.length ? enabled : PAYMENT_METHODS; // nunca deixa o card vazio
 }
-function syncPaymentTogglesUI(){
-  const cfg=loadPaymentConfig();
-  document.querySelectorAll('#view-configuracoes .toggle-switch input[data-method]').forEach(input=>{
-    input.checked = cfg[input.dataset.method]!==false;
-  });
-}
-document.querySelectorAll('#view-configuracoes .toggle-switch input[data-method]').forEach(input=>{
-  input.addEventListener('change',()=>{
-    const cfg=loadPaymentConfig();
-    const checkedInputs=[...document.querySelectorAll('#view-configuracoes .toggle-switch input[data-method]')].filter(i=>i.checked);
-    if(checkedInputs.length===0){
-      input.checked=true; // impede deixar todos desativados
-      showToast('Pelo menos um meio de pagamento precisa ficar ativo.');
-      return;
-    }
-    cfg[input.dataset.method]=input.checked;
-    savePaymentConfig(cfg);
-    showToast(input.checked
-      ? paymentLabel(input.dataset.method)+' ativado para seus clientes'
-      : paymentLabel(input.dataset.method)+' desativado para seus clientes');
-  });
-});
 
 /* ---------- configurações: chave de API da IA ---------- */
-const LLM_PROVIDER_KEY_LINKS={
-  anthropic:{url:'https://console.anthropic.com/settings/keys', label:'Criar uma chave no console da Anthropic ↗'},
-  openai:{url:'https://platform.openai.com/api-keys', label:'Criar uma chave na plataforma da OpenAI ↗'},
-  gemini:{url:'https://aistudio.google.com/app/apikey', label:'Criar uma chave no Google AI Studio ↗'},
-  outro:{url:null, label:''}
-};
-function updateLlmProviderKeyLink(){
-  const provider=document.getElementById('llm-provider-select').value;
-  const info=LLM_PROVIDER_KEY_LINKS[provider]||LLM_PROVIDER_KEY_LINKS.outro;
-  const linkEl=document.getElementById('llm-provider-key-link');
-  if(info.url){
-    linkEl.href=info.url;
-    linkEl.textContent=info.label;
-    linkEl.style.display='inline';
-  }else{
-    linkEl.style.display='none';
-  }
-}
-document.getElementById('llm-provider-select').addEventListener('change', updateLlmProviderKeyLink);
-
 /* ---------- configurações: persona da IA (foto, nome, sexo, tom) ---------- */
 function setSegmented(id, value){
   document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('active', b.dataset.value===value));
@@ -2130,7 +2184,7 @@ document.getElementById('ia-tom-segmented').addEventListener('click', e=>{
 
 let iaAvatarPendingPath=null;
 const iaAvatarInput=document.createElement('input');
-iaAvatarInput.type='file'; iaAvatarInput.accept='image/*'; iaAvatarInput.style.display='none';
+iaAvatarInput.type='file'; iaAvatarInput.accept='image/*'; iaAvatarInput.style.display='none'; iaAvatarInput.id='ia-avatar-file-input';
 document.body.appendChild(iaAvatarInput);
 document.getElementById('ia-avatar-upload-btn').addEventListener('click',()=>iaAvatarInput.click());
 iaAvatarInput.addEventListener('change', async ()=>{
@@ -2178,76 +2232,216 @@ document.getElementById('ia-persona-save').addEventListener('click', async ()=>{
   showToast('Configurações da IA salvas com sucesso');
 });
 
-async function syncLlmKeyUI(){
-  document.getElementById('llm-key-input').value='';
-  document.getElementById('llm-key-input').type='password';
-  const {data, error}=await sb.rpc('get_llm_key_status');
-  const status=data && data[0];
-  const statusEl=document.getElementById('llm-key-status');
-  const removeBtn=document.getElementById('llm-key-remove');
+/* ===================== painel de administração ===================== */
+const ADMIN_LLM_PROVIDER_KEY_LINKS={
+  anthropic:{url:'https://console.anthropic.com/settings/keys', label:'Criar uma chave no console da Anthropic ↗'},
+  openai:{url:'https://platform.openai.com/api-keys', label:'Criar uma chave na plataforma da OpenAI ↗'},
+  gemini:{url:'https://aistudio.google.com/app/apikey', label:'Criar uma chave no Google AI Studio ↗'},
+  outro:{url:null, label:''}
+};
+function updateAdminLlmProviderKeyLink(){
+  const provider=document.getElementById('admin-llm-provider-select').value;
+  const info=ADMIN_LLM_PROVIDER_KEY_LINKS[provider]||ADMIN_LLM_PROVIDER_KEY_LINKS.outro;
+  const linkEl=document.getElementById('admin-llm-provider-key-link');
+  if(info.url){ linkEl.href=info.url; linkEl.textContent=info.label; linkEl.style.display='inline'; }
+  else{ linkEl.style.display='none'; }
+}
+document.getElementById('admin-llm-provider-select').addEventListener('change', updateAdminLlmProviderKeyLink);
 
-  if(error){
-    statusEl.textContent='Não foi possível carregar o status da chave.';
-    statusEl.classList.remove('configured');
-    updateLlmProviderKeyLink();
+let adminClientsCache=[];
+let adminSelectedCompanyId=null;
+
+async function refreshAdminClientList(){
+  const {data, error}=await sb.from('companies')
+    .select('id, name, created_at, atendimento_ativo, llm_api_key, profiles(nome,email), products(count)')
+    .order('created_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar clientes: '+error.message); return; }
+  adminClientsCache=data||[];
+  renderAdminClientList('');
+}
+
+function renderAdminClientList(filterText){
+  const list=filterText
+    ? adminClientsCache.filter(c=>c.name.toLowerCase().includes(filterText.toLowerCase()))
+    : adminClientsCache;
+  const body=document.getElementById('admin-clients-body');
+  const empty=document.getElementById('admin-clients-empty');
+  const table=document.getElementById('admin-clients-table');
+
+  if(adminClientsCache.length===0){
+    table.style.display='none'; empty.style.display='block';
     return;
   }
-  if(status && status.configured){
-    document.getElementById('llm-provider-select').value=status.provider;
-    statusEl.textContent=`Chave configurada (terminando em ${status.last4}). Cole uma nova chave abaixo para substituí-la.`;
+  table.style.display='table'; empty.style.display='none';
+
+  body.innerHTML=list.map(c=>{
+    const resp=(c.profiles&&c.profiles[0])||{};
+    const nProdutos=(c.products&&c.products[0]&&c.products[0].count)||0;
+    const dataCad=new Date(c.created_at).toLocaleDateString('pt-BR');
+    const atendStatus=c.atendimento_ativo!==false
+      ? '<span class="status-pill INDEXADO">Ativo</span>'
+      : '<span class="status-pill PROCESSANDO">Pausado</span>';
+    const iaStatus=c.llm_api_key
+      ? '<span class="status-pill INDEXADO">Configurada</span>'
+      : '<span class="status-pill ERRO">Pendente</span>';
+    return `<tr data-id="${c.id}" style="cursor:pointer;">
+      <td><strong>${c.name}</strong></td>
+      <td class="cell-muted">${resp.nome||'—'}</td>
+      <td class="cell-muted">${dataCad}</td>
+      <td>${atendStatus}</td>
+      <td>${iaStatus}</td>
+      <td class="cell-mono">${nProdutos}</td>
+      <td><button class="ghost-action admin-open-btn">Ver detalhes</button></td>
+    </tr>`;
+  }).join('');
+
+  body.querySelectorAll('tr').forEach(row=>{
+    row.addEventListener('click',()=>openAdminDrawer(row.dataset.id));
+  });
+}
+
+document.getElementById('admin-search').addEventListener('input', e=>renderAdminClientList(e.target.value));
+
+const adminDrawerOverlay=document.getElementById('admin-drawer-overlay');
+const adminDrawerEl=document.getElementById('admin-drawer');
+
+async function openAdminDrawer(companyId){
+  adminSelectedCompanyId=companyId;
+  const company=adminClientsCache.find(c=>c.id===companyId);
+  if(!company) return;
+  const resp=(company.profiles&&company.profiles[0])||{};
+
+  document.getElementById('admin-drawer-company-name').textContent=company.name;
+  document.getElementById('admin-drawer-company-sub').textContent=resp.email||'';
+
+  // aba cadastro
+  document.getElementById('admin-info-empresa').textContent=company.name;
+  document.getElementById('admin-info-responsavel').textContent=resp.nome||'—';
+  document.getElementById('admin-info-email').textContent=resp.email||'—';
+  document.getElementById('admin-info-data').textContent=new Date(company.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('admin-info-id').textContent=company.id;
+  document.getElementById('admin-test-link').value=new URL('cliente.html?company='+company.id, window.location.href).href;
+
+  // buscar dados completos (pagamento + persona) que não vieram na lista resumida
+  const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom').eq('id', companyId).single();
+  const pm=(full&&full.payment_methods)||{pix:true,cartao:true,boleto:true};
+  document.getElementById('admin-pay-toggle-pix').checked=pm.pix!==false;
+  document.getElementById('admin-pay-toggle-cartao').checked=pm.cartao!==false;
+  document.getElementById('admin-pay-toggle-boleto').checked=pm.boleto!==false;
+
+  document.getElementById('admin-atendimento-toggle').checked=full ? full.atendimento_ativo!==false : true;
+  document.getElementById('admin-ia-status-sub').textContent=(full&&full.atendimento_ativo!==false) ? 'Ativo — a IA está respondendo' : 'Pausado — um humano responde';
+  document.getElementById('admin-llm-provider-select').value=(full&&full.llm_provider)||'anthropic';
+  updateAdminLlmProviderKeyLink();
+
+  document.getElementById('admin-llm-key-input').value='';
+  document.getElementById('admin-llm-key-input').type='password';
+  const {data:keyStatus}=await sb.rpc('get_llm_key_status_admin', {p_company_id:companyId});
+  const ks=keyStatus && keyStatus[0];
+  const statusEl=document.getElementById('admin-llm-key-status');
+  const removeBtn=document.getElementById('admin-llm-key-remove');
+  if(ks && ks.configured){
+    statusEl.textContent=`Chave configurada (terminando em ${ks.last4}). Cole uma nova chave abaixo para substituí-la.`;
     statusEl.classList.add('configured');
     removeBtn.style.display='inline-flex';
   }else{
-    statusEl.textContent='Nenhuma chave configurada ainda — a IA não pode negociar de verdade sem isso.';
+    statusEl.textContent='Nenhuma chave configurada ainda.';
     statusEl.classList.remove('configured');
     removeBtn.style.display='none';
   }
-  updateLlmProviderKeyLink();
+
+  const personaPreview=document.getElementById('admin-ia-avatar-preview');
+  if(full && full.ia_foto){
+    const {data:pub}=sb.storage.from('product-images').getPublicUrl(full.ia_foto);
+    personaPreview.innerHTML=`<img src="${pub.publicUrl}" alt="">`;
+  }else{
+    personaPreview.textContent=((full&&full.ia_nome)||'IA').trim().slice(0,2).toUpperCase();
+  }
+  document.getElementById('admin-ia-nome').textContent=(full&&full.ia_nome)||'Assistente';
+  const sexoLabel={feminino:'Feminino',masculino:'Masculino',neutro:'Neutro'}[full&&full.ia_sexo]||'Neutro';
+  const tomLabel={formal:'Formal',amigavel:'Amigável',casual:'Casual',direto:'Direto e objetivo'}[full&&full.ia_tom]||'Amigável';
+  document.getElementById('admin-ia-sexo-tom').textContent=`${sexoLabel} · ${tomLabel}`;
+
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab==='cadastro'));
+  document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.toggle('active', c.id==='admin-tab-cadastro'));
+
+  adminDrawerOverlay.classList.add('open'); adminDrawerEl.classList.add('open');
 }
 
-document.getElementById('llm-key-toggle-visibility').addEventListener('click',()=>{
-  const input=document.getElementById('llm-key-input');
+function closeAdminDrawer(){ adminDrawerOverlay.classList.remove('open'); adminDrawerEl.classList.remove('open'); adminSelectedCompanyId=null; }
+document.getElementById('close-admin-drawer').addEventListener('click', closeAdminDrawer);
+adminDrawerOverlay.addEventListener('click', closeAdminDrawer);
+
+document.querySelectorAll('.admin-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t===tab));
+    document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.toggle('active', c.id==='admin-tab-'+tab.dataset.tab));
+  });
+});
+
+document.getElementById('admin-test-link-copy').addEventListener('click', async ()=>{
+  const input=document.getElementById('admin-test-link');
+  try{ await navigator.clipboard.writeText(input.value); showToast('Link copiado!'); }
+  catch(e){ input.select(); showToast('Selecione e copie manualmente (Ctrl/Cmd+C)'); }
+});
+
+document.querySelectorAll('#admin-tab-pagamento .toggle-switch input[data-method]').forEach(input=>{
+  input.addEventListener('change', async ()=>{
+    if(!adminSelectedCompanyId) return;
+    const checkedInputs=[...document.querySelectorAll('#admin-tab-pagamento .toggle-switch input[data-method]')].filter(i=>i.checked);
+    if(checkedInputs.length===0){
+      input.checked=true;
+      showToast('Pelo menos um meio de pagamento precisa ficar ativo.');
+      return;
+    }
+    const pm={
+      pix:document.getElementById('admin-pay-toggle-pix').checked,
+      cartao:document.getElementById('admin-pay-toggle-cartao').checked,
+      boleto:document.getElementById('admin-pay-toggle-boleto').checked
+    };
+    const {error}=await sb.from('companies').update({payment_methods:pm}).eq('id', adminSelectedCompanyId);
+    if(error){ showToast('Erro ao salvar: '+error.message); return; }
+    showToast('Meios de pagamento atualizados');
+  });
+});
+
+document.getElementById('admin-atendimento-toggle').addEventListener('change', async (e)=>{
+  if(!adminSelectedCompanyId) return;
+  const novoStatus=e.target.checked;
+  const {error}=await sb.from('companies').update({atendimento_ativo:novoStatus}).eq('id', adminSelectedCompanyId);
+  if(error){ showToast('Erro ao salvar: '+error.message); e.target.checked=!novoStatus; return; }
+  document.getElementById('admin-ia-status-sub').textContent=novoStatus ? 'Ativo — a IA está respondendo' : 'Pausado — um humano responde';
+  showToast(novoStatus ? 'Atendimento reativado' : 'Atendimento pausado');
+  refreshAdminClientList();
+});
+
+document.getElementById('admin-llm-key-toggle-visibility').addEventListener('click',()=>{
+  const input=document.getElementById('admin-llm-key-input');
   input.type = input.type==='password' ? 'text' : 'password';
 });
 
-document.getElementById('llm-key-save').addEventListener('click', async ()=>{
-  const key=document.getElementById('llm-key-input').value.trim();
-  const provider=document.getElementById('llm-provider-select').value;
+document.getElementById('admin-llm-key-save').addEventListener('click', async ()=>{
+  if(!adminSelectedCompanyId) return;
+  const key=document.getElementById('admin-llm-key-input').value.trim();
+  const provider=document.getElementById('admin-llm-provider-select').value;
   if(!key){ showToast('Cole a chave de API antes de salvar.'); return; }
-  const btn=document.getElementById('llm-key-save');
+  const btn=document.getElementById('admin-llm-key-save');
   btn.disabled=true;
-  const {error}=await sb.from('companies').update({llm_api_key:key, llm_provider:provider}).eq('id', currentProfile.company_id);
+  const {error}=await sb.from('companies').update({llm_api_key:key, llm_provider:provider}).eq('id', adminSelectedCompanyId);
   btn.disabled=false;
   if(error){ showToast('Erro ao salvar a chave: '+error.message); return; }
   showToast('Chave de API salva com sucesso');
-  await syncLlmKeyUI();
-  await syncAtendimentoStatus();
+  await openAdminDrawer(adminSelectedCompanyId);
+  await refreshAdminClientList();
 });
 
-document.getElementById('llm-key-remove').addEventListener('click', async ()=>{
-  const {error}=await sb.from('companies').update({llm_api_key:null}).eq('id', currentProfile.company_id);
+document.getElementById('admin-llm-key-remove').addEventListener('click', async ()=>{
+  if(!adminSelectedCompanyId) return;
+  const {error}=await sb.from('companies').update({llm_api_key:null}).eq('id', adminSelectedCompanyId);
   if(error){ showToast('Erro ao remover a chave: '+error.message); return; }
   showToast('Chave de API removida');
-  await syncLlmKeyUI();
-  await syncAtendimentoStatus();
-});
-
-/* ---------- configurações: link de teste do lado do cliente ---------- */
-function syncClientTestLink(){
-  if(!currentProfile) return;
-  const url=new URL('cliente.html?company='+currentProfile.company_id, window.location.href).href;
-  document.getElementById('client-test-link').value=url;
-  document.getElementById('client-test-link-open').href=url;
-}
-document.getElementById('client-test-link-copy').addEventListener('click', async ()=>{
-  const input=document.getElementById('client-test-link');
-  try{
-    await navigator.clipboard.writeText(input.value);
-    showToast('Link copiado!');
-  }catch(e){
-    input.select();
-    showToast('Selecione e copie o link manualmente (Ctrl/Cmd+C)');
-  }
+  await openAdminDrawer(adminSelectedCompanyId);
+  await refreshAdminClientList();
 });
 
 let paymentCardSeq=0;

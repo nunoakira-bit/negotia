@@ -507,6 +507,8 @@
   .ia-status-btn.unconfigured .ia-status-switch{display:none;}
   .nav-admin-only{display:none;}
   body.is-admin-user .nav-admin-only{display:flex;}
+  .nav-item[data-view="chamados"], .nav-item[data-view="conhecimento"],
+  #shortcut-chamados-urgentes, #shortcut-add-pdf{display:none !important;}
 
   /* ---------- painel admin: drawer com abas ---------- */
   .admin-drawer{width:480px;}
@@ -1608,9 +1610,9 @@
       <div class="settings-row">
         <div class="settings-row-left">
           <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 12l8 10 8-10z"/></svg></div>
-          <div class="settings-row-text"><p class="s-title">Pix</p><p class="s-desc">Aprovação em segundos</p></div>
+          <div class="settings-row-text"><p class="s-title">Pix <span class="status-pill PROCESSANDO" style="margin-left:6px;">Em breve</span></p><p class="s-desc">Aprovação em segundos</p></div>
         </div>
-        <label class="toggle-switch"><input type="checkbox" id="admin-pay-toggle-pix" data-method="pix" checked><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><input type="checkbox" id="admin-pay-toggle-pix" data-method="pix" disabled><span class="toggle-slider"></span></label>
       </div>
       <div class="settings-row">
         <div class="settings-row-left">
@@ -1622,11 +1624,34 @@
       <div class="settings-row">
         <div class="settings-row-left">
           <div class="settings-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="5" width="1.6" height="14"/><rect x="8" y="5" width="1" height="14"/><rect x="10.5" y="5" width="2.6" height="14"/><rect x="15.5" y="5" width="1" height="14"/><rect x="18" y="5" width="1.6" height="14"/></svg></div>
-          <div class="settings-row-text"><p class="s-title">Boleto bancário</p><p class="s-desc">Confirmação em até 2 dias úteis</p></div>
+          <div class="settings-row-text"><p class="s-title">Boleto bancário <span class="status-pill PROCESSANDO" style="margin-left:6px;">Em breve</span></p><p class="s-desc">Confirmação em até 2 dias úteis</p></div>
         </div>
-        <label class="toggle-switch"><input type="checkbox" id="admin-pay-toggle-boleto" data-method="boleto" checked><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><input type="checkbox" id="admin-pay-toggle-boleto" data-method="boleto" disabled><span class="toggle-slider"></span></label>
       </div>
-      <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Pelo menos um meio de pagamento precisa ficar ativo.</p>
+      <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Pix e Boleto estão temporariamente indisponíveis — só Cartão de crédito processa pagamento real no momento.</p>
+
+      <div class="field" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <span class="field-label" style="margin-bottom:0;">Split PicPay (SubSeller)</span>
+          <span class="status-pill" id="admin-picpay-status-pill">—</span>
+        </div>
+        <p class="card-sub" style="margin-bottom:12px;">Cole o código gerado ao cadastrar este cliente como SubSeller no Painel Negócios PicPay (menu Split de Pagamento).</p>
+
+        <label class="field-label" for="admin-picpay-merchant-code">Merchant Code</label>
+        <input type="text" id="admin-picpay-merchant-code" class="auth-input" placeholder="Ex: 000000001179422" style="margin-bottom:12px;">
+
+        <label class="field-label" for="admin-picpay-commission-pct">Comissão da plataforma (%)</label>
+        <input type="number" id="admin-picpay-commission-pct" class="auth-input" placeholder="Deixe em branco para usar a regra padrão do PicPay" step="0.01" min="0" max="100" style="margin-bottom:14px;">
+
+        <button class="ghost-action" id="admin-picpay-save" type="button" style="width:100%;justify-content:center;">Salvar configuração PicPay</button>
+
+        <div class="settings-row" style="border-bottom:none;padding-top:16px;">
+          <div class="settings-row-left">
+            <div class="settings-row-text"><p class="s-title">Recebimento ativo</p><p class="s-desc" id="admin-picpay-status-sub">Cadastre o Merchant Code para ativar</p></div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="admin-picpay-active-toggle" disabled><span class="toggle-slider"></span></label>
+        </div>
+      </div>
     </div>
 
     <!-- ABA 3: IA -->
@@ -1897,7 +1922,9 @@ sidebarToggleBtn.addEventListener('click',()=>{
 document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
   item.addEventListener('click',()=>switchView(item.dataset.view));
 });
+
 function switchView(name){
+  if(name==='chamados' || name==='conhecimento') name='dashboard';
   document.querySelectorAll('.nav-item[data-view]').forEach(i=>i.classList.toggle('active', i.dataset.view===name));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
@@ -1974,13 +2001,7 @@ const notificationsMock=[
     atendId:7,lida:true,minAgo:340},
   {id:8,tipo:'venda',titulo:'Negociação concluída com sucesso',
     descricao:'Eduardo Santos comprou 10 unidades de Cabo USB-C 1m com 10% de desconto automático aplicado.',
-    atendId:6,lida:true,minAgo:1500},
-  {id:9,tipo:'chamado',titulo:'Chamado urgente com SLA vencido',
-    descricao:'O chamado #1042 de Marcos Tadeu (Prefeitura de Ponta Grossa) está URGENTE e passou do prazo de 4h sem resolução.',
-    chamadoId:1042,lida:false,minAgo:18},
-  {id:10,tipo:'chamado',titulo:'Novo chamado escalado para atendente',
-    descricao:'A IA não conseguiu resolver o chamado #1039 com as soluções da base de conhecimento e encaminhou para um atendente humano via WhatsApp.',
-    chamadoId:1039,lida:false,minAgo:95}
+    atendId:6,lida:true,minAgo:1500}
 ];
 
 function notifIconHtml(tipo){
@@ -2323,11 +2344,15 @@ async function openAdminDrawer(companyId){
   document.getElementById('admin-test-link').value=new URL('cliente.html?company='+company.id, window.location.href).href;
 
   // buscar dados completos (pagamento + persona) que não vieram na lista resumida
-  const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom').eq('id', companyId).single();
+  const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom, picpay_merchant_code, picpay_status, picpay_commission_percentage').eq('id', companyId).single();
   const pm=(full&&full.payment_methods)||{pix:true,cartao:true,boleto:true};
-  document.getElementById('admin-pay-toggle-pix').checked=pm.pix!==false;
+  document.getElementById('admin-pay-toggle-pix').checked=false;
   document.getElementById('admin-pay-toggle-cartao').checked=pm.cartao!==false;
-  document.getElementById('admin-pay-toggle-boleto').checked=pm.boleto!==false;
+  document.getElementById('admin-pay-toggle-boleto').checked=false;
+
+  document.getElementById('admin-picpay-merchant-code').value=(full&&full.picpay_merchant_code)||'';
+  document.getElementById('admin-picpay-commission-pct').value=(full&&full.picpay_commission_percentage!=null)?full.picpay_commission_percentage:'';
+  renderPicpayStatus((full&&full.picpay_status)||'nao_configurado', !!(full&&full.picpay_merchant_code));
 
   document.getElementById('admin-atendimento-toggle').checked=full ? full.atendimento_ativo!==false : true;
   document.getElementById('admin-ia-status-sub').textContent=(full&&full.atendimento_ativo!==false) ? 'Ativo — a IA está respondendo' : 'Pausado — um humano responde';
@@ -2385,24 +2410,79 @@ document.getElementById('admin-test-link-copy').addEventListener('click', async 
   catch(e){ input.select(); showToast('Selecione e copie manualmente (Ctrl/Cmd+C)'); }
 });
 
-document.querySelectorAll('#admin-tab-pagamento .toggle-switch input[data-method]').forEach(input=>{
+document.querySelectorAll('#admin-tab-pagamento .toggle-switch input[data-method]:not([disabled])').forEach(input=>{
   input.addEventListener('change', async ()=>{
     if(!adminSelectedCompanyId) return;
-    const checkedInputs=[...document.querySelectorAll('#admin-tab-pagamento .toggle-switch input[data-method]')].filter(i=>i.checked);
-    if(checkedInputs.length===0){
+    if(!document.getElementById('admin-pay-toggle-cartao').checked){
       input.checked=true;
-      showToast('Pelo menos um meio de pagamento precisa ficar ativo.');
+      showToast('Cartão de crédito precisa ficar ativo — é o único meio de pagamento disponível no momento.');
       return;
     }
-    const pm={
-      pix:document.getElementById('admin-pay-toggle-pix').checked,
-      cartao:document.getElementById('admin-pay-toggle-cartao').checked,
-      boleto:document.getElementById('admin-pay-toggle-boleto').checked
-    };
+    const pm={ pix:false, cartao:true, boleto:false };
     const {error}=await sb.from('companies').update({payment_methods:pm}).eq('id', adminSelectedCompanyId);
     if(error){ showToast('Erro ao salvar: '+error.message); return; }
     showToast('Meios de pagamento atualizados');
   });
+});
+
+function renderPicpayStatus(status, hasMerchantCode){
+  const pill=document.getElementById('admin-picpay-status-pill');
+  const sub=document.getElementById('admin-picpay-status-sub');
+  const toggle=document.getElementById('admin-picpay-active-toggle');
+  const map={
+    nao_configurado:{cls:'PROCESSANDO',label:'Não configurado'},
+    ativo:{cls:'INDEXADO',label:'Ativo'},
+    pausado:{cls:'ERRO',label:'Pausado'}
+  };
+  const s=map[status]||map.nao_configurado;
+  pill.className='status-pill '+s.cls;
+  pill.textContent=s.label;
+  toggle.disabled=!hasMerchantCode;
+  toggle.checked=status==='ativo';
+  sub.textContent=!hasMerchantCode
+    ? 'Cadastre o Merchant Code para ativar'
+    : (status==='ativo' ? 'Recebendo pagamentos com split automático' : 'Pausado — nenhum pagamento será dividido para este cliente');
+}
+
+document.getElementById('admin-picpay-save').addEventListener('click', async ()=>{
+  if(!adminSelectedCompanyId) return;
+  const codeInput=document.getElementById('admin-picpay-merchant-code');
+  const pctInput=document.getElementById('admin-picpay-commission-pct');
+  const code=codeInput.value.trim();
+
+  if(code && !/^\d{15,}$/.test(code)){
+    showToast('Merchant Code inválido — deve ter só números, com 15+ dígitos.');
+    return;
+  }
+  let pct=pctInput.value===''?null:parseFloat(pctInput.value);
+  if(pct!=null && (isNaN(pct) || pct<0 || pct>100)){
+    showToast('Comissão deve ser um número entre 0 e 100.');
+    return;
+  }
+
+  const {data:current}=await sb.from('companies').select('picpay_status').eq('id', adminSelectedCompanyId).single();
+  let novoStatus=(current&&current.picpay_status)||'nao_configurado';
+  if(!code) novoStatus='nao_configurado';
+  else if(novoStatus==='nao_configurado') novoStatus='ativo';
+
+  const {error}=await sb.from('companies').update({
+    picpay_merchant_code: code||null,
+    picpay_commission_percentage: pct,
+    picpay_status: novoStatus
+  }).eq('id', adminSelectedCompanyId);
+
+  if(error){ showToast('Erro ao salvar: '+error.message); return; }
+  renderPicpayStatus(novoStatus, !!code);
+  showToast('Configuração PicPay salva');
+});
+
+document.getElementById('admin-picpay-active-toggle').addEventListener('change', async (e)=>{
+  if(!adminSelectedCompanyId) return;
+  const novoStatus=e.target.checked?'ativo':'pausado';
+  const {error}=await sb.from('companies').update({picpay_status:novoStatus}).eq('id', adminSelectedCompanyId);
+  if(error){ showToast('Erro ao salvar: '+error.message); e.target.checked=!e.target.checked; return; }
+  const hasCode=!!document.getElementById('admin-picpay-merchant-code').value.trim();
+  renderPicpayStatus(novoStatus, hasCode);
 });
 
 document.getElementById('admin-atendimento-toggle').addEventListener('change', async (e)=>{

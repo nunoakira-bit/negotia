@@ -1602,6 +1602,19 @@
           </button>
         </div>
       </div>
+
+      <div class="field" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+        <div class="settings-row" style="border-bottom:none;padding-top:0;">
+          <div class="settings-row-left">
+            <div class="settings-row-text">
+              <p class="s-title">Administrador da plataforma</p>
+              <p class="s-desc" id="admin-role-desc">Dá acesso ao painel de Administração, com visão de todos os clientes.</p>
+            </div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="admin-role-toggle"><span class="toggle-slider"></span></label>
+        </div>
+        <p class="hint" id="admin-role-hint" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="0.6" fill="currentColor"/></svg>Este usuário não tem um perfil cadastrado ainda (provavelmente não concluiu o cadastro).</p>
+      </div>
     </div>
 
     <!-- ABA 2: pagamento -->
@@ -2271,10 +2284,11 @@ document.getElementById('admin-llm-provider-select').addEventListener('change', 
 
 let adminClientsCache=[];
 let adminSelectedCompanyId=null;
+let adminSelectedProfileId=null;
 
 async function refreshAdminClientList(){
   const {data, error}=await sb.from('companies')
-    .select('id, name, created_at, atendimento_ativo, llm_api_key, profiles(nome,email), products(count)')
+    .select('id, name, created_at, atendimento_ativo, llm_api_key, profiles(id,nome,email,is_admin), products(count)')
     .order('created_at',{ascending:false});
   if(error){ showToast('Erro ao carregar clientes: '+error.message); return; }
   adminClientsCache=data||[];
@@ -2343,6 +2357,19 @@ async function openAdminDrawer(companyId){
   document.getElementById('admin-info-id').textContent=company.id;
   document.getElementById('admin-test-link').value=new URL('cliente.html?company='+company.id, window.location.href).href;
 
+  const roleToggle=document.getElementById('admin-role-toggle');
+  const roleHint=document.getElementById('admin-role-hint');
+  adminSelectedProfileId=resp.id||null;
+  if(!resp.id){
+    roleToggle.checked=false;
+    roleToggle.disabled=true;
+    roleHint.style.display='flex';
+  }else{
+    roleToggle.checked=!!resp.is_admin;
+    roleToggle.disabled=false;
+    roleHint.style.display='none';
+  }
+
   // buscar dados completos (pagamento + persona) que não vieram na lista resumida
   const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom, picpay_merchant_code, picpay_status, picpay_commission_percentage').eq('id', companyId).single();
   const pm=(full&&full.payment_methods)||{pix:true,cartao:true,boleto:true};
@@ -2402,6 +2429,28 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
     document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t===tab));
     document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.toggle('active', c.id==='admin-tab-'+tab.dataset.tab));
   });
+});
+
+document.getElementById('admin-role-toggle').addEventListener('change', async (e)=>{
+  const wantsAdmin=e.target.checked;
+  if(!adminSelectedProfileId){ e.target.checked=false; return; }
+
+  const respName=document.getElementById('admin-info-responsavel').textContent;
+  const confirmMsg=wantsAdmin
+    ? `Tornar "${respName}" um administrador da plataforma?\n\nIsso dá acesso total ao painel de Administração, incluindo dados de todos os clientes cadastrados.`
+    : `Remover a permissão de administrador de "${respName}"?`;
+
+  if(!confirm(confirmMsg)){ e.target.checked=!wantsAdmin; return; }
+
+  const {data, error}=await sb.rpc('set_profile_admin_status',{p_profile_id:adminSelectedProfileId, p_is_admin:wantsAdmin});
+  if(error){
+    showToast('Erro: '+error.message);
+    e.target.checked=!wantsAdmin;
+    return;
+  }
+  showToast(wantsAdmin ? 'Usuário promovido a administrador' : 'Permissão de administrador removida');
+  const cached=adminClientsCache.find(c=>c.id===adminSelectedCompanyId);
+  if(cached && cached.profiles && cached.profiles[0]) cached.profiles[0].is_admin=wantsAdmin;
 });
 
 document.getElementById('admin-test-link-copy').addEventListener('click', async ()=>{

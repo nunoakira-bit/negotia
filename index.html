@@ -510,27 +510,40 @@
   .nav-item[data-view="chamados"], .nav-item[data-view="conhecimento"],
   #shortcut-chamados-urgentes, #shortcut-add-pdf{display:none !important;}
 
-  /* ---------- seletor de modo: Minha empresa / Administração (só admins) ---------- */
-  .mode-switcher{display:none;gap:3px;padding:3px;background:#F5F5F7;border-radius:10px;margin-bottom:18px;}
-  body.is-admin-user .mode-switcher{display:flex;}
-  .sidebar.collapsed .mode-switcher{flex-direction:column;}
-  .mode-switch-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;
-    border:none;background:transparent;border-radius:7px;font-size:12px;font-weight:500;color:var(--text-tertiary);
-    cursor:pointer;transition:.15s;font-family:var(--font-sans);white-space:nowrap;}
-  .mode-switch-btn svg{width:14px;height:14px;flex-shrink:0;}
-  .mode-switch-btn:hover{color:var(--text-secondary);}
-  .mode-switch-btn.active{background:#fff;color:var(--accent-dark);box-shadow:0 1px 2px rgba(16,24,40,.08);font-weight:600;}
-  .nav-item[data-view="admin"]{display:none;}
-  body.is-admin-user.admin-mode .nav-item[data-view="admin"]{display:flex;}
+  /* ---------- seletor de contexto no topbar (dropdown, só admins) ---------- */
+  .ctx-switcher{position:relative;display:none;}
+  body.is-admin-user .ctx-switcher{display:block;}
+  body.is-admin-user #client-logo-placeholder{display:none;}
+  .ctx-switcher-btn{display:flex;align-items:center;gap:10px;padding:6px 12px 6px 8px;background:transparent;
+    border:1px solid transparent;border-radius:11px;cursor:pointer;font-family:var(--font-sans);transition:.15s;}
+  .ctx-switcher-btn:hover{background:var(--bg-hover);border-color:var(--border);}
+  .ctx-ico{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ctx-ico svg{width:18px;height:18px;}
+  .ctx-text{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;}
+  .ctx-eyebrow{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);}
+  .ctx-name{font-size:13.5px;font-weight:600;color:var(--text-primary);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ctx-chevron{width:15px;height:15px;color:var(--text-tertiary);flex-shrink:0;transition:transform .15s;}
+  .ctx-switcher.open .ctx-chevron{transform:rotate(180deg);}
+  .ctx-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:260px;background:var(--bg-card);
+    border:1px solid var(--border);border-radius:13px;box-shadow:0 14px 36px rgba(16,24,40,.16);padding:6px;display:none;}
+  .ctx-menu.open{display:block;}
+  .ctx-menu-item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:none;
+    padding:10px 12px;border-radius:9px;cursor:pointer;font-family:var(--font-sans);}
+  .ctx-menu-item:hover{background:var(--bg-hover);}
+  .ctx-menu-item svg{width:18px;height:18px;color:var(--text-secondary);flex-shrink:0;}
+  .ctx-menu-item span{display:flex;flex-direction:column;line-height:1.3;}
+  .ctx-mi-t{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+  .ctx-mi-d{font-size:11.5px;color:var(--text-tertiary);}
+  .ctx-menu-item.active{background:var(--accent-soft);}
+  .ctx-menu-item.active .ctx-mi-t{color:var(--accent-dark);}
 
   /* ---------- modo administração: esconde o que é específico da própria empresa ---------- */
+  .nav-item[data-view="admin"]{display:none;}
+  body.is-admin-user.admin-mode .nav-item[data-view="admin"]{display:flex;}
   body.admin-mode .nav-company-item{display:none !important;}
   body.admin-mode #ia-status-toggle{display:none;}
   body.admin-mode #bell-wrap{display:none;}
-  body.admin-mode #client-logo-placeholder{display:none;}
-  .topbar-admin-label{display:none;align-items:center;gap:9px;font-size:14px;font-weight:600;color:var(--text-primary);}
-  body.admin-mode .topbar-admin-label{display:flex;}
-  .topbar-admin-label svg{width:19px;height:19px;color:var(--accent-dark);flex-shrink:0;}
 
   /* ---------- assistente de diagnóstico com IA ---------- */
   .ia-diag-fab{position:fixed;right:26px;bottom:26px;z-index:900;display:none;align-items:center;gap:10px;
@@ -812,9 +825,28 @@
       </div>
       <span>LOGO DO CLIENTE</span>
     </div>
-    <div class="topbar-admin-label" id="topbar-admin-label">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
-      <span>Modo Administração — visão de todos os clientes</span>
+
+    <div class="ctx-switcher" id="ctx-switcher">
+      <button class="ctx-switcher-btn" id="ctx-switcher-btn" type="button">
+        <span class="ctx-ico" id="ctx-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        </span>
+        <span class="ctx-text">
+          <span class="ctx-eyebrow" id="ctx-eyebrow">Contexto</span>
+          <span class="ctx-name" id="ctx-name">Minha empresa</span>
+        </span>
+        <svg class="ctx-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="ctx-menu" id="ctx-menu">
+        <button class="ctx-menu-item" data-mode="empresa" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+          <span><span class="ctx-mi-t">Minha empresa</span><span class="ctx-mi-d">Seu próprio ambiente</span></span>
+        </button>
+        <button class="ctx-menu-item" data-mode="admin" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          <span><span class="ctx-mi-t">Administração</span><span class="ctx-mi-d">Gerenciar todos os clientes</span></span>
+        </button>
+      </div>
     </div>
 
     <div class="topbar-right">
@@ -854,16 +886,6 @@
       <div class="logo"><span class="dot"></span><span class="logo-text">Negotia AI</span></div>
       <button class="sidebar-toggle" id="sidebar-toggle" title="Recolher menu" aria-label="Recolher menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-    </div>
-    <div class="mode-switcher" id="mode-switcher">
-      <button class="mode-switch-btn active" data-mode="empresa" type="button" title="Minha empresa">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
-        <span class="nav-label">Minha empresa</span>
-      </button>
-      <button class="mode-switch-btn" data-mode="admin" type="button" title="Administração">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        <span class="nav-label">Administração</span>
       </button>
     </div>
     <div class="nav-section">
@@ -1979,6 +2001,7 @@ async function onAuthReady(session){
   await loadCompanyPaymentMethods();
   await refreshOperacao();
   iaDiagUpdateVisibility('dashboard');
+  setMode('empresa');
 }
 
 (async function initSession(){
@@ -2046,16 +2069,47 @@ document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
   item.addEventListener('click',()=>switchView(item.dataset.view));
 });
 
-/* ===================== modo: Minha empresa / Administração (admins) ===================== */
+/* ===================== seletor de contexto: Minha empresa / Administração (admins) ===================== */
 let appMode='empresa';
 function setMode(mode){
   appMode=mode;
   document.body.classList.toggle('admin-mode', mode==='admin');
-  document.querySelectorAll('.mode-switch-btn').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  // atualiza rótulo do seletor no topbar
+  const ico=document.getElementById('ctx-ico');
+  const eyebrow=document.getElementById('ctx-eyebrow');
+  const name=document.getElementById('ctx-name');
+  if(mode==='admin'){
+    eyebrow.textContent='Você está em';
+    name.textContent='Administração';
+    ico.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>';
+  }else{
+    eyebrow.textContent='Você está em';
+    name.textContent='Minha empresa';
+    ico.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>';
+  }
+  document.querySelectorAll('.ctx-menu-item').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
   switchView(mode==='admin' ? 'admin' : 'dashboard');
 }
-document.querySelectorAll('.mode-switch-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>setMode(btn.dataset.mode));
+
+const ctxSwitcher=document.getElementById('ctx-switcher');
+const ctxMenu=document.getElementById('ctx-menu');
+document.getElementById('ctx-switcher-btn').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  ctxSwitcher.classList.toggle('open');
+  ctxMenu.classList.toggle('open');
+});
+document.querySelectorAll('.ctx-menu-item').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    ctxSwitcher.classList.remove('open');
+    ctxMenu.classList.remove('open');
+    setMode(btn.dataset.mode);
+  });
+});
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.ctx-switcher')){
+    ctxSwitcher.classList.remove('open');
+    ctxMenu.classList.remove('open');
+  }
 });
 
 function switchView(name){

@@ -538,6 +538,26 @@
   .ctx-menu-item.active{background:var(--accent-soft);}
   .ctx-menu-item.active .ctx-mi-t{color:var(--accent-dark);}
 
+  /* ---------- visão macro: drawer de conversa em somente leitura ---------- */
+  #atend-drawer.read-only #atend-close-venda-btn,
+  #atend-drawer.read-only .mode-row,
+  #atend-drawer.read-only .composer{display:none !important;}
+  #atend-drawer.read-only .phone-frame{margin-bottom:16px;}
+  .read-only-note{display:none;margin:0 0 14px;padding:9px 12px;border-radius:9px;background:var(--accent-soft);
+    color:var(--accent-dark);font-size:12px;font-weight:500;align-items:center;gap:7px;}
+  #atend-drawer.read-only .read-only-note{display:flex;}
+  .read-only-note svg{width:15px;height:15px;flex-shrink:0;}
+  /* banner de contexto no topo quando vendo o ambiente de um cliente */
+  .macro-banner{display:none;align-items:center;gap:10px;padding:10px 16px;margin-bottom:16px;border-radius:11px;
+    background:linear-gradient(135deg,rgba(79,70,229,.08),rgba(124,58,237,.08));border:1px solid var(--border);}
+  body.macro-view .macro-banner{display:flex;}
+  .macro-banner svg{width:17px;height:17px;color:var(--accent-dark);flex-shrink:0;}
+  .macro-banner .mb-text{font-size:13px;color:var(--text-secondary);}
+  .macro-banner .mb-text strong{color:var(--text-primary);}
+  .macro-banner .mb-back{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--accent-dark);cursor:pointer;
+    background:none;border:none;font-family:var(--font-sans);display:flex;align-items:center;gap:5px;}
+  .macro-banner .mb-back:hover{text-decoration:underline;}
+
   /* ---------- modo administração: esconde o que é específico da própria empresa ---------- */
   .nav-item[data-view="admin"]{display:none;}
   body.is-admin-user.admin-mode .nav-item[data-view="admin"]{display:flex;}
@@ -552,7 +572,8 @@
     box-shadow:0 8px 24px rgba(79,70,229,.35);transition:transform .15s, box-shadow .15s;}
   .ia-diag-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(79,70,229,.45);}
   .ia-diag-fab svg{width:21px;height:21px;flex-shrink:0;}
-  body.authed:not(.admin-mode) .ia-diag-fab.available{display:flex;}
+  body.authed:not(.admin-mode):not(.macro-view) .ia-diag-fab.available{display:flex;}
+  body.macro-view #btn-testar-ia{display:none;}
   .ia-diag-panel{position:fixed;right:26px;bottom:88px;z-index:901;width:420px;max-height:min(72vh,640px);
     background:var(--bg-card);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 50px rgba(16,24,40,.22);
     display:none;flex-direction:column;overflow:hidden;}
@@ -935,6 +956,12 @@
 
     <div class="main-body">
     <div class="content">
+
+      <div class="macro-banner" id="macro-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="mb-text">Você está vendo o ambiente de <strong id="macro-company-name">—</strong> em modo somente leitura.</span>
+        <button class="mb-back" id="macro-back-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;"><polyline points="15 18 9 12 15 6"/></svg>Voltar para Administração</button>
+      </div>
 
       <!-- ===================== DASHBOARD ===================== -->
       <section class="view active" id="view-dashboard">
@@ -1617,6 +1644,11 @@
     <button class="mode-toggle-btn" id="atend-mode-toggle"></button>
   </div>
 
+  <div class="read-only-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+    Visualização do ambiente do cliente — somente leitura.
+  </div>
+
   <div class="phone-frame" id="atend-phone-frame"></div>
 
   <div class="composer">
@@ -2093,6 +2125,36 @@ function setMode(mode){
 
 const ctxSwitcher=document.getElementById('ctx-switcher');
 const ctxMenu=document.getElementById('ctx-menu');
+
+/* ===================== visão macro: entrar/sair do ambiente de um cliente ===================== */
+async function enterCompanyView(companyId, companyName){
+  viewingCompanyId=companyId;
+  viewingCompanyName=companyName;
+  document.body.classList.add('macro-view');
+  document.body.classList.remove('admin-mode');
+  appMode='empresa';
+  // dropdown de contexto mostra o cliente observado
+  document.getElementById('ctx-eyebrow').textContent='Vendo o ambiente de';
+  document.getElementById('ctx-name').textContent=companyName;
+  document.getElementById('ctx-ico').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+  document.getElementById('macro-company-name').textContent=companyName;
+  await refreshOperacao();
+  switchView('dashboard');
+  showToast('Vendo o ambiente de '+companyName+' (somente leitura)');
+}
+
+async function exitCompanyView(goToAdmin){
+  viewingCompanyId=null;
+  viewingCompanyName=null;
+  viewingProductsMap={};
+  document.body.classList.remove('macro-view');
+  await refreshOperacao();
+  if(goToAdmin){ setMode('admin'); }
+  else{ setMode('empresa'); }
+}
+
+document.getElementById('macro-back-btn').addEventListener('click', ()=>exitCompanyView(true));
+
 document.getElementById('ctx-switcher-btn').addEventListener('click',(e)=>{
   e.stopPropagation();
   ctxSwitcher.classList.toggle('open');
@@ -2102,6 +2164,8 @@ document.querySelectorAll('.ctx-menu-item').forEach(btn=>{
   btn.addEventListener('click',()=>{
     ctxSwitcher.classList.remove('open');
     ctxMenu.classList.remove('open');
+    // sair da visão macro se estiver nela
+    if(viewingCompanyId){ exitCompanyView(btn.dataset.mode==='admin'); return; }
     setMode(btn.dataset.mode);
   });
 });
@@ -2496,19 +2560,31 @@ function renderAdminClientList(filterText){
     const iaStatus=c.llm_api_key
       ? '<span class="status-pill INDEXADO">Configurada</span>'
       : '<span class="status-pill ERRO">Pendente</span>';
-    return `<tr data-id="${c.id}" style="cursor:pointer;">
+    return `<tr data-id="${c.id}" data-name="${escapeHtml(c.name)}" style="cursor:pointer;">
       <td><strong>${c.name}</strong></td>
       <td class="cell-muted">${resp.nome||'—'}</td>
       <td class="cell-muted">${dataCad}</td>
       <td>${atendStatus}</td>
       <td>${iaStatus}</td>
       <td class="cell-mono">${nProdutos}</td>
-      <td><button class="ghost-action admin-open-btn">Ver detalhes</button></td>
+      <td onclick="event.stopPropagation()" style="white-space:nowrap;">
+        <button class="ghost-action admin-enter-btn" style="height:32px;padding:0 11px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Abrir ambiente</button>
+        <button class="ghost-action admin-open-btn" style="height:32px;padding:0 11px;">Ver detalhes</button>
+      </td>
     </tr>`;
   }).join('');
 
   body.querySelectorAll('tr').forEach(row=>{
     row.addEventListener('click',()=>openAdminDrawer(row.dataset.id));
+  });
+  body.querySelectorAll('.admin-open-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{ openAdminDrawer(e.target.closest('tr').dataset.id); });
+  });
+  body.querySelectorAll('.admin-enter-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const tr=e.target.closest('tr');
+      enterCompanyView(tr.dataset.id, tr.dataset.name);
+    });
   });
 }
 
@@ -2800,17 +2876,37 @@ function openPaymentFlow(frameEl, valor, onDone){
 /* ===================== dados reais: conversas e vendas (Supabase) ===================== */
 let conversasCache=[];
 let vendasCache=[];
+// Quando um admin "entra" no ambiente de um cliente, guardamos o id da empresa observada.
+// null = vendo a própria empresa (comportamento padrão).
+let viewingCompanyId=null;
+let viewingCompanyName=null;
+let viewingProductsMap={}; // id -> {nome, preco_padrao} (quando em visão macro, montado via RPC)
 
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s==null?'':String(s); return d.innerHTML; }
 function minAgoFrom(ts){ return ts ? Math.max(0, Math.round((Date.now()-new Date(ts).getTime())/60000)) : 999999; }
 
+async function loadViewingProductsMap(){
+  viewingProductsMap={};
+  if(!viewingCompanyId) return;
+  const {data}=await sb.rpc('admin_get_company_products', {p_company_id:viewingCompanyId});
+  (data||[]).forEach(p=>{ viewingProductsMap[p.id]={nome:p.nome, preco_padrao:p.preco_padrao}; });
+}
+
 async function loadConversas(){
-  const {data, error}=await sb.from('conversas')
-    .select('id, product_id, cliente_nome, cliente_telefone, status, atendido_por, canal, ultima_msg, ultima_msg_role, ultima_msg_at, created_at, products(nome, preco_padrao)')
-    .order('ultima_msg_at', {ascending:false, nullsFirst:false})
-    .limit(200);
-  if(error){ console.error('Erro ao carregar conversas:', error.message); return; }
-  conversasCache=(data||[]).map(c=>{
+  let rows=[];
+  if(viewingCompanyId){
+    const {data, error}=await sb.rpc('admin_get_company_conversas', {p_company_id:viewingCompanyId});
+    if(error){ console.error('Erro ao carregar conversas (admin):', error.message); return; }
+    rows=(data||[]).map(c=>({...c, products:viewingProductsMap[c.product_id]||null}));
+  }else{
+    const {data, error}=await sb.from('conversas')
+      .select('id, product_id, cliente_nome, cliente_telefone, status, atendido_por, canal, ultima_msg, ultima_msg_role, ultima_msg_at, created_at, products(nome, preco_padrao)')
+      .order('ultima_msg_at', {ascending:false, nullsFirst:false})
+      .limit(200);
+    if(error){ console.error('Erro ao carregar conversas:', error.message); return; }
+    rows=data||[];
+  }
+  conversasCache=rows.map(c=>{
     const minAgo=minAgoFrom(c.ultima_msg_at||c.created_at);
     return {
       id:c.id,
@@ -2826,21 +2922,30 @@ async function loadConversas(){
       ultimaMsgRole:c.ultima_msg_role,
       valor:'R$ '+formatBRL(c.products ? Number(c.products.preco_padrao) : 0),
       minAgo,
-      // Lead esfriado: conversa ainda aberta cuja última mensagem passou de 24h.
-      // Fora dessa janela o sistema não reabre a conversa (não enviamos após 24h);
-      // o gestor pode exportar o contato e falar com o lead por fora, se quiser.
       esfriado: c.status==='aberta' && minAgo>24*60
     };
   });
 }
 
 async function loadVendas(){
-  const {data, error}=await sb.from('vendas')
-    .select('id, conversa_id, product_id, cliente_nome, valor_cents, desconto_pct, pagamento, created_at, products(nome), conversas(atendido_por)')
-    .order('created_at', {ascending:false})
-    .limit(500);
-  if(error){ console.error('Erro ao carregar vendas:', error.message); return; }
-  vendasCache=(data||[]).map(v=>({
+  let rows=[];
+  if(viewingCompanyId){
+    const {data, error}=await sb.rpc('admin_get_company_vendas', {p_company_id:viewingCompanyId});
+    if(error){ console.error('Erro ao carregar vendas (admin):', error.message); return; }
+    const convById={}; conversasCache.forEach(c=>{ convById[c.id]=c; });
+    rows=(data||[]).map(v=>({...v,
+      products:viewingProductsMap[v.product_id]||null,
+      conversas:{atendido_por:(convById[v.conversa_id]?convById[v.conversa_id].atendidoPor:'ia')}
+    }));
+  }else{
+    const {data, error}=await sb.from('vendas')
+      .select('id, conversa_id, product_id, cliente_nome, valor_cents, desconto_pct, pagamento, created_at, products(nome), conversas(atendido_por)')
+      .order('created_at', {ascending:false})
+      .limit(500);
+    if(error){ console.error('Erro ao carregar vendas:', error.message); return; }
+    rows=data||[];
+  }
+  vendasCache=rows.map(v=>({
     id:v.id,
     atendId:v.conversa_id,
     cliente:v.cliente_nome||'Cliente sem nome',
@@ -2854,7 +2959,9 @@ async function loadVendas(){
 }
 
 async function refreshOperacao(){
-  await Promise.all([loadConversas(), loadVendas()]);
+  if(viewingCompanyId) await loadViewingProductsMap();
+  await loadConversas();
+  await loadVendas();
   refreshDashboardTable();
   refreshAtendimentosTable();
   renderDashboardKpis();
@@ -3106,6 +3213,9 @@ async function openAtendDrawer(id){
   const frame=document.getElementById('atend-phone-frame');
   frame.innerHTML='<div class="system-note">Carregando conversa...</div>';
   updateModeUI();
+  // Em visão macro (admin observando outro cliente) o modo é somente leitura.
+  const somenteLeitura=!!viewingCompanyId;
+  document.getElementById('atend-drawer').classList.toggle('read-only', somenteLeitura);
   const closeVendaBtn=document.getElementById('atend-close-venda-btn');
   closeVendaBtn.disabled = a.rawStatus==='vendida';
   closeVendaBtn.innerHTML = a.rawStatus==='vendida'
@@ -3113,10 +3223,15 @@ async function openAtendDrawer(id){
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda';
   atendOverlay.classList.add('open'); atendDrawer.classList.add('open');
 
-  const {data:msgs, error}=await sb.from('mensagens')
-    .select('role, content, created_at')
-    .eq('conversa_id', id)
-    .order('created_at');
+  let msgs, error;
+  if(viewingCompanyId){
+    ({data:msgs, error}=await sb.rpc('admin_get_conversa_mensagens', {p_conversa_id:id}));
+  }else{
+    ({data:msgs, error}=await sb.from('mensagens')
+      .select('role, content, created_at')
+      .eq('conversa_id', id)
+      .order('created_at'));
+  }
   if(currentAtendId!==id) return; // usuário fechou/abriu outra conversa enquanto carregava
   if(error){
     frame.innerHTML='<div class="system-note">Não consegui carregar as mensagens.</div>';

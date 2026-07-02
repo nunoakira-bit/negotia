@@ -532,6 +532,47 @@
   body.admin-mode .topbar-admin-label{display:flex;}
   .topbar-admin-label svg{width:19px;height:19px;color:var(--accent-dark);flex-shrink:0;}
 
+  /* ---------- assistente de diagnóstico com IA ---------- */
+  .ia-diag-fab{position:fixed;right:26px;bottom:26px;z-index:900;display:none;align-items:center;gap:10px;
+    padding:12px 18px 12px 14px;border:none;border-radius:999px;cursor:pointer;font-family:var(--font-sans);
+    background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;font-size:13.5px;font-weight:600;
+    box-shadow:0 8px 24px rgba(79,70,229,.35);transition:transform .15s, box-shadow .15s;}
+  .ia-diag-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(79,70,229,.45);}
+  .ia-diag-fab svg{width:21px;height:21px;flex-shrink:0;}
+  body.authed:not(.admin-mode) .ia-diag-fab.available{display:flex;}
+  .ia-diag-panel{position:fixed;right:26px;bottom:88px;z-index:901;width:420px;max-height:min(72vh,640px);
+    background:var(--bg-card);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 50px rgba(16,24,40,.22);
+    display:none;flex-direction:column;overflow:hidden;}
+  .ia-diag-panel.open{display:flex;}
+  .ia-diag-head{display:flex;align-items:center;gap:11px;padding:16px 18px;border-bottom:1px solid var(--border);
+    background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(124,58,237,.07));}
+  .ia-diag-avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#4F46E5,#7C3AED);
+    display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+  .ia-diag-avatar svg{width:22px;height:22px;}
+  .ia-diag-head h3{font-size:14px;font-weight:600;margin:0;}
+  .ia-diag-head p{font-size:12px;color:var(--text-tertiary);margin:1px 0 0;}
+  .ia-diag-close{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-tertiary);padding:6px;border-radius:8px;}
+  .ia-diag-close:hover{background:var(--bg-hover);color:var(--text-primary);}
+  .ia-diag-close svg{width:17px;height:17px;display:block;}
+  .ia-diag-body{padding:16px 18px;overflow-y:auto;flex:1;}
+  .ia-diag-resumo{font-size:13px;color:var(--text-secondary);line-height:1.55;margin:0 0 16px;}
+  .ia-diag-section-title{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);margin:0 0 9px;}
+  .ia-diag-item{border:1px solid var(--border);border-radius:11px;padding:12px 13px;margin-bottom:9px;}
+  .ia-diag-item .t{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;margin:0 0 3px;}
+  .ia-diag-item .d{font-size:12.5px;color:var(--text-secondary);line-height:1.5;margin:0;}
+  .sev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .sev-alta{background:#DC2626;} .sev-media{background:#D97706;} .sev-baixa{background:#16A34A;}
+  .ia-diag-msg{background:#F5F5F7;border-radius:9px;padding:10px 12px;font-size:12.5px;line-height:1.55;
+    margin:9px 0 0;white-space:pre-wrap;color:var(--text-primary);}
+  .ia-diag-actions{display:flex;gap:8px;margin-top:9px;}
+  .ia-diag-actions .ghost-action{height:32px;padding:0 12px;font-size:12.5px;}
+  .ia-diag-run{display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 10px;text-align:center;}
+  .ia-diag-run p{font-size:13px;color:var(--text-secondary);line-height:1.55;margin:0;max-width:300px;}
+  .ia-diag-spinner{width:26px;height:26px;border:3px solid var(--accent-soft);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .ia-diag-tag{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;
+    background:var(--accent-soft);color:var(--accent-dark);margin-left:7px;vertical-align:1px;}
+
   /* ---------- painel admin: drawer com abas ---------- */
   .admin-drawer{width:480px;}
   .admin-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:4px -28px 0;padding:0 28px;flex-shrink:0;}
@@ -1762,6 +1803,29 @@
 
 <div id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="4 12 9 17 20 6"/></svg><span id="toast-msg">Salvo</span></div>
 
+<!-- ===================== assistente de diagnóstico com IA ===================== -->
+<button class="ia-diag-fab" id="ia-diag-fab" type="button">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="9" width="14" height="10" rx="2.5"/><circle cx="9.5" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14" r="1" fill="currentColor" stroke="none"/><path d="M9.5 16.6c.7.6 1.6.9 2.5.9s1.8-.3 2.5-.9"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.1" fill="currentColor" stroke="none"/></svg>
+  <span>Melhore sua operação com IA</span>
+</button>
+
+<div class="ia-diag-panel" id="ia-diag-panel">
+  <div class="ia-diag-head">
+    <div class="ia-diag-avatar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="9" width="14" height="10" rx="2.5"/><circle cx="9.5" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14" r="1" fill="currentColor" stroke="none"/><path d="M9.5 16.6c.7.6 1.6.9 2.5.9s1.8-.3 2.5-.9"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.1" fill="currentColor" stroke="none"/></svg>
+    </div>
+    <div>
+      <h3>Diagnóstico da operação</h3>
+      <p id="ia-diag-scope-label">Visão geral</p>
+    </div>
+    <button class="ia-diag-close" id="ia-diag-close" type="button" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ia-diag-body" id="ia-diag-body"></div>
+</div>
+
+
 <script>
 /* ===================== supabase: cliente e autenticação ===================== */
 const SUPABASE_URL='https://qskvqnpmxblbgsgjqyex.supabase.co';
@@ -1885,6 +1949,7 @@ async function onAuthReady(session){
   await syncAtendimentoStatus();
   await loadCompanyPaymentMethods();
   await refreshOperacao();
+  iaDiagUpdateVisibility('dashboard');
 }
 
 (async function initSession(){
@@ -1974,6 +2039,7 @@ function switchView(name){
   if(name==='vendas'){ refreshVendas(); }
   if(name==='configuracoes'){ syncIaPersonaUI(); }
   if(name==='admin'){ refreshAdminClientList(); }
+  iaDiagUpdateVisibility(name);
 }
 document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
 
@@ -4210,6 +4276,137 @@ document.querySelectorAll('#view-vendas th.sortable').forEach(th=>{
     if(vendasSortState.dir===-1) th.classList.add('desc');
     renderVendasFromCache();
   });
+});
+
+/* ===================== assistente de diagnóstico com IA ===================== */
+const IA_DIAG_VIEWS={dashboard:'Visão geral', atendimentos:'Atendimentos', vendas:'Vendas'};
+let iaDiagCurrentView='dashboard';
+let iaDiagLoading=false;
+const iaDiagCache={}; // {scope: diagnostico}
+
+function iaDiagUpdateVisibility(viewName){
+  if(IA_DIAG_VIEWS[viewName]) iaDiagCurrentView=viewName;
+  const fab=document.getElementById('ia-diag-fab');
+  const available=!!IA_DIAG_VIEWS[viewName];
+  fab.classList.toggle('available', available);
+  if(!available) document.getElementById('ia-diag-panel').classList.remove('open');
+  if(available){
+    document.getElementById('ia-diag-scope-label').textContent=IA_DIAG_VIEWS[viewName];
+    if(document.getElementById('ia-diag-panel').classList.contains('open')) iaDiagRenderCurrent();
+  }
+}
+
+function iaDiagIntro(){
+  const textos={
+    dashboard:'Posso analisar os números da sua operação — conversas, conversão e vendas — e apontar o que merece a sua atenção.',
+    atendimentos:'Posso identificar conversas paradas ou sem resposta e escrever mensagens prontas para você reativar esses clientes.',
+    vendas:'Posso avaliar o desempenho de cada produto e sugerir ajustes de preço, promoções ou descontos para os que vendem menos.'
+  };
+  return `<div class="ia-diag-run">
+    <p>${textos[iaDiagCurrentView]}</p>
+    <button class="btn-primary" id="ia-diag-run-btn" style="justify-content:center;">Analisar agora</button>
+  </div>`;
+}
+
+function iaDiagSevLabel(s){ return {alta:'Atenção alta', media:'Atenção média', baixa:'Observação'}[s]||s; }
+
+function iaDiagRenderResult(diag){
+  const pontos=(diag.pontos_atencao||[]).map(p=>`
+    <div class="ia-diag-item">
+      <p class="t"><span class="sev-dot sev-${escapeHtml(p.severidade||'baixa')}"></span>${escapeHtml(p.titulo||'')}</p>
+      <p class="d">${escapeHtml(p.detalhe||'')}</p>
+    </div>`).join('');
+
+  const sugestoes=(diag.sugestoes||[]).map((s,i)=>{
+    let extra='';
+    if(s.tipo==='mensagem' && s.mensagem){
+      const convId=s.conversa_id && conversasCache.some(c=>c.id===s.conversa_id) ? s.conversa_id : null;
+      extra=`<div class="ia-diag-msg" id="ia-diag-msg-${i}">${escapeHtml(s.mensagem)}</div>
+        <div class="ia-diag-actions">
+          <button class="ghost-action ia-diag-copy" data-target="ia-diag-msg-${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar mensagem</button>
+          ${convId?`<button class="ghost-action ia-diag-open-conv" data-conv="${convId}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button>`:''}
+        </div>`;
+    }
+    const tag=s.tipo==='mensagem'?'Mensagem pronta':s.tipo==='preco'?'Preço':s.tipo==='promocao'?'Promoção':'';
+    return `<div class="ia-diag-item">
+      <p class="t">${escapeHtml(s.titulo||'')}${tag?`<span class="ia-diag-tag">${tag}</span>`:''}</p>
+      <p class="d">${escapeHtml(s.detalhe||'')}${s.produto?` <strong>(${escapeHtml(s.produto)})</strong>`:''}</p>
+      ${extra}
+    </div>`;
+  }).join('');
+
+  return `
+    <p class="ia-diag-resumo">${escapeHtml(diag.resumo||'')}</p>
+    ${pontos?`<p class="ia-diag-section-title">Pontos de atenção</p>${pontos}`:''}
+    ${sugestoes?`<p class="ia-diag-section-title" style="margin-top:14px;">Sugestões</p>${sugestoes}`:''}
+    <div style="display:flex;justify-content:center;margin-top:14px;">
+      <button class="ghost-action" id="ia-diag-rerun" style="height:34px;">Analisar novamente</button>
+    </div>
+    <p style="font-size:11px;color:var(--text-tertiary);text-align:center;margin:10px 0 0;line-height:1.5;">Análise gerada por IA a partir dos dados da sua operação. Revise antes de agir — sugestões podem conter imprecisões.</p>`;
+}
+
+function iaDiagRenderCurrent(){
+  const body=document.getElementById('ia-diag-body');
+  if(iaDiagLoading){
+    body.innerHTML=`<div class="ia-diag-run"><div class="ia-diag-spinner"></div><p>Analisando sua operação... isso leva alguns segundos.</p></div>`;
+    return;
+  }
+  const cached=iaDiagCache[iaDiagCurrentView];
+  body.innerHTML = cached ? iaDiagRenderResult(cached) : iaDiagIntro();
+}
+
+async function iaDiagRun(){
+  if(iaDiagLoading) return;
+  iaDiagLoading=true;
+  const scope=iaDiagCurrentView;
+  iaDiagRenderCurrent();
+  try{
+    const {data, error}=await sb.functions.invoke('diagnose', {body:{scope}});
+    if(error){
+      let msg=error.message;
+      try{ const b=await error.context.json(); if(b?.error) msg=b.error; }catch(_e){}
+      throw new Error(msg);
+    }
+    if(data?.error) throw new Error(data.error);
+    iaDiagCache[scope]=data.diagnostico;
+  }catch(e){
+    iaDiagLoading=false;
+    document.getElementById('ia-diag-body').innerHTML=`<div class="ia-diag-run">
+      <p>Não consegui concluir a análise: ${escapeHtml(e.message||String(e))}</p>
+      <button class="btn-primary" id="ia-diag-run-btn" style="justify-content:center;">Tentar novamente</button>
+    </div>`;
+    return;
+  }
+  iaDiagLoading=false;
+  iaDiagRenderCurrent();
+}
+
+document.getElementById('ia-diag-fab').addEventListener('click',()=>{
+  const panel=document.getElementById('ia-diag-panel');
+  const opening=!panel.classList.contains('open');
+  panel.classList.toggle('open');
+  if(opening) iaDiagRenderCurrent();
+});
+document.getElementById('ia-diag-close').addEventListener('click',()=>{
+  document.getElementById('ia-diag-panel').classList.remove('open');
+});
+document.getElementById('ia-diag-body').addEventListener('click', async (e)=>{
+  const runBtn=e.target.closest('#ia-diag-run-btn, #ia-diag-rerun');
+  if(runBtn){ iaDiagRun(); return; }
+  const copyBtn=e.target.closest('.ia-diag-copy');
+  if(copyBtn){
+    const el=document.getElementById(copyBtn.dataset.target);
+    try{
+      await navigator.clipboard.writeText(el.textContent);
+      showToast('Mensagem copiada!');
+    }catch(_e){ showToast('Não consegui copiar — selecione o texto manualmente.'); }
+    return;
+  }
+  const convBtn=e.target.closest('.ia-diag-open-conv');
+  if(convBtn){
+    document.getElementById('ia-diag-panel').classList.remove('open');
+    openAtendDrawer(convBtn.dataset.conv);
+  }
 });
 
 /* ===================== inicialização ===================== */

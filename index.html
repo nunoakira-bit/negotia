@@ -510,6 +510,28 @@
   .nav-item[data-view="chamados"], .nav-item[data-view="conhecimento"],
   #shortcut-chamados-urgentes, #shortcut-add-pdf{display:none !important;}
 
+  /* ---------- seletor de modo: Minha empresa / Administração (só admins) ---------- */
+  .mode-switcher{display:none;gap:3px;padding:3px;background:#F5F5F7;border-radius:10px;margin-bottom:18px;}
+  body.is-admin-user .mode-switcher{display:flex;}
+  .sidebar.collapsed .mode-switcher{flex-direction:column;}
+  .mode-switch-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;
+    border:none;background:transparent;border-radius:7px;font-size:12px;font-weight:500;color:var(--text-tertiary);
+    cursor:pointer;transition:.15s;font-family:var(--font-sans);white-space:nowrap;}
+  .mode-switch-btn svg{width:14px;height:14px;flex-shrink:0;}
+  .mode-switch-btn:hover{color:var(--text-secondary);}
+  .mode-switch-btn.active{background:#fff;color:var(--accent-dark);box-shadow:0 1px 2px rgba(16,24,40,.08);font-weight:600;}
+  .nav-item[data-view="admin"]{display:none;}
+  body.is-admin-user.admin-mode .nav-item[data-view="admin"]{display:flex;}
+
+  /* ---------- modo administração: esconde o que é específico da própria empresa ---------- */
+  body.admin-mode .nav-company-item{display:none !important;}
+  body.admin-mode #ia-status-toggle{display:none;}
+  body.admin-mode #bell-wrap{display:none;}
+  body.admin-mode #client-logo-placeholder{display:none;}
+  .topbar-admin-label{display:none;align-items:center;gap:9px;font-size:14px;font-weight:600;color:var(--text-primary);}
+  body.admin-mode .topbar-admin-label{display:flex;}
+  .topbar-admin-label svg{width:19px;height:19px;color:var(--accent-dark);flex-shrink:0;}
+
   /* ---------- painel admin: drawer com abas ---------- */
   .admin-drawer{width:480px;}
   .admin-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:4px -28px 0;padding:0 28px;flex-shrink:0;}
@@ -736,6 +758,10 @@
       </div>
       <span>LOGO DO CLIENTE</span>
     </div>
+    <div class="topbar-admin-label" id="topbar-admin-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      <span>Modo Administração — visão de todos os clientes</span>
+    </div>
 
     <div class="topbar-right">
       <button class="ia-status-btn" id="ia-status-toggle">
@@ -776,36 +802,46 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
     </div>
+    <div class="mode-switcher" id="mode-switcher">
+      <button class="mode-switch-btn active" data-mode="empresa" type="button" title="Minha empresa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        <span class="nav-label">Minha empresa</span>
+      </button>
+      <button class="mode-switch-btn" data-mode="admin" type="button" title="Administração">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span class="nav-label">Administração</span>
+      </button>
+    </div>
     <div class="nav-section">
-      <div class="nav-item active" data-view="dashboard" title="Dashboard">
+      <div class="nav-item nav-company-item active" data-view="dashboard" title="Dashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
         <span class="nav-label">Dashboard</span>
       </div>
-      <div class="nav-item" data-view="atendimentos" title="Atendimentos">
+      <div class="nav-item nav-company-item" data-view="atendimentos" title="Atendimentos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         <span class="nav-label">Atendimentos</span>
       </div>
-      <div class="nav-item" data-view="chamados" title="Chamados">
+      <div class="nav-item nav-company-item" data-view="chamados" title="Chamados">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13a8 8 0 0116 0v4a2 2 0 01-2 2h-1v-7h3"/><path d="M4 17v-4h3v7H5a2 2 0 01-2-2z" /><path d="M9 21h4"/></svg>
         <span class="nav-label">Chamados</span>
       </div>
-      <div class="nav-item" data-view="conhecimento" title="Base de Conhecimento">
+      <div class="nav-item nav-company-item" data-view="conhecimento" title="Base de Conhecimento">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
         <span class="nav-label">Base de Conhecimento</span>
       </div>
-      <div class="nav-item" data-view="produtos" title="Produtos">
+      <div class="nav-item nav-company-item" data-view="produtos" title="Produtos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l8-8 9 9-8 8-9-9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>
         <span class="nav-label">Produtos</span>
       </div>
-      <div class="nav-item" data-view="vendas" title="Vendas">
+      <div class="nav-item nav-company-item" data-view="vendas" title="Vendas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 016 0"/></svg>
         <span class="nav-label">Vendas</span>
       </div>
-      <div class="nav-item" data-view="configuracoes" title="Configurações">
+      <div class="nav-item nav-company-item" data-view="configuracoes" title="Configurações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l1.9-1.5-2-3.4-2.2.6a7.6 7.6 0 00-1.7-1l-.3-2.3H9.9l-.3 2.3a7.6 7.6 0 00-1.7 1l-2.2-.6-2 3.4L5.6 11a7.6 7.6 0 000 2l-1.9 1.5 2 3.4 2.2-.6a7.6 7.6 0 001.7 1l.3 2.3h4.2l.3-2.3a7.6 7.6 0 001.7-1l2.2.6 2-3.4z"/></svg>
         <span class="nav-label">Configurações</span>
       </div>
-      <div class="nav-item nav-admin-only" data-view="admin" title="Administração">
+      <div class="nav-item" data-view="admin" title="Administração">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
         <span class="nav-label">Administração</span>
       </div>
@@ -853,28 +889,7 @@
           </div>
         </div>
 
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <p class="kpi-label">Atendimentos hoje</p>
-            <p class="kpi-value">18</p>
-            <div class="kpi-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>12% vs. ontem</div>
-          </div>
-          <div class="kpi-card">
-            <p class="kpi-label">Em andamento</p>
-            <p class="kpi-value">6</p>
-            <div class="kpi-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>2 novos agora</div>
-          </div>
-          <div class="kpi-card">
-            <p class="kpi-label">Taxa de conversão</p>
-            <p class="kpi-value">42%</p>
-            <div class="kpi-trend down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6 13 12 19 18 13"/></svg>3% vs. semana</div>
-          </div>
-          <div class="kpi-card">
-            <p class="kpi-label">Ticket médio</p>
-            <p class="kpi-value">R$ 287</p>
-            <div class="kpi-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>8% vs. semana</div>
-          </div>
-        </div>
+        <div class="kpi-grid" id="dashboard-kpis"></div>
 
         <div class="section-block">
           <div class="block-head">
@@ -1869,6 +1884,7 @@ async function onAuthReady(session){
   await refreshKbDocsFromDb();
   await syncAtendimentoStatus();
   await loadCompanyPaymentMethods();
+  await refreshOperacao();
 }
 
 (async function initSession(){
@@ -1934,6 +1950,18 @@ sidebarToggleBtn.addEventListener('click',()=>{
 /* ===================== navegação ===================== */
 document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
   item.addEventListener('click',()=>switchView(item.dataset.view));
+});
+
+/* ===================== modo: Minha empresa / Administração (admins) ===================== */
+let appMode='empresa';
+function setMode(mode){
+  appMode=mode;
+  document.body.classList.toggle('admin-mode', mode==='admin');
+  document.querySelectorAll('.mode-switch-btn').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  switchView(mode==='admin' ? 'admin' : 'dashboard');
+}
+document.querySelectorAll('.mode-switch-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>setMode(btn.dataset.mode));
 });
 
 function switchView(name){
@@ -2618,73 +2646,111 @@ function openPaymentFlow(frameEl, valor, onDone){
   });
 }
 
-/* Registra a venda fechada: tabela de vendas, notificação no sino e toast de confirmação. */
-function registerVenda({cliente, produto, valor, desconto=0, pagamento, atendidoPor='IA', atendId}){
-  const vid='v'+Date.now();
-  vendasMock.unshift({id:vid, cliente, produto, valor, desconto, pagamento:paymentTableLabel(pagamento), atendidoPor, minAgo:0, atendId});
+/* O preview de negociação do formulário de produto é apenas demonstração visual — não registra vendas reais. */
 
-  const notifId=(notificationsMock.length? Math.max(...notificationsMock.map(n=>n.id)):0)+1;
-  notificationsMock.unshift({
-    id:notifId, tipo:'venda', titulo:'Negociação concluída com sucesso',
-    descricao:`${cliente} fechou ${produto} por R$ ${formatBRL(valor)} via ${paymentLabel(pagamento)}.`,
-    atendId, lida:false, minAgo:0
-  });
-  updateBellBadge();
-  renderBellPanel();
-  renderNotifPage();
-  showToast(`Venda fechada com ${cliente} via ${paymentLabel(pagamento)}! 🎉`);
-  refreshDashboardTable();
-  refreshAtendimentosTable();
-  const vendasView=document.getElementById('view-vendas');
-  if(vendasView && vendasView.classList.contains('active')) refreshVendas();
+/* ===================== dados reais: conversas e vendas (Supabase) ===================== */
+let conversasCache=[];
+let vendasCache=[];
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s==null?'':String(s); return d.innerHTML; }
+function minAgoFrom(ts){ return ts ? Math.max(0, Math.round((Date.now()-new Date(ts).getTime())/60000)) : 999999; }
+
+async function loadConversas(){
+  const {data, error}=await sb.from('conversas')
+    .select('id, product_id, cliente_nome, status, atendido_por, canal, ultima_msg, ultima_msg_role, ultima_msg_at, created_at, products(nome, preco_padrao)')
+    .order('ultima_msg_at', {ascending:false, nullsFirst:false})
+    .limit(200);
+  if(error){ console.error('Erro ao carregar conversas:', error.message); return; }
+  conversasCache=(data||[]).map(c=>({
+    id:c.id,
+    productId:c.product_id,
+    cliente:c.cliente_nome||'Cliente sem nome',
+    produto:c.products ? c.products.nome : '—',
+    status:c.status==='vendida' ? 'fechado' : (c.status==='abandonada' ? 'perdido' : 'andamento'),
+    rawStatus:c.status,
+    atendidoPor:c.atendido_por,
+    canal:c.canal,
+    ultimaMsg:c.ultima_msg||'',
+    ultimaMsgRole:c.ultima_msg_role,
+    valor:'R$ '+formatBRL(c.products ? Number(c.products.preco_padrao) : 0),
+    minAgo:minAgoFrom(c.ultima_msg_at||c.created_at)
+  }));
 }
 
-/* ===================== mock: atendimentos ===================== */
-const atendimentosMock=[
-  {id:1,cliente:'Marina Silva',produto:'Consultoria UX',status:'andamento',ultimaMsg:'Consegue um desconto melhor?',valor:'R$ 350,00',quando:'Hoje, 14:32',minAgo:30,
-    mensagens:[{from:'in',text:'Olá, vi o anúncio da consultoria UX, quanto custa?'},{from:'out',text:'Olá Marina! A consultoria UX custa R$ 350,00 por sessão.'},{from:'in',text:'Consegue um desconto melhor?'}]},
-  {id:2,cliente:'Rafael Almeida',produto:'Plano mensal Premium',status:'fechado',ultimaMsg:'Combinado, pode fechar!',valor:'R$ 199,00',quando:'Hoje, 11:08',minAgo:210,
-    mensagens:[{from:'in',text:'Qual o valor do plano Premium?'},{from:'out',text:'O plano Premium custa R$ 199,00 por mês.'},{from:'in',text:'Combinado, pode fechar!'},{from:'out',text:'Perfeito! Já vou te enviar o link de pagamento.'}]},
-  {id:3,cliente:'Juliana Prado',produto:'Cabo USB-C 1m',status:'novo',ultimaMsg:'Vocês entregam em Curitiba?',valor:'R$ 39,90',quando:'Hoje, 09:51',minAgo:287,
-    mensagens:[{from:'in',text:'Vocês entregam em Curitiba?'}]},
-  {id:4,cliente:'Carlos Eduardo',produto:'Consultoria UX',status:'perdido',ultimaMsg:'Vou pensar e te retorno.',valor:'R$ 350,00',quando:'Ontem, 18:20',minAgo:1000,
-    mensagens:[{from:'in',text:'Quanto custa a consultoria?'},{from:'out',text:'A consultoria custa R$ 350,00.'},{from:'in',text:'Vou pensar e te retorno.'}]},
-  {id:5,cliente:'Beatriz Lima',produto:'Plano mensal Premium',status:'andamento',ultimaMsg:'Tem desconto pagando anual?',valor:'R$ 199,00',quando:'Ontem, 16:44',minAgo:1100,
-    mensagens:[{from:'in',text:'Tem desconto pagando anual?'},{from:'out',text:'Sim! No plano anual aplicamos 15% de desconto.'}]},
-  {id:6,cliente:'Eduardo Santos',produto:'Cabo USB-C 1m',status:'fechado',ultimaMsg:'Perfeito, obrigado!',valor:'R$ 35,90',quando:'Ontem, 10:05',minAgo:1500,
-    mensagens:[{from:'in',text:'Quero 10 cabos, tem desconto?'},{from:'out',text:'Para 10 unidades aplicamos 10% de desconto: R$ 35,90 cada.'},{from:'in',text:'Perfeito, obrigado!'}]},
-  {id:7,cliente:'Patrícia Gomes',produto:'Consultoria UX',status:'novo',ultimaMsg:'Oi! Vi o anúncio no Instagram.',valor:'R$ 350,00',quando:'2 dias atrás',minAgo:2880,
-    mensagens:[{from:'in',text:'Oi! Vi o anúncio no Instagram.'}]},
-  {id:8,cliente:'Thiago Ferreira',produto:'Plano mensal Premium',status:'perdido',ultimaMsg:'Achei caro, vou procurar outra opção.',valor:'R$ 199,00',quando:'3 dias atrás',minAgo:4320,
-    mensagens:[{from:'in',text:'Quanto custa o plano?'},{from:'out',text:'O plano custa R$ 199,00 por mês.'},{from:'in',text:'Achei caro, vou procurar outra opção.'}]}
-];
+async function loadVendas(){
+  const {data, error}=await sb.from('vendas')
+    .select('id, conversa_id, product_id, cliente_nome, valor_cents, desconto_pct, pagamento, created_at, products(nome), conversas(atendido_por)')
+    .order('created_at', {ascending:false})
+    .limit(500);
+  if(error){ console.error('Erro ao carregar vendas:', error.message); return; }
+  vendasCache=(data||[]).map(v=>({
+    id:v.id,
+    atendId:v.conversa_id,
+    cliente:v.cliente_nome||'Cliente sem nome',
+    produto:v.products ? v.products.nome : '—',
+    valor:v.valor_cents/100,
+    desconto:Number(v.desconto_pct)||0,
+    pagamento:v.pagamento||'—',
+    atendidoPor:(v.conversas && v.conversas.atendido_por==='humano') ? 'Humano' : 'IA',
+    minAgo:minAgoFrom(v.created_at)
+  }));
+}
+
+async function refreshOperacao(){
+  await Promise.all([loadConversas(), loadVendas()]);
+  refreshDashboardTable();
+  refreshAtendimentosTable();
+  renderDashboardKpis();
+  const vendasView=document.getElementById('view-vendas');
+  if(vendasView && vendasView.classList.contains('active')) renderVendasFromCache();
+}
+
+function renderDashboardKpis(){
+  const el=document.getElementById('dashboard-kpis');
+  if(!el) return;
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const minutosDesdeMeiaNoite=Math.round((Date.now()-hoje.getTime())/60000);
+  const ativasHoje=conversasCache.filter(c=>c.minAgo<=minutosDesdeMeiaNoite).length;
+  const emAndamento=conversasCache.filter(c=>c.rawStatus==='aberta').length;
+  const total=conversasCache.length;
+  const vendidas=conversasCache.filter(c=>c.rawStatus==='vendida').length;
+  const taxa=total ? Math.round(vendidas/total*100) : null;
+  const ticket=vendasCache.length ? vendasCache.reduce((a,v)=>a+v.valor,0)/vendasCache.length : null;
+  el.innerHTML =
+    kpiCardHtml('Atendimentos hoje', ativasHoje, 'conversas com atividade hoje') +
+    kpiCardHtml('Em andamento', emAndamento, 'aguardando fechamento') +
+    kpiCardHtml('Taxa de conversão', taxa!=null ? taxa+'%' : '—', `${vendidas} de ${total} conversas viraram venda`) +
+    kpiCardHtml('Ticket médio', ticket!=null ? 'R$ '+formatBRL(ticket) : '—', 'por venda registrada');
+}
 
 function statusLabel(s){return {andamento:'Em andamento',fechado:'Fechado',perdido:'Perdido',novo:'Novo'}[s]||s;}
 
 function renderAtendimentosTable(bodyId, list){
   const body=document.getElementById(bodyId);
+  if(!list.length){
+    const cols=bodyId==='atendimentos-body'?7:6;
+    body.innerHTML=`<tr><td colspan="${cols}" class="cell-muted" style="text-align:center;padding:28px 0;">Nenhuma conversa ainda — elas aparecem aqui quando um cliente abre uma negociação.</td></tr>`;
+    return;
+  }
   body.innerHTML=list.map(a=>`
     <tr data-id="${a.id}">
-      <td>${a.cliente}</td>
-      <td class="cell-muted">${a.produto}</td>
+      <td>${escapeHtml(a.cliente)}</td>
+      <td class="cell-muted">${escapeHtml(a.produto)}</td>
       <td><span class="status-pill ${a.status}">${statusLabel(a.status)}</span></td>
-      ${bodyId==='atendimentos-body' ? `<td class="cell-muted">${a.ultimaMsg}</td>` : ''}
+      ${bodyId==='atendimentos-body' ? `<td class="cell-muted">${escapeHtml(a.ultimaMsg)}</td>` : ''}
       <td class="cell-mono">${a.valor}</td>
-      <td class="cell-muted">${a.quando}</td>
+      <td class="cell-muted">${notifTimeLabel(a.minAgo)}</td>
       <td onclick="event.stopPropagation()"><button class="ghost-action ver-conversa-btn" style="height:32px;padding:0 12px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button></td>
     </tr>`).join('');
-  body.querySelectorAll('tr').forEach(tr=>{
-    tr.addEventListener('click',()=>openAtendDrawer(parseInt(tr.dataset.id,10)));
+  body.querySelectorAll('tr[data-id]').forEach(tr=>{
+    tr.addEventListener('click',()=>openAtendDrawer(tr.dataset.id));
   });
   body.querySelectorAll('.ver-conversa-btn').forEach(btn=>{
     btn.addEventListener('click',e=>{
-      const id=parseInt(e.target.closest('tr').dataset.id,10);
-      openAtendDrawer(id);
+      openAtendDrawer(e.target.closest('tr').dataset.id);
     });
   });
 }
-renderAtendimentosTable('dashboard-recent-body', atendimentosMock.slice(0,5));
-renderAtendimentosTable('atendimentos-body', atendimentosMock);
 
 /* ===================== ordenação das colunas ===================== */
 function parseValor(v){ return parseFloat(String(v).replace('R$','').trim().replace(/\./g,'').replace(',','.'))||0; }
@@ -2708,14 +2774,14 @@ const sortState={
 };
 
 function refreshDashboardTable(){
-  let list=atendimentosMock.slice(0,5);
+  let list=conversasCache.slice(0,5);
   const st=sortState['dashboard-recent-body'];
   if(st.key) list=sortList(list, st.key, st.dir);
   renderAtendimentosTable('dashboard-recent-body', list);
 }
 function refreshAtendimentosTable(){
   const q=document.getElementById('atend-search').value.toLowerCase();
-  let list=atendimentosMock.filter(a=>a.cliente.toLowerCase().includes(q)||a.produto.toLowerCase().includes(q));
+  let list=conversasCache.filter(a=>a.cliente.toLowerCase().includes(q)||a.produto.toLowerCase().includes(q));
   const st=sortState['atendimentos-body'];
   if(st.key) list=sortList(list, st.key, st.dir);
   renderAtendimentosTable('atendimentos-body', list);
@@ -2776,8 +2842,15 @@ function updateModeUI(){
   }
 }
 
-document.getElementById('atend-mode-toggle').addEventListener('click',()=>{
-  currentMode = currentMode==='ia' ? 'humano' : 'ia';
+document.getElementById('atend-mode-toggle').addEventListener('click', async ()=>{
+  const novo = currentMode==='ia' ? 'humano' : 'ia';
+  if(currentAtendId){
+    const {error}=await sb.from('conversas').update({atendido_por:novo}).eq('id', currentAtendId);
+    if(error){ showToast('Erro ao atualizar: '+error.message); return; }
+    const c=conversasCache.find(x=>x.id===currentAtendId);
+    if(c) c.atendidoPor=novo;
+  }
+  currentMode=novo;
   updateModeUI();
   addSystemNote(currentMode==='humano' ? 'Você assumiu esta conversa' : 'Conversa devolvida para a IA');
   showToast(currentMode==='humano' ? 'Você assumiu o atendimento' : 'Atendimento devolvido para a IA');
@@ -2789,14 +2862,21 @@ function addSystemNote(text){
   frame.scrollTop=frame.scrollHeight;
 }
 
-function sendHumanMessage(){
+async function sendHumanMessage(){
   const input=document.getElementById('atend-composer-input');
   const text=input.value.trim();
-  if(!text || currentMode!=='humano') return;
-  const a=atendimentosMock.find(x=>x.id===currentAtendId);
-  if(a){ a.mensagens.push({from:'out',text}); }
+  if(!text || currentMode!=='humano' || !currentAtendId) return;
+  const {error}=await sb.from('mensagens').insert({
+    conversa_id:currentAtendId, company_id:currentProfile.company_id, role:'humano', content:text
+  });
+  if(error){ showToast('Erro ao enviar: '+error.message); return; }
+  await sb.from('conversas').update({
+    ultima_msg:text.slice(0,200), ultima_msg_role:'humano', ultima_msg_at:new Date().toISOString()
+  }).eq('id', currentAtendId);
+  const c=conversasCache.find(x=>x.id===currentAtendId);
+  if(c){ c.ultimaMsg=text; c.minAgo=0; }
   const frame=document.getElementById('atend-phone-frame');
-  frame.insertAdjacentHTML('beforeend', `<div class="bubble out">${text}</div>`);
+  frame.insertAdjacentHTML('beforeend', `<div class="bubble out">${escapeHtml(text)}</div>`);
   frame.scrollTop=frame.scrollHeight;
   input.value='';
 }
@@ -2805,22 +2885,36 @@ document.getElementById('atend-composer-input').addEventListener('keydown',e=>{
   if(e.key==='Enter') sendHumanMessage();
 });
 
-function openAtendDrawer(id){
-  const a=atendimentosMock.find(x=>x.id===id);
+async function openAtendDrawer(id){
+  const a=conversasCache.find(x=>x.id===id);
   if(!a) return;
   currentAtendId=id;
-  currentMode='ia';
+  currentMode = a.atendidoPor==='humano' ? 'humano' : 'ia';
   document.getElementById('atend-drawer-name').textContent=a.cliente;
-  document.getElementById('atend-drawer-meta').textContent=a.produto+' · '+a.quando;
-  document.getElementById('atend-phone-frame').innerHTML=a.mensagens.map(m=>
-    `<div class="bubble ${m.from}">${m.text}</div>`).join('');
+  document.getElementById('atend-drawer-meta').textContent=a.produto+' · '+notifTimeLabel(a.minAgo);
+  const frame=document.getElementById('atend-phone-frame');
+  frame.innerHTML='<div class="system-note">Carregando conversa...</div>';
   updateModeUI();
   const closeVendaBtn=document.getElementById('atend-close-venda-btn');
-  closeVendaBtn.disabled = a.status==='fechado';
-  closeVendaBtn.innerHTML = a.status==='fechado'
+  closeVendaBtn.disabled = a.rawStatus==='vendida';
+  closeVendaBtn.innerHTML = a.rawStatus==='vendida'
     ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada'
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Fechar venda';
   atendOverlay.classList.add('open'); atendDrawer.classList.add('open');
+
+  const {data:msgs, error}=await sb.from('mensagens')
+    .select('role, content, created_at')
+    .eq('conversa_id', id)
+    .order('created_at');
+  if(currentAtendId!==id) return; // usuário fechou/abriu outra conversa enquanto carregava
+  if(error){
+    frame.innerHTML='<div class="system-note">Não consegui carregar as mensagens.</div>';
+    return;
+  }
+  frame.innerHTML=(msgs||[]).map(m=>
+    `<div class="bubble ${m.role==='cliente'?'in':'out'}">${escapeHtml(m.content)}</div>`).join('')
+    || '<div class="system-note">Conversa sem mensagens.</div>';
+  frame.scrollTop=frame.scrollHeight;
 }
 function closeAtendDrawer(){
   atendOverlay.classList.remove('open'); atendDrawer.classList.remove('open');
@@ -2831,20 +2925,28 @@ document.getElementById('close-atend-drawer').addEventListener('click',closeAten
 atendOverlay.addEventListener('click',closeAtendDrawer);
 
 document.getElementById('atend-close-venda-btn').addEventListener('click',()=>{
-  const a=atendimentosMock.find(x=>x.id===currentAtendId);
+  const a=conversasCache.find(x=>x.id===currentAtendId);
   const btn=document.getElementById('atend-close-venda-btn');
-  if(!a || a.status==='fechado' || btn.disabled) return;
+  if(!a || a.rawStatus==='vendida' || btn.disabled) return;
   btn.disabled=true;
   const frame=document.getElementById('atend-phone-frame');
   const valor=parseValor(a.valor);
-  openPaymentFlow(frame, valor, (method)=>{
-    a.status='fechado';
-    a.ultimaMsg='Pagamento aprovado via '+paymentLabel(method);
-    a.mensagens.push({from:'out',text:'Como você prefere pagar os R$ '+formatBRL(valor)+'?'});
-    a.mensagens.push({from:'out',text:'Pagamento confirmado via '+paymentLabel(method)+'.'});
+  openPaymentFlow(frame, valor, async (method)=>{
+    try{
+      const {error}=await sb.rpc('register_venda_simulador', {
+        p_conversation_id:a.id, p_product_id:a.productId,
+        p_valor_cents:Math.round(valor*100), p_desconto_pct:0,
+        p_pagamento:paymentLabel(method), p_cliente_nome:a.cliente==='Cliente sem nome'?null:a.cliente
+      });
+      if(error) throw error;
+    }catch(e){
+      showToast('Erro ao registrar a venda: '+(e.message||e));
+      btn.disabled=false;
+      return;
+    }
     btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada';
-    registerVenda({cliente:a.cliente, produto:a.produto, valor, desconto:0, pagamento:method,
-      atendidoPor: currentMode==='humano'?'Humano':'IA', atendId:a.id});
+    showToast(`Venda fechada com ${a.cliente}! 🎉`);
+    refreshOperacao();
   });
 });
 
@@ -2853,6 +2955,7 @@ const iaTestOverlay=document.getElementById('ia-test-drawer-overlay');
 const iaTestDrawer=document.getElementById('ia-test-drawer');
 let iaTestProduct=null;
 let iaTestHistory=[]; // {role, content}
+let iaTestConversationId=null;
 let iaTestClosed=false;
 let iaTestSending=false;
 
@@ -2872,15 +2975,17 @@ function iaTestSetSending(sending){
 }
 
 async function iaTestCallNegotiate(message, start){
-  const {data, error}=await sb.functions.invoke('negotiate', {
-    body: start ? {product_id:iaTestProduct.id, history:iaTestHistory, start:true} : {product_id:iaTestProduct.id, history:iaTestHistory, message}
-  });
+  const body = start ? {product_id:iaTestProduct.id, history:iaTestHistory, start:true} : {product_id:iaTestProduct.id, history:iaTestHistory, message};
+  body.cliente_nome='Teste do gestor';
+  if(iaTestConversationId) body.conversation_id=iaTestConversationId;
+  const {data, error}=await sb.functions.invoke('negotiate', { body });
   if(error){
     let msg=error.message;
-    try{ const body=await error.context.json(); if(body?.error) msg=body.error; }catch(_e){}
+    try{ const b=await error.context.json(); if(b?.error) msg=b.error; }catch(_e){}
     throw new Error(msg);
   }
   if(data?.error) throw new Error(data.error);
+  if(data.conversation_id) iaTestConversationId=data.conversation_id;
   iaTestHistory.push({role:'user', content:data.userTurn});
   iaTestHistory.push({role:'assistant', content:data.reply});
   return data.reply;
@@ -2938,6 +3043,7 @@ document.getElementById('ia-test-composer-input').addEventListener('keydown',e=>
 document.getElementById('ia-test-product-select').addEventListener('change',(e)=>{
   iaTestProduct=productsCache.find(p=>p.id===e.target.value);
   iaTestHistory=[];
+  iaTestConversationId=null;
   iaTestClosed=false;
   iaTestSetSending(false);
   const frame=document.getElementById('ia-test-phone-frame');
@@ -2987,9 +3093,18 @@ document.getElementById('ia-test-close-venda-btn').addEventListener('click', asy
   iaTestSetSending(true);
   const precoMatch=reply.match(/R\$\s?([\d.,]+)/);
   const valor=precoMatch ? parseValor(precoMatch[1]) : parseValor(iaTestProduct.precoPadrao);
-  openPaymentFlow(frame, valor, (method)=>{
+  openPaymentFlow(frame, valor, async (method)=>{
+    if(iaTestConversationId){
+      const descontoPct=Math.max(0, Math.round((1 - valor/parseValor(iaTestProduct.precoPadrao))*10000)/100);
+      const {error}=await sb.rpc('register_venda_simulador', {
+        p_conversation_id:iaTestConversationId, p_product_id:iaTestProduct.id,
+        p_valor_cents:Math.round(valor*100), p_desconto_pct:isFinite(descontoPct)?descontoPct:0,
+        p_pagamento:paymentLabel(method), p_cliente_nome:'Teste do gestor'
+      });
+      if(error){ showToast('Erro ao registrar a venda: '+error.message); }
+      else { showToast('Venda de teste registrada! 🎉'); refreshOperacao(); }
+    }
     btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada';
-    registerVenda({cliente:'Cliente de teste (IA)', produto:iaTestProduct.nome, valor, desconto:0, pagamento:method, atendidoPor:'IA'});
   });
 });
 
@@ -3481,8 +3596,8 @@ document.getElementById('neg-close-venda-btn').addEventListener('click',()=>{
   const valor=negSimContext.precoPadrao*(1-negSimContext.maxDesc/100);
   openPaymentFlow(frame, valor, (method)=>{
     btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Venda fechada';
-    registerVenda({cliente:'Cliente exemplo', produto:negSimContext.nome, valor,
-      desconto:negSimContext.maxDesc, pagamento:method, atendidoPor:'IA'});
+    frame.insertAdjacentHTML('beforeend', '<div class="system-note">Demonstração — nenhuma venda foi registrada.</div>');
+    frame.scrollTop=frame.scrollHeight;
   });
 });
 
@@ -3969,25 +4084,13 @@ document.getElementById('kb-search-input').addEventListener('keydown',e=>{
 });
 
 /* ===================== vendas ===================== */
-const vendasMock=[
-  {id:'v1',cliente:'Rafael Almeida',produto:'Plano mensal Premium',valor:199.00,desconto:0,pagamento:'PIX',atendidoPor:'IA',minAgo:70,atendId:2},
-  {id:'v2',cliente:'Eduardo Santos',produto:'Cabo USB-C 1m',valor:359.00,desconto:10,pagamento:'Cartão',atendidoPor:'IA',minAgo:1500,atendId:6},
-  {id:'v3',cliente:'Camila Ferreira',produto:'Consultoria UX',valor:297.50,desconto:15,pagamento:'PIX',atendidoPor:'IA',minAgo:300},
-  {id:'v4',cliente:'Lucas Martins',produto:'Plano mensal Premium',valor:169.15,desconto:15,pagamento:'Boleto',atendidoPor:'Humano',minAgo:600},
-  {id:'v5',cliente:'Sabrina Alves',produto:'Cabo USB-C 1m',valor:35.90,desconto:0,pagamento:'PIX',atendidoPor:'IA',minAgo:900},
-  {id:'v6',cliente:'Diego Souza',produto:'Consultoria UX',valor:350.00,desconto:0,pagamento:'Cartão',atendidoPor:'IA',minAgo:1200},
-  {id:'v7',cliente:'Fernanda Lima',produto:'Plano mensal Premium',valor:199.00,desconto:0,pagamento:'PIX',atendidoPor:'IA',minAgo:2000},
-  {id:'v8',cliente:'Gabriel Rocha',produto:'Cabo USB-C 1m',valor:323.10,desconto:10,pagamento:'Cartão',atendidoPor:'Humano',minAgo:2600},
-  {id:'v9',cliente:'Helena Costa',produto:'Consultoria UX',valor:332.50,desconto:5,pagamento:'PIX',atendidoPor:'IA',minAgo:3200},
-  {id:'v10',cliente:'Igor Pereira',produto:'Plano mensal Premium',valor:179.10,desconto:10,pagamento:'Boleto',atendidoPor:'IA',minAgo:4000}
-];
-
+/* ===================== vendas (dados reais via vendasCache) ===================== */
 function formatBRL(v){
   return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
 function vendasMetrics(days){
-  const vendas=vendasMock.filter(v=>v.minAgo<=days*1440);
+  const vendas=vendasCache.filter(v=>v.minAgo<=days*1440);
   const total=vendas.reduce((a,v)=>a+v.valor,0);
   const count=vendas.length;
   const ticketMedio=count? total/count : 0;
@@ -4048,25 +4151,34 @@ const vendasSortState={key:null,dir:1};
 
 function renderVendasTable(list){
   const body=document.getElementById('vendas-body');
+  if(!list.length){
+    body.innerHTML='<tr><td colspan="7" class="cell-muted" style="text-align:center;padding:28px 0;">Nenhuma venda no período — elas aparecem aqui quando um pedido é fechado.</td></tr>';
+    return;
+  }
   body.innerHTML=list.map(v=>`
     <tr data-id="${v.id}" data-atend="${v.atendId||''}">
-      <td>${v.cliente}</td>
-      <td class="cell-muted">${v.produto}</td>
+      <td>${escapeHtml(v.cliente)}</td>
+      <td class="cell-muted">${escapeHtml(v.produto)}</td>
       <td class="cell-mono">R$ ${formatBRL(v.valor)}</td>
       <td class="desconto-cell">${v.desconto>0?v.desconto+'%':'—'}</td>
-      <td class="cell-muted">${v.pagamento}</td>
+      <td class="cell-muted">${escapeHtml(v.pagamento)}</td>
       <td><span class="canal-pill ${v.atendidoPor}">${v.atendidoPor}</span></td>
       <td class="cell-muted">${notifTimeLabel(v.minAgo)}</td>
     </tr>`).join('');
-  body.querySelectorAll('tr').forEach(tr=>{
+  body.querySelectorAll('tr[data-atend]').forEach(tr=>{
     tr.addEventListener('click',()=>{
       const atendId=tr.dataset.atend;
-      if(atendId) openAtendDrawer(parseInt(atendId,10));
+      if(atendId) openAtendDrawer(atendId);
     });
   });
 }
 
-function refreshVendas(){
+async function refreshVendas(){
+  await loadVendas();
+  renderVendasFromCache();
+}
+
+function renderVendasFromCache(){
   const days=parseInt(document.getElementById('vendas-period').value,10);
   const q=(document.getElementById('vendas-search').value||'').toLowerCase();
   const m=vendasMetrics(days);
@@ -4086,8 +4198,8 @@ function refreshVendas(){
   }
   renderVendasTable(list);
 }
-document.getElementById('vendas-period').addEventListener('change',refreshVendas);
-document.getElementById('vendas-search').addEventListener('input',refreshVendas);
+document.getElementById('vendas-period').addEventListener('change',renderVendasFromCache);
+document.getElementById('vendas-search').addEventListener('input',renderVendasFromCache);
 document.querySelectorAll('#view-vendas th.sortable').forEach(th=>{
   th.addEventListener('click',()=>{
     const key=th.dataset.key;
@@ -4096,7 +4208,7 @@ document.querySelectorAll('#view-vendas th.sortable').forEach(th=>{
     document.querySelectorAll('#view-vendas th.sortable').forEach(t=>t.classList.remove('sort-active','desc'));
     th.classList.add('sort-active');
     if(vendasSortState.dir===-1) th.classList.add('desc');
-    refreshVendas();
+    renderVendasFromCache();
   });
 });
 

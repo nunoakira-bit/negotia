@@ -144,6 +144,7 @@
     <div class="setup" id="setup-screen">
       <h3>Escolha um produto para testar</h3>
       <p class="sub">Você vai conversar como se fosse o cliente. A IA responde com base nas regras configuradas para este produto.</p>
+      <input type="text" id="cliente-nome-input" placeholder="Seu nome (opcional)" style="width:100%;height:40px;padding:0 12px;border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:13.5px;margin-bottom:10px;box-sizing:border-box;">
       <div id="demo-products"></div>
       <button class="start-btn" id="start-chat-btn">Iniciar conversa no WhatsApp</button>
     </div>
@@ -180,6 +181,7 @@ let REAL_PRODUCTS=[];
 let selectedProduct=null;
 let negState={ closed:false, sending:false };
 let conversationHistory=[]; // {role:'user'|'assistant', content}
+let conversationId=null;    // id da conversa persistida no Supabase (mesma estrutura que o WhatsApp usará)
 
 function renderDemoProducts(){
   const wrap=document.getElementById('demo-products');
@@ -321,15 +323,19 @@ function showTyping(){
 function removeTyping(id){ const el=document.getElementById(id); if(el) el.remove(); }
 
 async function callNegotiate(message, start){
+  const clienteNome=(document.getElementById('cliente-nome-input').value||'').trim()||null;
+  const payload=start
+    ? {product_id:selectedProduct.id, history:conversationHistory, start:true, cliente_nome:clienteNome}
+    : {product_id:selectedProduct.id, history:conversationHistory, message, cliente_nome:clienteNome};
+  if(conversationId) payload.conversation_id=conversationId;
   const res=await fetch(`${SUPABASE_URL}/functions/v1/negotiate`, {
     method:'POST',
     headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
-    body:JSON.stringify(start
-      ? {product_id:selectedProduct.id, history:conversationHistory, start:true}
-      : {product_id:selectedProduct.id, history:conversationHistory, message})
+    body:JSON.stringify(payload)
   });
   const data=await res.json().catch(()=>({}));
   if(!res.ok || data.error) throw new Error(data.error || 'Não consegui falar com a IA agora.');
+  if(data.conversation_id) conversationId=data.conversation_id;
   conversationHistory.push({role:'user', content:data.userTurn});
   conversationHistory.push({role:'assistant', content:data.reply});
   return data.reply;
@@ -383,8 +389,23 @@ async function closeSale(){
   const valor=extractPriceFromText(reply, selectedProduct.precoPadrao);
   setTimeout(()=>{
     const frame=document.getElementById('chat-frame');
-    openPaymentFlow(frame, valor, (method)=>{
+    openPaymentFlow(frame, valor, async (method)=>{
       appendSys(`Pedido de ${selectedProduct.nome} confirmado via ${paymentLabel(method)} · R$ ${formatBRL(valor)}`);
+      document.getElementById('restart-btn').style.display='none';
+      try{
+        if(conversationId){
+          const descontoPct=Math.max(0, Math.round((1 - valor/selectedProduct.precoPadrao)*10000)/100);
+          const clienteNome=(document.getElementById('cliente-nome-input').value||'').trim()||null;
+          await sb.rpc('register_venda_simulador', {
+            p_conversation_id:conversationId,
+            p_product_id:selectedProduct.id,
+            p_valor_cents:Math.round(valor*100),
+            p_desconto_pct:descontoPct,
+            p_pagamento:paymentLabel(method),
+            p_cliente_nome:clienteNome
+          });
+        }
+      }catch(e){ console.error('Falha ao registrar venda:', e); }
       document.getElementById('restart-btn').style.display='block';
     });
   }, 500);
@@ -413,6 +434,7 @@ document.querySelectorAll('.quick-btn').forEach(btn=>{
 async function startChat(){
   negState={closed:false, sending:false};
   conversationHistory=[];
+  conversationId=null;
   document.getElementById('chat-frame').innerHTML='';
   setQuickActionsEnabled(false);
   document.getElementById('restart-btn').style.display='none';

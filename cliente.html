@@ -322,11 +322,9 @@ function showTyping(){
 }
 function removeTyping(id){ const el=document.getElementById(id); if(el) el.remove(); }
 
-async function callNegotiate(message, start){
+async function callNegotiate(message){
   const clienteNome=(document.getElementById('cliente-nome-input').value||'').trim()||null;
-  const payload=start
-    ? {product_id:selectedProduct.id, history:conversationHistory, start:true, cliente_nome:clienteNome}
-    : {product_id:selectedProduct.id, history:conversationHistory, message, cliente_nome:clienteNome};
+  const payload={product_id:selectedProduct.id, history:conversationHistory, message, cliente_nome:clienteNome};
   if(conversationId) payload.conversation_id=conversationId;
   const res=await fetch(`${SUPABASE_URL}/functions/v1/negotiate`, {
     method:'POST',
@@ -436,21 +434,14 @@ async function startChat(){
   conversationHistory=[];
   conversationId=null;
   document.getElementById('chat-frame').innerHTML='';
-  setQuickActionsEnabled(false);
   document.getElementById('restart-btn').style.display='none';
   document.getElementById('setup-screen').style.display='none';
   document.getElementById('chat-screen').classList.add('active');
-  const typingId=showTyping();
-  try{
-    const reply=await callNegotiate(null, true);
-    removeTyping(typingId);
-    appendBubble('them', reply);
-  }catch(e){
-    removeTyping(typingId);
-    appendBubble('them', `Olá! Bem-vindo(a). Vi seu interesse em ${selectedProduct.nome}. Posso te ajudar com o preço, desconto, ou já fechar o pedido.`);
-    appendSys(e.message);
-  }
+  // A IA não inicia a conversa — no WhatsApp real ela só responde depois que o cliente escreve.
+  // Mostramos uma instrução de interface (não é a IA falando) para orientar a demonstração.
+  appendSys('Envie uma mensagem para iniciar — a IA responde como faria no WhatsApp.');
   setQuickActionsEnabled(true);
+  document.getElementById('composer-input').focus();
 }
 document.getElementById('start-chat-btn').addEventListener('click', startChat);
 document.getElementById('restart-btn').addEventListener('click', ()=>{

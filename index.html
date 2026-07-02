@@ -573,6 +573,19 @@
   .ia-diag-tag{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;
     background:var(--accent-soft);color:var(--accent-dark);margin-left:7px;vertical-align:1px;}
 
+  /* ---------- lead esfriado + exportação de contatos ---------- */
+  .lead-frio-tag{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;
+    background:#EFF3F8;color:#5B6B7F;margin-left:7px;vertical-align:1px;text-transform:uppercase;letter-spacing:.03em;}
+  .export-wrap{position:relative;}
+  .export-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:50;min-width:230px;background:var(--bg-card);
+    border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 30px rgba(16,24,40,.16);padding:6px;display:none;}
+  .export-menu.open{display:block;}
+  .export-menu button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;
+    background:none;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-family:var(--font-sans);}
+  .export-menu button:hover{background:var(--bg-hover);}
+  .export-menu button .em-t{font-size:13px;font-weight:600;color:var(--text-primary);}
+  .export-menu button .em-d{font-size:11.5px;color:var(--text-tertiary);}
+
   /* ---------- painel admin: drawer com abas ---------- */
   .admin-drawer{width:480px;}
   .admin-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:4px -28px 0;padding:0 28px;flex-shrink:0;}
@@ -966,10 +979,26 @@
           </button>
         </div>
 
-        <div class="section-block" style="margin-bottom:16px;">
-          <div class="search-input">
+        <div class="section-block" style="margin-bottom:16px;display:flex;gap:12px;align-items:center;">
+          <div class="search-input" style="flex:1;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
             <input type="text" id="atend-search" placeholder="Buscar por cliente ou produto">
+          </div>
+          <div class="export-wrap">
+            <button class="ghost-action" id="btn-exportar-contatos" type="button" style="height:42px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12"/><polyline points="8 11 12 15 16 11"/><path d="M5 19h14"/></svg>
+              Exportar contatos
+            </button>
+            <div class="export-menu" id="export-menu">
+              <button type="button" data-export="todas">
+                <span class="em-t">Todas as conversas</span>
+                <span class="em-d">Exporta todos os contatos da lista</span>
+              </button>
+              <button type="button" data-export="esfriados">
+                <span class="em-t">Somente leads que esfriaram</span>
+                <span class="em-d">Conversas abertas há mais de 24h sem fechar</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -2723,24 +2752,32 @@ function minAgoFrom(ts){ return ts ? Math.max(0, Math.round((Date.now()-new Date
 
 async function loadConversas(){
   const {data, error}=await sb.from('conversas')
-    .select('id, product_id, cliente_nome, status, atendido_por, canal, ultima_msg, ultima_msg_role, ultima_msg_at, created_at, products(nome, preco_padrao)')
+    .select('id, product_id, cliente_nome, cliente_telefone, status, atendido_por, canal, ultima_msg, ultima_msg_role, ultima_msg_at, created_at, products(nome, preco_padrao)')
     .order('ultima_msg_at', {ascending:false, nullsFirst:false})
     .limit(200);
   if(error){ console.error('Erro ao carregar conversas:', error.message); return; }
-  conversasCache=(data||[]).map(c=>({
-    id:c.id,
-    productId:c.product_id,
-    cliente:c.cliente_nome||'Cliente sem nome',
-    produto:c.products ? c.products.nome : '—',
-    status:c.status==='vendida' ? 'fechado' : (c.status==='abandonada' ? 'perdido' : 'andamento'),
-    rawStatus:c.status,
-    atendidoPor:c.atendido_por,
-    canal:c.canal,
-    ultimaMsg:c.ultima_msg||'',
-    ultimaMsgRole:c.ultima_msg_role,
-    valor:'R$ '+formatBRL(c.products ? Number(c.products.preco_padrao) : 0),
-    minAgo:minAgoFrom(c.ultima_msg_at||c.created_at)
-  }));
+  conversasCache=(data||[]).map(c=>{
+    const minAgo=minAgoFrom(c.ultima_msg_at||c.created_at);
+    return {
+      id:c.id,
+      productId:c.product_id,
+      cliente:c.cliente_nome||'Cliente sem nome',
+      telefone:c.cliente_telefone||'',
+      produto:c.products ? c.products.nome : '—',
+      status:c.status==='vendida' ? 'fechado' : (c.status==='abandonada' ? 'perdido' : 'andamento'),
+      rawStatus:c.status,
+      atendidoPor:c.atendido_por,
+      canal:c.canal,
+      ultimaMsg:c.ultima_msg||'',
+      ultimaMsgRole:c.ultima_msg_role,
+      valor:'R$ '+formatBRL(c.products ? Number(c.products.preco_padrao) : 0),
+      minAgo,
+      // Lead esfriado: conversa ainda aberta cuja última mensagem passou de 24h.
+      // Fora dessa janela o sistema não reabre a conversa (não enviamos após 24h);
+      // o gestor pode exportar o contato e falar com o lead por fora, se quiser.
+      esfriado: c.status==='aberta' && minAgo>24*60
+    };
+  });
 }
 
 async function loadVendas(){
@@ -2802,7 +2839,7 @@ function renderAtendimentosTable(bodyId, list){
     <tr data-id="${a.id}">
       <td>${escapeHtml(a.cliente)}</td>
       <td class="cell-muted">${escapeHtml(a.produto)}</td>
-      <td><span class="status-pill ${a.status}">${statusLabel(a.status)}</span></td>
+      <td><span class="status-pill ${a.status}">${statusLabel(a.status)}</span>${a.esfriado?'<span class="lead-frio-tag" title="Passou de 24h sem fechar — fora da janela de resposta">esfriou</span>':''}</td>
       ${bodyId==='atendimentos-body' ? `<td class="cell-muted">${escapeHtml(a.ultimaMsg)}</td>` : ''}
       <td class="cell-mono">${a.valor}</td>
       <td class="cell-muted">${notifTimeLabel(a.minAgo)}</td>
@@ -2873,6 +2910,60 @@ document.querySelectorAll('.data-table').forEach(table=>{
 });
 
 document.getElementById('atend-search').addEventListener('input',refreshAtendimentosTable);
+
+/* ===================== exportação de contatos (CSV) ===================== */
+function csvEscape(v){
+  const s=(v==null?'':String(v));
+  return /[",;\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+
+function exportarContatos(escopo){
+  let lista=conversasCache;
+  if(escopo==='esfriados') lista=conversasCache.filter(c=>c.esfriado);
+
+  if(!lista.length){
+    showToast(escopo==='esfriados' ? 'Nenhum lead esfriado para exportar.' : 'Nenhuma conversa para exportar.');
+    return;
+  }
+
+  const cabecalho=['Cliente','Telefone','Produto','Status','Lead esfriado','Última atividade'];
+  const statusExport={andamento:'Em andamento',fechado:'Fechado',perdido:'Perdido'};
+  const linhas=lista.map(c=>[
+    c.cliente,
+    c.telefone,
+    c.produto,
+    statusExport[c.status]||c.status,
+    c.esfriado?'Sim':'Não',
+    notifTimeLabel(c.minAgo)
+  ].map(csvEscape).join(';'));
+
+  // BOM para o Excel reconhecer acentos corretamente
+  const csv='\uFEFF'+[cabecalho.join(';'), ...linhas].join('\r\n');
+  const blob=new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const hoje=new Date().toISOString().slice(0,10);
+  a.href=url;
+  a.download=`contatos-${escopo==='esfriados'?'leads-esfriados':'todas-conversas'}-${hoje}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`${lista.length} contato${lista.length>1?'s':''} exportado${lista.length>1?'s':''}.`);
+}
+
+const exportMenu=document.getElementById('export-menu');
+document.getElementById('btn-exportar-contatos').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  exportMenu.classList.toggle('open');
+});
+exportMenu.querySelectorAll('button[data-export]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    exportMenu.classList.remove('open');
+    exportarContatos(btn.dataset.export);
+  });
+});
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.export-wrap')) exportMenu.classList.remove('open');
+});
 
 const atendOverlay=document.getElementById('atend-drawer-overlay');
 const atendDrawer=document.getElementById('atend-drawer');
@@ -4299,7 +4390,7 @@ function iaDiagUpdateVisibility(viewName){
 function iaDiagIntro(){
   const textos={
     dashboard:'Posso analisar os números da sua operação — conversas, conversão e vendas — e apontar o que merece a sua atenção.',
-    atendimentos:'Posso identificar conversas paradas ou sem resposta e escrever mensagens prontas para você reativar esses clientes.',
+    atendimentos:'Posso identificar clientes que demonstraram interesse — perguntaram preço ou negociaram — mas não fecharam, para você ter visibilidade das oportunidades.',
     vendas:'Posso avaliar o desempenho de cada produto e sugerir ajustes de preço, promoções ou descontos para os que vendem menos.'
   };
   return `<div class="ia-diag-run">
@@ -4319,18 +4410,15 @@ function iaDiagRenderResult(diag){
 
   const sugestoes=(diag.sugestoes||[]).map((s,i)=>{
     let extra='';
-    if(s.tipo==='mensagem' && s.mensagem){
-      const convId=s.conversa_id && conversasCache.some(c=>c.id===s.conversa_id) ? s.conversa_id : null;
-      extra=`<div class="ia-diag-msg" id="ia-diag-msg-${i}">${escapeHtml(s.mensagem)}</div>
-        <div class="ia-diag-actions">
-          <button class="ghost-action ia-diag-copy" data-target="ia-diag-msg-${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar mensagem</button>
-          ${convId?`<button class="ghost-action ia-diag-open-conv" data-conv="${convId}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button>`:''}
+    if(s.tipo==='interesse' && s.conversa_id && conversasCache.some(c=>c.id===s.conversa_id)){
+      extra=`<div class="ia-diag-actions">
+          <button class="ghost-action ia-diag-open-conv" data-conv="${s.conversa_id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button>
         </div>`;
     }
-    const tag=s.tipo==='mensagem'?'Mensagem pronta':s.tipo==='preco'?'Preço':s.tipo==='promocao'?'Promoção':'';
+    const tag=s.tipo==='interesse'?'Interesse sem venda':s.tipo==='preco'?'Preço':s.tipo==='promocao'?'Promoção':'';
     return `<div class="ia-diag-item">
       <p class="t">${escapeHtml(s.titulo||'')}${tag?`<span class="ia-diag-tag">${tag}</span>`:''}</p>
-      <p class="d">${escapeHtml(s.detalhe||'')}${s.produto?` <strong>(${escapeHtml(s.produto)})</strong>`:''}</p>
+      <p class="d">${escapeHtml(s.detalhe||'')}${s.cliente?` <strong>${escapeHtml(s.cliente)}</strong>`:''}${s.produto?` <span style="color:var(--text-tertiary);">(${escapeHtml(s.produto)})</span>`:''}</p>
       ${extra}
     </div>`;
   }).join('');
@@ -4393,15 +4481,6 @@ document.getElementById('ia-diag-close').addEventListener('click',()=>{
 document.getElementById('ia-diag-body').addEventListener('click', async (e)=>{
   const runBtn=e.target.closest('#ia-diag-run-btn, #ia-diag-rerun');
   if(runBtn){ iaDiagRun(); return; }
-  const copyBtn=e.target.closest('.ia-diag-copy');
-  if(copyBtn){
-    const el=document.getElementById(copyBtn.dataset.target);
-    try{
-      await navigator.clipboard.writeText(el.textContent);
-      showToast('Mensagem copiada!');
-    }catch(_e){ showToast('Não consegui copiar — selecione o texto manualmente.'); }
-    return;
-  }
   const convBtn=e.target.closest('.ia-diag-open-conv');
   if(convBtn){
     document.getElementById('ia-diag-panel').classList.remove('open');

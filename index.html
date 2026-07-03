@@ -47,7 +47,10 @@
 
   /* ---------- header (full width) ---------- */
   .topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
-    padding:24px;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-card);}
+    padding:24px;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-card);
+    transition:background .25s ease, border-color .25s ease;}
+  body.admin-mode .topbar{background:#F4F6FC;border-color:#DCE3F5;}
+  body.macro-view .topbar{background:#F3F6FB;border-color:#D9E4F2;}
 
   /* ---------- sidebar ---------- */
   .sidebar{width:236px;flex-shrink:0;background:#fff;border:1px solid var(--border);border-radius:16px;
@@ -558,6 +561,44 @@
     background:none;border:none;font-family:var(--font-sans);display:flex;align-items:center;gap:5px;}
   .macro-banner .mb-back:hover{text-decoration:underline;}
 
+  /* ---------- tela do agente de monitoramento ---------- */
+  .nav-badge{margin-left:auto;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#DC2626;
+    color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .agente-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .agente-filtro{padding:7px 14px;border:1px solid var(--border);background:var(--bg-card);border-radius:999px;
+    font-size:12.5px;font-weight:500;color:var(--text-secondary);cursor:pointer;font-family:var(--font-sans);transition:.15s;}
+  .agente-filtro:hover{border-color:var(--accent);color:var(--accent-dark);}
+  .agente-filtro.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .alerta-card{display:flex;gap:13px;padding:15px 16px;border:1px solid var(--border);border-radius:13px;margin-bottom:11px;
+    background:var(--bg-card);transition:.15s;}
+  .alerta-card.nao-lido{border-color:#C9D4EC;background:linear-gradient(0deg,rgba(79,70,229,.02),rgba(79,70,229,.02)),var(--bg-card);}
+  .alerta-sev{width:9px;height:9px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+  .alerta-sev.alta{background:#DC2626;} .alerta-sev.media{background:#D97706;} .alerta-sev.baixa{background:#16A34A;}
+  .alerta-body{flex:1;min-width:0;}
+  .alerta-top{display:flex;align-items:center;gap:9px;margin-bottom:3px;}
+  .alerta-titulo{font-size:14px;font-weight:600;color:var(--text-primary);}
+  .alerta-tipo-tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);}
+  .alerta-novo{font-size:10px;font-weight:700;color:#4F46E5;text-transform:uppercase;letter-spacing:.04em;}
+  .alerta-detalhe{font-size:13px;color:var(--text-secondary);line-height:1.5;margin:0 0 9px;}
+  .alerta-acoes{display:flex;gap:8px;align-items:center;}
+  .alerta-acoes .ghost-action{height:30px;padding:0 11px;font-size:12px;}
+  .alerta-time{font-size:11.5px;color:var(--text-tertiary);margin-left:auto;}
+  /* hero de venda */
+  .agente-hero{max-width:640px;margin:10px auto;text-align:center;padding:36px 32px;border:1px solid var(--border);
+    border-radius:20px;background:linear-gradient(160deg,rgba(79,70,229,.05),rgba(124,58,237,.04));}
+  .agente-hero-icon{width:60px;height:60px;border-radius:16px;margin:0 auto 18px;
+    background:linear-gradient(135deg,#4F46E5,#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;}
+  .agente-hero-icon svg{width:32px;height:32px;}
+  .agente-hero h2{font-size:22px;font-weight:700;margin:0 0 10px;color:var(--text-primary);}
+  .agente-hero>p{font-size:14.5px;color:var(--text-secondary);line-height:1.6;margin:0 auto 26px;max-width:480px;}
+  .agente-beneficios{display:flex;flex-direction:column;gap:14px;text-align:left;max-width:420px;margin:0 auto 28px;}
+  .agente-beneficio{display:flex;gap:13px;align-items:flex-start;}
+  .agente-beneficio svg{width:22px;height:22px;color:var(--accent-dark);flex-shrink:0;margin-top:2px;}
+  .agente-beneficio strong{display:block;font-size:14px;color:var(--text-primary);margin-bottom:1px;}
+  .agente-beneficio span{font-size:13px;color:var(--text-secondary);line-height:1.45;}
+  .agente-cta{max-width:320px;margin:0 auto;font-size:14.5px;height:46px;}
+  .agente-hero-note{font-size:12.5px;color:var(--text-tertiary);margin:14px 0 0;}
+
   /* ---------- modo administração: esconde o que é específico da própria empresa ---------- */
   .nav-item[data-view="admin"]{display:none;}
   body.is-admin-user.admin-mode .nav-item[data-view="admin"]{display:flex;}
@@ -933,6 +974,11 @@
       <div class="nav-item nav-company-item" data-view="vendas" title="Vendas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 016 0"/></svg>
         <span class="nav-label">Vendas</span>
+      </div>
+      <div class="nav-item nav-company-item" data-view="agente" title="Agente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="9" width="14" height="10" rx="2.5"/><circle cx="9.5" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14" r="1" fill="currentColor" stroke="none"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <span class="nav-label">Agente</span>
+        <span class="nav-badge" id="agente-nav-badge" style="display:none;">0</span>
       </div>
       <div class="nav-item nav-company-item" data-view="configuracoes" title="Configurações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l1.9-1.5-2-3.4-2.2.6a7.6 7.6 0 00-1.7-1l-.3-2.3H9.9l-.3 2.3a7.6 7.6 0 00-1.7 1l-2.2-.6-2 3.4L5.6 11a7.6 7.6 0 000 2l-1.9 1.5 2 3.4 2.2-.6a7.6 7.6 0 001.7 1l.3 2.3h4.2l.3-2.3a7.6 7.6 0 001.7-1l2.2.6 2-3.4z"/></svg>
@@ -1525,6 +1571,60 @@
         </div>
       </section>
 
+      <!-- ===================== AGENTE ===================== -->
+      <section class="view" id="view-agente">
+        <div class="page-head">
+          <div>
+            <h1>Agente de monitoramento</h1>
+            <p class="page-sub">A IA vigia sua operação e avisa quando algo precisa da sua atenção.</p>
+          </div>
+        </div>
+
+        <!-- estado ATIVO: histórico de alertas -->
+        <div id="agente-ativo-view" style="display:none;">
+          <div class="agente-filtros">
+            <button class="agente-filtro active" data-filtro="todos" type="button">Todos</button>
+            <button class="agente-filtro" data-filtro="nao_lidos" type="button">Não lidos</button>
+            <button class="agente-filtro" data-filtro="conversa_parada" type="button">Conversas paradas</button>
+            <button class="agente-filtro" data-filtro="lead_esfriando" type="button">Leads esfriando</button>
+            <button class="agente-filtro" data-filtro="sla_humano" type="button">SLA humano</button>
+            <button class="agente-filtro" data-filtro="queda_leads" type="button">Queda de leads</button>
+          </div>
+          <div id="agente-alertas-list"></div>
+          <div id="agente-alertas-empty" class="empty-state" style="display:none;">
+            <h3>Tudo tranquilo por aqui</h3>
+            <p>O agente não encontrou nada que precise da sua atenção no momento.</p>
+          </div>
+        </div>
+
+        <!-- estado INATIVO: tela de venda -->
+        <div id="agente-venda-view" style="display:none;">
+          <div class="agente-hero">
+            <div class="agente-hero-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="9" width="14" height="10" rx="2.5"/><circle cx="9.5" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14" r="1" fill="currentColor" stroke="none"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.1" fill="currentColor" stroke="none"/></svg>
+            </div>
+            <h2>Deixe uma IA de olho na sua operação 24h por dia</h2>
+            <p>O Agente de monitoramento acompanha suas conversas e vendas em tempo real e te avisa na hora certa — sem você precisar ficar conferindo.</p>
+            <div class="agente-beneficios">
+              <div class="agente-beneficio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <div><strong>Conversas paradas</strong><span>Avisa quando uma negociação trava sem resposta.</span></div>
+              </div>
+              <div class="agente-beneficio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <div><strong>Leads esfriando</strong><span>Sinaliza clientes interessados antes de perdê-los.</span></div>
+              </div>
+              <div class="agente-beneficio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+                <div><strong>Queda de leads</strong><span>Detecta quando o volume de contatos cai do normal.</span></div>
+              </div>
+            </div>
+            <button class="btn-primary agente-cta" id="agente-cta-btn" type="button" style="justify-content:center;">Experimente grátis por 1 semana</button>
+            <p class="agente-hero-note">Quer ativar? Fale com a equipe Negotia para liberar o período de teste.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- ===================== CONFIGURAÇÕES ===================== -->
       <section class="view" id="view-configuracoes">
         <div class="page-head">
@@ -1815,6 +1915,13 @@
         <label class="toggle-switch"><input type="checkbox" id="admin-atendimento-toggle"><span class="toggle-slider"></span></label>
       </div>
 
+      <div class="settings-row" style="padding-top:14px;">
+        <div class="settings-row-left">
+          <div class="settings-row-text"><p class="s-title">Agente de monitoramento <span class="ia-diag-tag" style="margin-left:4px;">Beta</span></p><p class="s-desc" id="admin-agente-status-sub">Vigia a operação e gera alertas para o gestor</p></div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="admin-agente-toggle"><span class="toggle-slider"></span></label>
+      </div>
+
       <div class="field" style="margin-top:8px;">
         <label class="field-label" for="admin-llm-provider-select">Provedor</label>
         <select id="admin-llm-provider-select" class="auth-input" style="margin-bottom:6px;">
@@ -2034,6 +2141,9 @@ async function onAuthReady(session){
   await refreshOperacao();
   iaDiagUpdateVisibility('dashboard');
   setMode('empresa');
+  // carrega estado do agente para o badge do menu aparecer já no login
+  await loadAgenteEstado();
+  if(agenteAtivoEmpresa){ await loadAlertas(); updateAgenteBadge(); }
 }
 
 (async function initSession(){
@@ -2186,6 +2296,7 @@ function switchView(name){
   if(name==='vendas'){ refreshVendas(); }
   if(name==='configuracoes'){ syncIaPersonaUI(); }
   if(name==='admin'){ refreshAdminClientList(); }
+  if(name==='agente'){ refreshAgente(); }
   iaDiagUpdateVisibility(name);
 }
 document.getElementById('ver-todos-atend').addEventListener('click',()=>switchView('atendimentos'));
@@ -2624,7 +2735,7 @@ async function openAdminDrawer(companyId){
   }
 
   // buscar dados completos (pagamento + persona) que não vieram na lista resumida
-  const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom, picpay_merchant_code, picpay_status, picpay_commission_percentage').eq('id', companyId).single();
+  const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, agente_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom, picpay_merchant_code, picpay_status, picpay_commission_percentage').eq('id', companyId).single();
   const pm=(full&&full.payment_methods)||{pix:true,cartao:true,boleto:true};
   document.getElementById('admin-pay-toggle-pix').checked=false;
   document.getElementById('admin-pay-toggle-cartao').checked=pm.cartao!==false;
@@ -2635,6 +2746,11 @@ async function openAdminDrawer(companyId){
   renderPicpayStatus((full&&full.picpay_status)||'nao_configurado', !!(full&&full.picpay_merchant_code));
 
   document.getElementById('admin-atendimento-toggle').checked=full ? full.atendimento_ativo!==false : true;
+  const agToggle=document.getElementById('admin-agente-toggle');
+  agToggle.checked=!!(full && full.agente_ativo);
+  document.getElementById('admin-agente-status-sub').textContent=agToggle.checked
+    ? 'Ativo — vigiando a operação e gerando alertas'
+    : 'Inativo — o gestor vê a tela de experimentação';
   document.getElementById('admin-ia-status-sub').textContent=(full&&full.atendimento_ativo!==false) ? 'Ativo — a IA está respondendo' : 'Pausado — um humano responde';
   document.getElementById('admin-llm-provider-select').value=(full&&full.llm_provider)||'anthropic';
   updateAdminLlmProviderKeyLink();
@@ -2795,6 +2911,20 @@ document.getElementById('admin-atendimento-toggle').addEventListener('change', a
   document.getElementById('admin-ia-status-sub').textContent=novoStatus ? 'Ativo — a IA está respondendo' : 'Pausado — um humano responde';
   showToast(novoStatus ? 'Atendimento reativado' : 'Atendimento pausado');
   refreshAdminClientList();
+});
+
+document.getElementById('admin-agente-toggle').addEventListener('change', async (e)=>{
+  if(!adminSelectedCompanyId) return;
+  const novo=e.target.checked;
+  const {error}=await sb.from('companies').update({
+    agente_ativo:novo,
+    agente_ativado_em: novo ? new Date().toISOString() : null
+  }).eq('id', adminSelectedCompanyId);
+  if(error){ showToast('Erro ao salvar: '+error.message); e.target.checked=!novo; return; }
+  document.getElementById('admin-agente-status-sub').textContent=novo
+    ? 'Ativo — vigiando a operação e gerando alertas'
+    : 'Inativo — o gestor vê a tela de experimentação';
+  showToast(novo ? 'Agente de monitoramento ativado' : 'Agente de monitoramento desativado');
 });
 
 document.getElementById('admin-llm-key-toggle-visibility').addEventListener('click',()=>{
@@ -4655,6 +4785,125 @@ document.getElementById('ia-diag-body').addEventListener('click', async (e)=>{
     document.getElementById('ia-diag-panel').classList.remove('open');
     openAtendDrawer(convBtn.dataset.conv);
   }
+});
+
+/* ===================== agente de monitoramento (tela + alertas) ===================== */
+let agenteAtivoEmpresa=false;
+let alertasCache=[];
+let agenteFiltroAtual='todos';
+
+async function loadAgenteEstado(){
+  const cid = viewingCompanyId || (currentProfile && currentProfile.company_id);
+  if(!cid){ agenteAtivoEmpresa=false; return; }
+  if(viewingCompanyId){
+    const {data}=await sb.rpc('admin_get_company_overview',{p_company_id:viewingCompanyId});
+    agenteAtivoEmpresa = !!(data && data.agente_ativo);
+  }else{
+    const {data}=await sb.from('companies').select('agente_ativo').eq('id', cid).single();
+    agenteAtivoEmpresa = !!(data && data.agente_ativo);
+  }
+}
+
+async function loadAlertas(){
+  if(!agenteAtivoEmpresa){ alertasCache=[]; return; }
+  let query=sb.from('agente_alertas').select('*').order('created_at',{ascending:false}).limit(100);
+  if(viewingCompanyId) query=query.eq('company_id', viewingCompanyId);
+  const {data,error}=await query;
+  if(error){ console.error('Erro ao carregar alertas:', error.message); return; }
+  alertasCache=data||[];
+}
+
+function alertaTipoLabel(t){
+  return {conversa_parada:'Conversa parada', lead_esfriando:'Lead esfriando', sla_humano:'SLA humano', queda_leads:'Queda de leads', outro:'Alerta'}[t]||t;
+}
+function alertaTimeLabel(ts){
+  const min=Math.round((Date.now()-new Date(ts).getTime())/60000);
+  return notifTimeLabel(min);
+}
+
+function renderAlertas(){
+  const list=document.getElementById('agente-alertas-list');
+  const empty=document.getElementById('agente-alertas-empty');
+  let filtrados=alertasCache.filter(a=>!a.resolvido);
+  if(agenteFiltroAtual==='nao_lidos') filtrados=filtrados.filter(a=>!a.lido);
+  else if(agenteFiltroAtual!=='todos') filtrados=filtrados.filter(a=>a.tipo===agenteFiltroAtual);
+
+  if(!filtrados.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML=filtrados.map(a=>{
+    const temConversa=a.conversa_id && conversasCache.some(c=>c.id===a.conversa_id);
+    return `<div class="alerta-card ${a.lido?'':'nao-lido'}" data-id="${a.id}">
+      <span class="alerta-sev ${escapeHtml(a.severidade)}"></span>
+      <div class="alerta-body">
+        <div class="alerta-top">
+          <span class="alerta-titulo">${escapeHtml(a.titulo)}</span>
+          <span class="alerta-tipo-tag">${alertaTipoLabel(a.tipo)}</span>
+          ${a.lido?'':'<span class="alerta-novo">Novo</span>'}
+          <span class="alerta-time">${alertaTimeLabel(a.created_at)}</span>
+        </div>
+        <p class="alerta-detalhe">${escapeHtml(a.detalhe)}</p>
+        <div class="alerta-acoes">
+          ${temConversa?`<button class="ghost-action alerta-ver-conv" data-conv="${a.conversa_id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button>`:''}
+          ${a.lido?'':'<button class="ghost-action alerta-marcar-lido" data-id="'+a.id+'">Marcar como lido</button>'}
+          <button class="ghost-action alerta-resolver" data-id="${a.id}">Resolver</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.alerta-ver-conv').forEach(b=>b.addEventListener('click',()=>{
+    if(viewingCompanyId){ showToast('Abra o ambiente do cliente para ver a conversa.'); return; }
+    openAtendDrawer(b.dataset.conv);
+  }));
+  list.querySelectorAll('.alerta-marcar-lido').forEach(b=>b.addEventListener('click',()=>marcarAlerta(b.dataset.id,{lido:true})));
+  list.querySelectorAll('.alerta-resolver').forEach(b=>b.addEventListener('click',()=>marcarAlerta(b.dataset.id,{resolvido:true,lido:true})));
+}
+
+async function marcarAlerta(id, campos){
+  if(viewingCompanyId){ showToast('Somente leitura — entre no ambiente do cliente para agir.'); return; }
+  const {error}=await sb.from('agente_alertas').update(campos).eq('id', id);
+  if(error){ showToast('Erro: '+error.message); return; }
+  const a=alertasCache.find(x=>x.id===id);
+  if(a) Object.assign(a, campos);
+  renderAlertas();
+  updateAgenteBadge();
+}
+
+function updateAgenteBadge(){
+  const naoLidos=alertasCache.filter(a=>!a.lido && !a.resolvido).length;
+  const badge=document.getElementById('agente-nav-badge');
+  if(naoLidos>0){ badge.style.display='flex'; badge.textContent=naoLidos>99?'99+':naoLidos; }
+  else badge.style.display='none';
+}
+
+async function refreshAgente(){
+  await loadAgenteEstado();
+  const ativoView=document.getElementById('agente-ativo-view');
+  const vendaView=document.getElementById('agente-venda-view');
+  if(agenteAtivoEmpresa){
+    await loadAlertas();
+    ativoView.style.display='block';
+    vendaView.style.display='none';
+    renderAlertas();
+    updateAgenteBadge();
+  }else{
+    ativoView.style.display='none';
+    vendaView.style.display='block';
+    document.getElementById('agente-nav-badge').style.display='none';
+  }
+}
+
+document.querySelectorAll('.agente-filtro').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.agente-filtro').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    agenteFiltroAtual=btn.dataset.filtro;
+    renderAlertas();
+  });
+});
+
+document.getElementById('agente-cta-btn').addEventListener('click',()=>{
+  showToast('Pedido registrado! A equipe Negotia vai entrar em contato para liberar seu teste.');
 });
 
 /* ===================== inicialização ===================== */

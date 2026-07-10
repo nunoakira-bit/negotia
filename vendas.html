@@ -82,32 +82,47 @@
   .hero-ctas{display:flex;gap:14px;align-items:center}
   .hero-note{margin-top:16px;font-size:14px;color:var(--ink-soft)}
 
-  /* phone mockup — assinatura da página */
+  /* phone mockup — assinatura da página (moldura iPhone) */
   .phone{
     width:390px;margin:0 auto;
     background:var(--white) !important;
-    border:1px solid var(--line);
-    border-radius:34px;
-    box-shadow:var(--shadow);
+    border:11px solid #10161C;
+    border-radius:52px;
+    box-shadow:var(--shadow), 0 0 0 2px #2A333B;
     overflow:hidden;
+    position:relative;
+  }
+  .island{
+    position:absolute;top:11px;left:50%;transform:translateX(-50%);
+    width:112px;height:28px;border-radius:999px;
+    background:#10161C !important;z-index:5;
   }
   .phone-top{
     background:var(--green-deep) !important;color:#fff;
-    padding:16px 18px;display:flex;align-items:center;gap:12px;
+    padding:50px 18px 14px;display:flex;align-items:center;gap:12px;
+  }
+  .home-bar{
+    height:26px;background:#EDF3EC !important;
+    display:grid;place-items:center;
+  }
+  .home-bar i{
+    display:block;width:120px;height:5px;border-radius:999px;
+    background:#10161C;opacity:.85;
   }
   .avatar{width:38px;height:38px;border-radius:50%;background:var(--green-tint) !important;color:var(--green-deep);display:grid;place-items:center;font-weight:700;font-size:15px}
   .phone-top .who{font-size:15px;font-weight:600;line-height:1.2}
-  .phone-top .status{font-size:12px;opacity:.8}
+  .phone-top .status{font-size:12px;opacity:.8;transition:opacity .2s}
   .chat{
     background:#EDF3EC !important;
-    padding:18px 14px 22px;
-    min-height:420px;
-    display:flex;flex-direction:column;gap:10px;
+    padding:14px 12px 16px;
+    display:flex;flex-direction:column;gap:8px;
+    position:relative;
+    height:712px;overflow:hidden;
   }
   .msg{
-    max-width:82%;
-    padding:10px 14px;border-radius:14px;
-    font-size:14px;line-height:1.45;
+    max-width:84%;
+    padding:8px 12px;border-radius:13px;
+    font-size:13px;line-height:1.4;
     opacity:0;transform:translateY(8px);
     box-shadow:0 1px 2px rgba(11,31,23,.07);
   }
@@ -116,10 +131,14 @@
   .msg.ai-msg{align-self:flex-end;background:#D7F0DE !important;border-bottom-right-radius:4px}
   .msg .tag{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green-deep);margin-bottom:3px}
   .msg.closed{align-self:center;background:var(--amber-tint) !important;color:var(--amber);font-weight:700;font-size:13px;border-radius:999px;padding:8px 18px;box-shadow:none}
-  .typing{align-self:flex-end;display:none;gap:4px;padding:12px 16px;background:#D7F0DE !important;border-radius:14px;border-bottom-right-radius:4px}
-  .typing.on{display:flex}
-  .typing i{width:6px;height:6px;border-radius:50%;background:var(--green-deep);animation:tp 1.1s infinite}
-  .typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+  .pix{
+    margin-top:8px;background:var(--white) !important;
+    border:1px dashed var(--green);border-radius:10px;
+    padding:8px 10px;font-family:ui-monospace,Menlo,monospace;
+    font-size:11.5px;color:var(--green-deep);
+    word-break:break-all;
+  }
+  .pix b{display:block;font-family:'Instrument Sans',sans-serif;font-size:11px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
   @keyframes tp{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
 
   /* ---------- seções ---------- */
@@ -184,7 +203,77 @@
     background:var(--paper) !important;color:var(--ink-soft);
   }
 
-  /* como funciona */
+  /* ---------- gestão / painel ---------- */
+  .manage{background:var(--white) !important;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .browser{
+    border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    box-shadow:var(--shadow);background:var(--paper) !important;
+  }
+  .browser-bar{
+    display:flex;align-items:center;gap:14px;
+    background:#EBF1EC !important;border-bottom:1px solid var(--line);
+    padding:12px 16px;
+  }
+  .browser-bar .dots{display:flex;gap:6px}
+  .browser-bar .dots i{width:11px;height:11px;border-radius:50%;display:block}
+  .browser-bar .dots i:nth-child(1){background:#E8837B}
+  .browser-bar .dots i:nth-child(2){background:#EFC46A}
+  .browser-bar .dots i:nth-child(3){background:#7BCFA0}
+  .browser-bar .url{
+    flex:1;max-width:320px;background:var(--white) !important;
+    border:1px solid var(--line);border-radius:999px;
+    font-size:12.5px;color:var(--ink-soft);padding:6px 16px;
+  }
+  .panel{display:grid;grid-template-columns:300px 1fr;min-height:440px}
+  .convo-list{border-right:1px solid var(--line);background:var(--white) !important;padding:14px 0}
+  .convo-list h4{
+    font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);padding:0 18px 10px;
+  }
+  .convo{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 18px;cursor:default;
+  }
+  .convo.active{background:var(--green-tint) !important;border-right:3px solid var(--green)}
+  .convo .avatar{width:36px;height:36px;font-size:13px;flex-shrink:0;background:#E4EDE6 !important;color:var(--ink-soft)}
+  .convo.active .avatar{background:var(--green) !important;color:#fff}
+  .convo .meta{flex:1;min-width:0}
+  .convo .nm{font-size:14px;font-weight:600;line-height:1.3}
+  .convo .prev{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pill{
+    flex-shrink:0;font-size:10.5px;font-weight:700;letter-spacing:.04em;
+    padding:4px 10px;border-radius:999px;
+  }
+  .pill.ia{background:var(--green-tint) !important;color:var(--green-deep)}
+  .pill.you{background:var(--amber-tint) !important;color:var(--amber)}
+  .convo-view{display:flex;flex-direction:column;background:var(--paper) !important}
+  .convo-head{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px 20px;border-bottom:1px solid var(--line);background:var(--white) !important;
+  }
+  .convo-head .who{display:flex;align-items:center;gap:12px}
+  .convo-head .nm{font-weight:700;font-size:15px;line-height:1.25}
+  .convo-head .ph{font-size:12.5px;color:var(--ink-soft)}
+  .btn-take{
+    background:var(--amber) !important;color:#fff;border:none;cursor:default;
+    font-family:inherit;font-weight:700;font-size:13.5px;
+    padding:10px 18px;border-radius:999px;
+  }
+  .convo-msgs{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:9px}
+  .convo-msgs .msg{opacity:1;transform:none;font-size:13px}
+  .sysline{
+    align-self:center;display:flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:700;color:var(--amber);
+    background:var(--amber-tint) !important;border-radius:999px;padding:7px 16px;
+    margin:4px 0;
+  }
+  .sysline i{width:7px;height:7px;border-radius:50%;background:var(--amber);display:block}
+  .msg.human{align-self:flex-end;background:#FCEFD8 !important;border-bottom-right-radius:4px}
+  .msg.human .tag{color:var(--amber)}
+  .manage-points{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:36px}
+  .mpoint h3{font-size:17px;margin-bottom:6px}
+  .mpoint p{font-size:14.5px;color:var(--ink-soft)}
+
   .how{background:var(--green-deep) !important;color:#fff}
   .how .sec-head h2{color:#fff}
   .how .sec-head p{color:#BFD9CB}
@@ -239,6 +328,8 @@
     .diag-grid{grid-template-columns:1fr}
     .cap.wide{grid-column:span 1;flex-direction:column;align-items:flex-start}
     .pain-grid,.steps{grid-template-columns:1fr;gap:16px}
+    .manage-points{grid-template-columns:1fr;gap:20px}
+    .panel{grid-template-columns:240px 1fr}
   }
   @media (max-width: 640px){
     .nav a:not(.btn){display:none}
@@ -250,8 +341,8 @@
     .hero h1{font-size:36px}
     .hero p.lead{font-size:17px}
     .hero-ctas{flex-direction:column;align-items:stretch;gap:10px}
-    .phone{width:100%;max-width:390px;border-radius:26px}
-    .chat{min-height:380px}
+    .phone{width:100%;max-width:390px;border-radius:44px;border-width:9px}
+    .chat{height:772px}
     section{padding:56px 0}
     .sec-head{margin-bottom:36px}
     .sec-head h2{font-size:29px}
@@ -266,6 +357,10 @@
     details{padding:16px 18px}
     summary{font-size:15.5px}
     footer .wrap{flex-direction:column;gap:10px;text-align:center}
+    .panel{grid-template-columns:1fr;min-height:0}
+    .convo-list{display:none}
+    .convo-head{flex-direction:column;align-items:flex-start;gap:10px}
+    .btn-take{align-self:stretch;text-align:center}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -286,6 +381,7 @@
     </a>
     <nav class="nav">
       <a href="#diagnostico">O que a IA faz</a>
+      <a href="#gestao">Gestão</a>
       <a href="#como-funciona">Como funciona</a>
       <a href="#faq">Perguntas</a>
       <a class="btn" href="https://nunoakira-bit.github.io/negotia/">Experimente grátis</a>
@@ -307,12 +403,13 @@
       <p class="hero-note">Sem cartão de crédito. Configuração em minutos.</p>
     </div>
 
-    <div class="phone" aria-label="Simulação de uma negociação real conduzida pela IA no WhatsApp">
+    <div class="phone" aria-label="Simulação de uma negociação real conduzida pela IA no WhatsApp, incluindo cobrança">
+      <span class="island" aria-hidden="true"></span>
       <div class="phone-top">
         <span class="avatar">SL</span>
         <div>
           <div class="who">Sua Loja · Vendas</div>
-          <div class="status">respondido pela Negotia AI</div>
+          <div class="status" id="aiStatus">respondido pela Negotia AI</div>
         </div>
       </div>
       <div class="chat" id="chat">
@@ -320,10 +417,13 @@
         <div class="msg ai-msg" data-t="2100"><span class="tag">Negotia AI</span>Olá! 😊 Ótima escolha. Para 10 unidades do kit profissional, consigo R$ 2.890 com frete incluso. Fecho o pedido pra você?</div>
         <div class="msg lead-msg" data-t="4000">Achei salgado... faz por 2.500?</div>
         <div class="msg ai-msg" data-t="5900"><span class="tag">Negotia AI</span>Entendo! R$ 2.500 fica abaixo do que consigo praticar. Mas te ofereço R$ 2.690 à vista — é o meu melhor preço, com desconto máximo aplicado.</div>
-        <div class="msg lead-msg" data-t="7800">Fechado! Como pago?</div>
-        <div class="msg closed" data-t="9200">✓ Venda fechada às 23h47 — dentro das suas regras</div>
-        <div class="typing" id="typing"><i></i><i></i><i></i></div>
+        <div class="msg lead-msg" data-t="7800">Fechado!</div>
+        <div class="msg ai-msg" data-t="9500"><span class="tag">Negotia AI</span>Perfeito! 🎉 Como prefere pagar? Pix à vista (R$ 2.690) ou link do cartão em até 3x?</div>
+        <div class="msg lead-msg" data-t="11300">Pix</div>
+        <div class="msg ai-msg" data-t="13100"><span class="tag">Negotia AI</span>Segue o Pix copia e cola — é só pagar e me mandar o comprovante:<span class="pix"><b>Pix · R$ 2.690,00</b>00020126580014br.gov.bcb.pix0136sua-loja…6304A1C7</span></div>
+        <div class="msg closed" data-t="14800">✓ Venda fechada às 23h47 — dentro das suas regras</div>
       </div>
+      <div class="home-bar" aria-hidden="true"><i></i></div>
     </div>
   </div>
 </section>
@@ -467,6 +567,82 @@
   </div>
 </section>
 
+<!-- GESTÃO -->
+<section class="manage" id="gestao">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow"><span class="dot"></span>Gestão em tempo real</span>
+      <h2>Acompanhe cada conversa. Assuma quando quiser.</h2>
+      <p>No painel, você vê todas as negociações acontecendo ao vivo. Se quiser entrar em uma conversa, é um clique: a IA pausa naquele atendimento na hora e você fala direto com o cliente.</p>
+    </div>
+
+    <div class="browser" role="img" aria-label="Painel de gestão da Negotia AI mostrando a lista de conversas e o gestor assumindo um atendimento">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">app.negotia.ai/conversas</span>
+      </div>
+      <div class="panel">
+        <div class="convo-list">
+          <h4>Conversas de hoje</h4>
+          <div class="convo">
+            <span class="avatar">MA</span>
+            <span class="meta"><span class="nm">Mariana Alves</span><br><span class="prev">Perfeito, pode emitir a nota…</span></span>
+            <span class="pill ia">IA</span>
+          </div>
+          <div class="convo active">
+            <span class="avatar">CM</span>
+            <span class="meta"><span class="nm">Carlos Mendes</span><br><span class="prev">Preciso de um prazo maior…</span></span>
+            <span class="pill you">VOCÊ</span>
+          </div>
+          <div class="convo">
+            <span class="avatar">RS</span>
+            <span class="meta"><span class="nm">Roberta Souza</span><br><span class="prev">Qual o frete pra Curitiba?</span></span>
+            <span class="pill ia">IA</span>
+          </div>
+          <div class="convo">
+            <span class="avatar">JP</span>
+            <span class="meta"><span class="nm">João Pedro Lima</span><br><span class="prev">Vou fechar as 20 unidades!</span></span>
+            <span class="pill ia">IA</span>
+          </div>
+        </div>
+        <div class="convo-view">
+          <div class="convo-head">
+            <div class="who">
+              <span class="avatar">CM</span>
+              <div>
+                <div class="nm">Carlos Mendes</div>
+                <div class="ph">+55 41 9 8765-4321</div>
+              </div>
+            </div>
+            <button class="btn-take" type="button">Conversa assumida</button>
+          </div>
+          <div class="convo-msgs">
+            <div class="msg lead-msg">Gostei da proposta, mas preciso de um prazo maior de pagamento. Vocês fazem 60 dias?</div>
+            <div class="msg ai-msg"><span class="tag">Negotia AI</span>Entendo, Carlos! Condições especiais de prazo passam pelo nosso gestor. Já estou chamando ele aqui pra você. 😉</div>
+            <div class="sysline"><i></i>Você assumiu esta conversa — IA pausada neste atendimento</div>
+            <div class="msg human"><span class="tag">Você</span>Carlos, aqui é o Nuno, dono da loja. Pra esse volume consigo sim 60 dias. Te mando o contrato ainda hoje!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="manage-points">
+      <div class="mpoint">
+        <h3>Visão ao vivo de tudo</h3>
+        <p>Todas as conversas, vendas e leads em um painel só — com o status de cada atendimento sinalizado.</p>
+      </div>
+      <div class="mpoint">
+        <h3>Transição sem atrito</h3>
+        <p>Ao assumir, a IA pausa só naquela conversa e continua vendendo nas outras. O cliente nem percebe a troca.</p>
+      </div>
+      <div class="mpoint">
+        <h3>Devolva quando quiser</h3>
+        <p>Resolveu o caso? Reative a IA naquele atendimento com um clique e ela retoma de onde parou.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- COMO FUNCIONA -->
 <section class="how" id="como-funciona">
   <div class="wrap">
@@ -547,21 +723,23 @@
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var msgs = Array.prototype.slice.call(document.querySelectorAll('#chat .msg'));
-  var typing = document.getElementById('typing');
+  var aiStatus = document.getElementById('aiStatus');
+  var IDLE = 'respondido pela Negotia AI';
   if (reduced) { msgs.forEach(function(m){ m.classList.add('show'); }); return; }
 
   function play(){
     msgs.forEach(function(m){ m.classList.remove('show'); });
+    aiStatus.textContent = IDLE;
     msgs.forEach(function(m){
       var t = parseInt(m.getAttribute('data-t'), 10);
       var isAi = m.classList.contains('ai-msg');
       if (isAi) {
-        setTimeout(function(){ typing.classList.add('on'); }, t - 1100);
-        setTimeout(function(){ typing.classList.remove('on'); }, t - 50);
+        setTimeout(function(){ aiStatus.textContent = 'digitando\u2026'; }, t - 1100);
+        setTimeout(function(){ aiStatus.textContent = IDLE; }, t - 50);
       }
       setTimeout(function(){ m.classList.add('show'); }, t);
     });
-    setTimeout(play, 15000);
+    setTimeout(play, 21000);
   }
   play();
 })();

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Negotia AI — Sua IA que negocia e vende no WhatsApp</title>
+<meta name="description" content="A Negotia AI responde, negocia e fecha vendas no WhatsApp da sua empresa, 24 horas por dia, respeitando suas regras de desconto. Experimente grátis por 1 semana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light only;
+    --ink:#0B1F17;
+    --ink-soft:#3C5248;
+    --paper:#F7FAF6;
+    --white:#FFFFFF;
+    --green:#0C6B44;
+    --green-deep:#084D31;
+    --green-tint:#E3F2E8;
+    --amber:#B97514;
+    --amber-tint:#FBF1DF;
+    --line:#D8E4DB;
+    --radius:16px;
+    --shadow:0 10px 30px rgba(11,31,23,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Instrument Sans',system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--paper) !important;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Bricolage Grotesque','Instrument Sans',sans-serif;line-height:1.12}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(247,250,246,.92) !important;
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;letter-spacing:-.02em}
+  .logo-mark{width:32px;height:32px;border-radius:9px;background:var(--green);display:grid;place-items:center}
+  .logo-mark svg{width:18px;height:18px}
+  .nav{display:flex;align-items:center;gap:28px;font-size:15px;font-weight:500;color:var(--ink-soft)}
+  .nav a:hover{color:var(--green-deep)}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--green) !important;color:#fff;
+    font-weight:600;font-size:15px;
+    padding:12px 22px;border-radius:999px;
+    transition:background .18s ease, transform .18s ease;
+    border:none;cursor:pointer;
+  }
+  .btn:hover{background:var(--green-deep) !important;transform:translateY(-1px)}
+  .btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .btn.ghost{background:transparent !important;color:var(--green-deep);border:1.5px solid var(--green)}
+  .btn.ghost:hover{background:var(--green-tint) !important}
+  .btn.big{font-size:17px;padding:16px 32px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:84px 0 96px;overflow:hidden}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--green-deep);background:var(--green-tint) !important;
+    padding:7px 14px;border-radius:999px;margin-bottom:22px;
+  }
+  .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .hero h1{font-size:56px;font-weight:800;letter-spacing:-.03em;margin-bottom:22px}
+  .hero h1 .hl{color:var(--green)}
+  .hero p.lead{font-size:19px;color:var(--ink-soft);max-width:520px;margin-bottom:34px}
+  .hero-ctas{display:flex;gap:14px;align-items:center}
+  .hero-note{margin-top:16px;font-size:14px;color:var(--ink-soft)}
+
+  /* phone mockup — assinatura da página */
+  .phone{
+    width:390px;margin:0 auto;
+    background:var(--white) !important;
+    border:1px solid var(--line);
+    border-radius:34px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .phone-top{
+    background:var(--green-deep) !important;color:#fff;
+    padding:16px 18px;display:flex;align-items:center;gap:12px;
+  }
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--green-tint) !important;color:var(--green-deep);display:grid;place-items:center;font-weight:700;font-size:15px}
+  .phone-top .who{font-size:15px;font-weight:600;line-height:1.2}
+  .phone-top .status{font-size:12px;opacity:.8}
+  .chat{
+    background:#EDF3EC !important;
+    padding:18px 14px 22px;
+    min-height:420px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .msg{
+    max-width:82%;
+    padding:10px 14px;border-radius:14px;
+    font-size:14px;line-height:1.45;
+    opacity:0;transform:translateY(8px);
+    box-shadow:0 1px 2px rgba(11,31,23,.07);
+  }
+  .msg.show{opacity:1;transform:translateY(0);transition:opacity .35s ease,transform .35s ease}
+  .msg.lead-msg{align-self:flex-start;background:var(--white) !important;border-bottom-left-radius:4px}
+  .msg.ai-msg{align-self:flex-end;background:#D7F0DE !important;border-bottom-right-radius:4px}
+  .msg .tag{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green-deep);margin-bottom:3px}
+  .msg.closed{align-self:center;background:var(--amber-tint) !important;color:var(--amber);font-weight:700;font-size:13px;border-radius:999px;padding:8px 18px;box-shadow:none}
+  .typing{align-self:flex-end;display:none;gap:4px;padding:12px 16px;background:#D7F0DE !important;border-radius:14px;border-bottom-right-radius:4px}
+  .typing.on{display:flex}
+  .typing i{width:6px;height:6px;border-radius:50%;background:var(--green-deep);animation:tp 1.1s infinite}
+  .typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+  @keyframes tp{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+
+  /* ---------- seções ---------- */
+  section{padding:88px 0}
+  .sec-head{max-width:640px;margin-bottom:52px}
+  .sec-head .eyebrow{margin-bottom:16px}
+  .sec-head h2{font-size:40px;font-weight:800;letter-spacing:-.025em;margin-bottom:14px}
+  .sec-head p{font-size:17px;color:var(--ink-soft)}
+
+  /* dores */
+  .pains{background:var(--white) !important;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .pain{
+    background:var(--paper) !important;border:1px solid var(--line);
+    border-radius:var(--radius);padding:28px;
+  }
+  .pain .x{
+    width:36px;height:36px;border-radius:10px;
+    background:var(--amber-tint) !important;color:var(--amber);
+    display:grid;place-items:center;font-weight:800;font-size:17px;margin-bottom:16px;
+  }
+  .pain h3{font-size:19px;margin-bottom:8px}
+  .pain p{font-size:15px;color:var(--ink-soft)}
+
+  /* ---------- diagnóstico de IA ---------- */
+  .diag .sec-head{max-width:720px}
+  .diag-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+  .cap{
+    background:var(--white) !important;border:1px solid var(--line);
+    border-radius:var(--radius);padding:32px;
+    display:flex;flex-direction:column;gap:12px;
+    transition:box-shadow .2s ease, transform .2s ease;
+  }
+  .cap:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .cap-head{display:flex;align-items:center;gap:14px}
+  .cap-icon{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    background:var(--green-tint) !important;color:var(--green-deep);
+    display:grid;place-items:center;
+  }
+  .cap-icon svg{width:22px;height:22px}
+  .cap h3{font-size:20px;letter-spacing:-.01em}
+  .cap p{font-size:15px;color:var(--ink-soft)}
+  .cap ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .cap li{font-size:14.5px;color:var(--ink-soft);display:flex;gap:10px;align-items:flex-start}
+  .cap li::before{
+    content:"";flex-shrink:0;margin-top:6px;
+    width:7px;height:7px;border-radius:50%;background:var(--green);
+  }
+  .cap .badge{
+    align-self:flex-start;margin-top:auto;
+    font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--green-deep);background:var(--green-tint) !important;
+    padding:5px 12px;border-radius:999px;
+  }
+  .cap.wide{grid-column:span 2;flex-direction:row;align-items:center;gap:32px}
+  .cap.wide .cap-body{flex:1}
+  .llm-row{display:flex;gap:12px}
+  .llm{
+    border:1.5px solid var(--line);border-radius:12px;
+    padding:14px 20px;font-weight:600;font-size:15px;
+    background:var(--paper) !important;color:var(--ink-soft);
+  }
+
+  /* como funciona */
+  .how{background:var(--green-deep) !important;color:#fff}
+  .how .sec-head h2{color:#fff}
+  .how .sec-head p{color:#BFD9CB}
+  .how .eyebrow{background:rgba(255,255,255,.12) !important;color:#CFEADA}
+  .how .eyebrow .dot{background:#7BCFA0}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .step{
+    background:rgba(255,255,255,.06) !important;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:var(--radius);padding:30px;
+  }
+  .step .n{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;
+    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:#7BCFA0 !important;color:var(--green-deep);margin-bottom:18px;
+  }
+  .step h3{font-size:19px;margin-bottom:8px;color:#fff}
+  .step p{font-size:15px;color:#BFD9CB}
+
+  /* FAQ */
+  .faq-list{display:flex;flex-direction:column;gap:12px;max-width:760px}
+  details{
+    background:var(--white) !important;border:1px solid var(--line);
+    border-radius:14px;padding:20px 24px;
+  }
+  details[open]{border-color:var(--green)}
+  summary{
+    cursor:pointer;font-weight:600;font-size:16.5px;
+    list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:22px;color:var(--green);font-weight:400;transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{margin-top:12px;font-size:15px;color:var(--ink-soft)}
+
+  /* CTA final */
+  .final{padding:100px 0;text-align:center}
+  .final h2{font-size:44px;font-weight:800;letter-spacing:-.03em;margin-bottom:16px}
+  .final p{font-size:18px;color:var(--ink-soft);margin-bottom:32px}
+
+  footer{
+    border-top:1px solid var(--line);
+    padding:28px 0;font-size:14px;color:var(--ink-soft);
+    background:var(--white) !important;
+  }
+  footer .wrap{display:flex;justify-content:space-between;align-items:center}
+
+  /* ---------- responsivo ---------- */
+  @media (max-width: 1024px){
+    .hero .wrap{grid-template-columns:1fr;gap:48px}
+    .hero{padding:56px 0 72px}
+    .diag-grid{grid-template-columns:1fr}
+    .cap.wide{grid-column:span 1;flex-direction:column;align-items:flex-start}
+    .pain-grid,.steps{grid-template-columns:1fr;gap:16px}
+  }
+  @media (max-width: 640px){
+    .nav a:not(.btn){display:none}
+    .topbar .wrap{height:60px}
+    .btn{padding:11px 18px;font-size:14px}
+    .btn.big{font-size:16px;padding:15px 24px;width:100%;justify-content:center}
+    .btn.ghost{width:100%;justify-content:center}
+    .hero{padding:40px 0 56px}
+    .hero h1{font-size:36px}
+    .hero p.lead{font-size:17px}
+    .hero-ctas{flex-direction:column;align-items:stretch;gap:10px}
+    .phone{width:100%;max-width:390px;border-radius:26px}
+    .chat{min-height:380px}
+    section{padding:56px 0}
+    .sec-head{margin-bottom:36px}
+    .sec-head h2{font-size:29px}
+    .sec-head p{font-size:16px}
+    .cap{padding:24px}
+    .cap h3{font-size:18px}
+    .llm-row{flex-wrap:wrap}
+    .final{padding:64px 0}
+    .final h2{font-size:30px}
+    .final h2 br{display:none}
+    .final p{font-size:16px}
+    details{padding:16px 18px}
+    summary{font-size:15.5px}
+    footer .wrap{flex-direction:column;gap:10px;text-align:center}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+    .msg{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="logo" href="#">
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l2-5.4a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5Z"/></svg>
+      </span>
+      Negotia AI
+    </a>
+    <nav class="nav">
+      <a href="#diagnostico">O que a IA faz</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#faq">Perguntas</a>
+      <a class="btn" href="https://nunoakira-bit.github.io/negotia/">Experimente grátis</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Vendendo agora, enquanto você lê isto</span>
+      <h1>Sua IA que <span class="hl">negocia e vende</span> no WhatsApp. 24 horas por dia.</h1>
+      <p class="lead">A Negotia AI responde seus leads na hora, negocia dentro das regras de desconto que você define e fecha vendas — sem aumentar sua equipe.</p>
+      <div class="hero-ctas">
+        <a class="btn big" href="https://nunoakira-bit.github.io/negotia/">Experimente grátis por 1 semana</a>
+        <a class="btn ghost" href="#diagnostico">Ver o que a IA faz</a>
+      </div>
+      <p class="hero-note">Sem cartão de crédito. Configuração em minutos.</p>
+    </div>
+
+    <div class="phone" aria-label="Simulação de uma negociação real conduzida pela IA no WhatsApp">
+      <div class="phone-top">
+        <span class="avatar">SL</span>
+        <div>
+          <div class="who">Sua Loja · Vendas</div>
+          <div class="status">respondido pela Negotia AI</div>
+        </div>
+      </div>
+      <div class="chat" id="chat">
+        <div class="msg lead-msg" data-t="600">Oi! Vi o kit profissional no site. Qual o melhor preço pra 10 unidades?</div>
+        <div class="msg ai-msg" data-t="2100"><span class="tag">Negotia AI</span>Olá! 😊 Ótima escolha. Para 10 unidades do kit profissional, consigo R$ 2.890 com frete incluso. Fecho o pedido pra você?</div>
+        <div class="msg lead-msg" data-t="4000">Achei salgado... faz por 2.500?</div>
+        <div class="msg ai-msg" data-t="5900"><span class="tag">Negotia AI</span>Entendo! R$ 2.500 fica abaixo do que consigo praticar. Mas te ofereço R$ 2.690 à vista — é o meu melhor preço, com desconto máximo aplicado.</div>
+        <div class="msg lead-msg" data-t="7800">Fechado! Como pago?</div>
+        <div class="msg closed" data-t="9200">✓ Venda fechada às 23h47 — dentro das suas regras</div>
+        <div class="typing" id="typing"><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DORES -->
+<section class="pains">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow"><span class="dot"></span>O problema</span>
+      <h2>Cada lead sem resposta é uma venda que foi para o concorrente</h2>
+    </div>
+    <div class="pain-grid">
+      <div class="pain">
+        <span class="x">✕</span>
+        <h3>Lead esfria fora do horário</h3>
+        <p>Seu cliente pesquisa à noite e no fim de semana. Quando sua equipe responde na segunda-feira, ele já comprou de outro.</p>
+      </div>
+      <div class="pain">
+        <span class="x">✕</span>
+        <h3>Desconto sem critério</h3>
+        <p>Na pressa de fechar, vendedores dão descontos acima do limite e corroem sua margem — sem que você fique sabendo.</p>
+      </div>
+      <div class="pain">
+        <span class="x">✕</span>
+        <h3>Conversas que morrem no vácuo</h3>
+        <p>Follow-ups esquecidos, clientes interessados sem retorno e ninguém enxergando onde as vendas estão escapando.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIAGNÓSTICO: TUDO QUE A IA FAZ -->
+<section class="diag" id="diagnostico">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow"><span class="dot"></span>Diagnóstico completo</span>
+      <h2>Tudo que a inteligência artificial faz pelo seu negócio</h2>
+      <p>Não é um chatbot de respostas prontas. É um sistema completo de vendas com IA — da primeira mensagem ao fechamento, com monitoramento contínuo do que acontece no seu funil.</p>
+    </div>
+
+    <div class="diag-grid">
+
+      <div class="cap">
+        <div class="cap-head">
+          <span class="cap-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l2-5.4a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5Z"/><path d="M8 10h8M8 14h5"/></svg>
+          </span>
+          <h3>Negociação autônoma no WhatsApp</h3>
+        </div>
+        <p>A IA conduz a conversa de venda do início ao fim: apresenta produtos, responde objeções, negocia preço e fecha o pedido.</p>
+        <ul>
+          <li>Responde em segundos, a qualquer hora do dia</li>
+          <li>Negocia apenas dentro do desconto máximo que você configurou</li>
+          <li>Conhece seu catálogo: preços, fotos e condições de cada produto</li>
+        </ul>
+        <span class="badge">Vende por você</span>
+      </div>
+
+      <div class="cap">
+        <div class="cap-head">
+          <span class="cap-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15Z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/><path d="M9 7h6M9 11h4"/></svg>
+          </span>
+          <h3>Base de conhecimento inteligente</h3>
+        </div>
+        <p>Envie seus catálogos, tabelas e políticas em PDF. A IA lê tudo e busca a informação certa no momento certo da conversa.</p>
+        <ul>
+          <li>Respostas sempre baseadas nos documentos da sua empresa</li>
+          <li>Busca semântica: entende a pergunta, não só palavras-chave</li>
+          <li>Atualizou o catálogo? A IA já responde com a nova versão</li>
+        </ul>
+        <span class="badge">Responde com precisão</span>
+      </div>
+
+      <div class="cap">
+        <div class="cap-head">
+          <span class="cap-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v3l2 2"/></svg>
+          </span>
+          <h3>Diagnóstico de leads quentes</h3>
+        </div>
+        <p>Uma IA dedicada analisa suas conversas e identifica clientes que demonstraram interesse mas não fecharam — para sua equipe agir antes que esfriem.</p>
+        <ul>
+          <li>Detecta sinais de interesse real na conversa</li>
+          <li>Mostra exatamente onde a venda travou</li>
+          <li>Exporte a lista de leads e retome o contato</li>
+        </ul>
+        <span class="badge">Recupera vendas perdidas</span>
+      </div>
+
+      <div class="cap">
+        <div class="cap-head">
+          <span class="cap-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 1 6 6c0 4 2 5 2 5H4s2-1 2-5a6 6 0 0 1 6-6Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          </span>
+          <h3>Agente de monitoramento do funil</h3>
+        </div>
+        <p>Um agente vigia sua operação de vendas e avisa quando algo sai do padrão — antes de virar prejuízo.</p>
+        <ul>
+          <li>Alerta sobre conversas paradas há muito tempo</li>
+          <li>Detecta queda no volume de novos leads</li>
+          <li>Avisa quando um cliente espera resposta humana além do prazo</li>
+          <li>Você liga e desliga cada função, e vê o registro de tudo</li>
+        </ul>
+        <span class="badge">Vigia sua operação</span>
+      </div>
+
+      <div class="cap">
+        <div class="cap-head">
+          <span class="cap-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <h3>Regras e limites sob seu controle</h3>
+        </div>
+        <p>A IA trabalha para você — nunca por conta própria. Cada decisão respeita os limites que você definiu.</p>
+        <ul>
+          <li>Desconto máximo por produto, configurado por você</li>
+          <li>A IA nunca envia a primeira mensagem: o cliente sempre inicia</li>
+          <li>Pause o atendimento com um clique, quando quiser</li>
+        </ul>
+        <span class="badge">Você no comando</span>
+      </div>
+
+      <div class="cap">
+        <div class="cap-head">
+          <span class="cap-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3"/></svg>
+          </span>
+          <h3>Motor de IA de última geração</h3>
+        </div>
+        <p>Sua conta usa os melhores modelos de inteligência artificial do mercado, escolhidos conforme o perfil do seu negócio.</p>
+        <div class="llm-row" style="margin-top:6px">
+          <span class="llm">Anthropic</span>
+          <span class="llm">OpenAI</span>
+          <span class="llm">Google Gemini</span>
+        </div>
+        <span class="badge">Tecnologia de ponta</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="how" id="como-funciona">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow"><span class="dot"></span>Como funciona</span>
+      <h2>Do zero à primeira venda em três passos</h2>
+      <p>Sem instalação, sem treinamento técnico. Você configura pelo painel e a IA assume a linha de frente.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="n">1</span>
+        <h3>Cadastre produtos e regras</h3>
+        <p>Adicione seu catálogo com fotos e preços, defina o desconto máximo e envie seus documentos para a base de conhecimento.</p>
+      </div>
+      <div class="step">
+        <span class="n">2</span>
+        <h3>Conecte seu WhatsApp</h3>
+        <p>Vincule o número da sua empresa. A partir daí, toda mensagem recebida é respondida pela IA — o cliente sempre dá o primeiro passo.</p>
+      </div>
+      <div class="step">
+        <span class="n">3</span>
+        <h3>Acompanhe as vendas</h3>
+        <p>Veja conversas, vendas fechadas e leads quentes no painel. O agente de monitoramento avisa se algo precisar da sua atenção.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow"><span class="dot"></span>Perguntas frequentes</span>
+      <h2>O que os gestores nos perguntam</h2>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>A IA pode dar um desconto maior do que eu autorizei?</summary>
+        <p>Não. O desconto máximo é uma regra rígida configurada por você. A IA negocia com o cliente, mas nunca ultrapassa esse limite — como você viu na simulação acima.</p>
+      </details>
+      <details>
+        <summary>A IA vai mandar mensagem para os meus clientes sem eu pedir?</summary>
+        <p>Nunca. A Negotia AI só responde quando o cliente inicia a conversa. Nada de disparos em massa nem mensagens invasivas que queimam sua marca.</p>
+      </details>
+      <details>
+        <summary>E se a IA não souber responder algo?</summary>
+        <p>Ela responde com base no seu catálogo e nos documentos que você enviou. Quando o assunto foge disso, ela conduz o cliente para o atendimento humano — e o agente de monitoramento avisa se a resposta humana demorar.</p>
+      </details>
+      <details>
+        <summary>Preciso saber de tecnologia para usar?</summary>
+        <p>Não. Tudo é feito pelo painel: cadastrar produtos, definir regras, enviar PDFs e ligar ou pausar o atendimento com um clique.</p>
+      </details>
+      <details>
+        <summary>O que acontece depois da semana grátis?</summary>
+        <p>Você decide se continua. Sem fidelidade e sem surpresa: se não fizer sentido para o seu negócio, é só não seguir — seus dados continuam seus.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="final">
+  <div class="wrap">
+    <h2>Seu próximo lead chega hoje à noite.<br>Quem vai responder?</h2>
+    <p>Coloque a Negotia AI na linha de frente do seu WhatsApp ainda hoje.</p>
+    <a class="btn big" href="https://nunoakira-bit.github.io/negotia/">Experimente grátis por 1 semana</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Negotia AI — Vendas inteligentes no WhatsApp</span>
+    <a href="https://nunoakira-bit.github.io/negotia/">Acessar a plataforma</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var msgs = Array.prototype.slice.call(document.querySelectorAll('#chat .msg'));
+  var typing = document.getElementById('typing');
+  if (reduced) { msgs.forEach(function(m){ m.classList.add('show'); }); return; }
+
+  function play(){
+    msgs.forEach(function(m){ m.classList.remove('show'); });
+    msgs.forEach(function(m){
+      var t = parseInt(m.getAttribute('data-t'), 10);
+      var isAi = m.classList.contains('ai-msg');
+      if (isAi) {
+        setTimeout(function(){ typing.classList.add('on'); }, t - 1100);
+        setTimeout(function(){ typing.classList.remove('on'); }, t - 50);
+      }
+      setTimeout(function(){ m.classList.add('show'); }, t);
+    });
+    setTimeout(play, 15000);
+  }
+  play();
+})();
+</script>
+
+</body>
+</html>

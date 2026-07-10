@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Negotia AI — Atendimento</title>
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light only">
 <meta name="theme-color" content="#F6F7F9">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -599,6 +599,12 @@
   .agente-cta{max-width:320px;margin:0 auto;font-size:14.5px;height:46px;}
   .agente-hero-note{font-size:12.5px;color:var(--text-tertiary);margin:14px 0 0;}
 
+  /* ---------- botões de tipo de comissão (Asaas) ---------- */
+  .comm-type-btn{flex:1;padding:9px 12px;border:1px solid var(--border);background:var(--bg-card);border-radius:9px;
+    font-size:12.5px;font-weight:500;color:var(--text-secondary);cursor:pointer;font-family:var(--font-sans);transition:.15s;}
+  .comm-type-btn:hover{border-color:var(--accent);}
+  .comm-type-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dark);font-weight:600;}
+
   /* ---------- modo administração: esconde o que é específico da própria empresa ---------- */
   .nav-item[data-view="admin"]{display:none;}
   body.is-admin-user.admin-mode .nav-item[data-view="admin"]{display:flex;}
@@ -830,6 +836,135 @@
   .canal-pill.IA{background:var(--accent-soft);color:var(--accent-dark);}
   .canal-pill.Humano{background:#F0F1F4;color:var(--text-secondary);}
   .desconto-cell{font-family:var(--font-mono);}
+/* ================================================================
+   RESPONSIVIDADE MOBILE
+   ================================================================ */
+
+.hamburger-btn{display:none;align-items:center;justify-content:center;width:38px;height:38px;
+  border:1px solid var(--border);background:var(--bg-card);border-radius:9px;cursor:pointer;
+  color:var(--text-secondary);flex-shrink:0;margin-right:2px;}
+.hamburger-btn svg{width:19px;height:19px;}
+.hamburger-btn:hover{background:var(--bg-hover);}
+
+/* ---------- tablet e abaixo (≤900px): navegação vira menu retrátil ---------- */
+@media (max-width: 900px){
+  html, body{min-width:0;}
+  .shell{padding:10px;gap:10px;}
+  .topbar{padding:12px 14px;gap:8px;}
+  .main-body{padding:20px 16px 90px;}
+  .hamburger-btn{display:flex;}
+  #client-logo-placeholder{display:none !important;}
+  .topbar{flex-wrap:wrap;row-gap:8px;justify-content:flex-start;gap:10px;}
+  .topbar-right{gap:8px;margin-left:auto;}
+
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:150;border-radius:0;
+    box-shadow:0 0 44px rgba(16,24,40,.28);transform:translateX(-105%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .sidebar.collapsed{width:236px;padding:24px 20px;}
+  .sidebar.collapsed .sidebar-top{flex-direction:row;gap:0;}
+  .sidebar.collapsed .logo-text{display:inline;}
+  .sidebar.collapsed .nav-item{justify-content:flex-start;padding:10px 12px;}
+  .sidebar.collapsed .nav-label{display:inline;}
+  .sidebar.collapsed .sidebar-footer{justify-content:flex-start;}
+  .sidebar.collapsed .sidebar-footer .who{display:flex;}
+  .sidebar-toggle{display:none;}
+  #sidebar-overlay{z-index:140;}
+
+  .ctx-eyebrow{display:none;}
+  .ctx-name{max-width:90px;}
+  .ctx-switcher-btn{padding:6px 6px 6px 6px;gap:6px;}
+  .ctx-ico{width:28px;height:28px;}
+  .ctx-chevron{width:12px;height:12px;}
+
+  .ia-status-sub{display:none;}
+  .ia-status-btn{height:38px;padding:0 6px 0 9px;gap:6px;}
+
+  .page-head{flex-wrap:wrap;gap:14px;margin-bottom:22px;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+  .charts-grid, .charts-grid2{grid-template-columns:1fr;}
+  .row-2, .row-3{grid-template-columns:1fr;gap:14px;}
+  .restrictions-grid{grid-template-columns:repeat(2,1fr);}
+  .radio-group{grid-template-columns:1fr;}
+  .segmented{width:100%;}
+  .search-input{max-width:100%;}
+  .product-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+
+  .admin-drawer{width:420px;}
+}
+
+/* ---------- tabelas viram cartões (≤680px) ---------- */
+@media (max-width: 680px){
+  .data-table{border:none;background:transparent;box-shadow:none;}
+  .data-table thead{display:none;}
+  .data-table, .data-table tbody, .data-table tr, .data-table td{display:block;width:100%;}
+  .data-table tr{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+    margin-bottom:10px;overflow:hidden;}
+  .data-table tr:hover{background:var(--bg-card);}
+  .data-table td{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;min-height:18px;}
+  .data-table td:last-child{border-bottom:none;}
+  .data-table td[data-label]:not([data-label=""])::before{
+    content:attr(data-label);font-size:10.5px;font-weight:600;color:var(--text-tertiary);
+    text-transform:uppercase;letter-spacing:.03em;text-align:left;margin-right:auto;flex-shrink:0;}
+  .data-table td[data-label=""]{justify-content:center;padding:12px 14px;}
+  .admin-row-actions{flex-direction:column;align-items:stretch !important;gap:8px;}
+  .admin-row-actions button{width:100%;justify-content:center;}
+}
+
+/* ---------- telefone (≤560px): telas cheias, densidade reduzida ---------- */
+@media (max-width: 560px){
+  .shell{padding:8px;gap:8px;}
+  .topbar{padding:10px 12px;}
+  .main-body{padding:16px 14px 90px;}
+  .kpi-grid{grid-template-columns:1fr;}
+  .restrictions-grid{grid-template-columns:1fr;}
+  .product-grid{grid-template-columns:1fr;}
+
+  .drawer, .admin-drawer{width:100vw;max-width:100vw;height:100dvh;padding:18px;border-radius:0;}
+  .admin-tabs{margin:4px -18px 0;padding:0 18px;overflow-x:auto;}
+  .admin-tabs::-webkit-scrollbar{display:none;}
+
+  .modal-box{width:calc(100vw - 32px);}
+
+  .ia-diag-fab span{display:none;}
+  .ia-diag-fab{right:16px;bottom:16px;padding:14px;border-radius:50%;}
+  .ia-diag-panel{right:10px;left:10px;width:auto;bottom:80px;max-height:min(75vh,600px);}
+
+  .notif-panel{position:fixed;top:64px;right:10px;left:10px;width:auto;}
+
+  #toast{left:14px;right:14px;bottom:16px;width:auto;justify-content:center;}
+
+  .export-menu{right:0;left:auto;max-width:calc(100vw - 40px);}
+  .ctx-menu{max-width:calc(100vw - 24px);}
+
+  .mobile-toolbar{flex-wrap:wrap;}
+  .mobile-toolbar .search-input{flex:1 1 100%;}
+  .mobile-toolbar .export-wrap{width:100%;}
+  .mobile-toolbar .export-wrap #btn-exportar-contatos{width:100%;justify-content:center;}
+
+  .macro-banner{flex-wrap:wrap;}
+  .macro-banner .mb-back{margin-left:0;}
+
+  .agente-hero{padding:26px 18px;}
+  .agente-filtros{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
+  .agente-filtro{flex-shrink:0;}
+
+  .alerta-top{flex-wrap:wrap;}
+  .alerta-time{margin-left:0;}
+  .alerta-acoes{flex-wrap:wrap;}
+
+  .comm-type-btn{font-size:11.5px;padding:9px 8px;}
+
+  .ctx-name{max-width:64px;}
+  .ctx-chevron{display:none;}
+  .ia-status-title{font-size:11.5px;}
+  .ia-status-btn{padding:0 5px 0 8px;}
+}
+
+@supports (height: 100dvh){
+  @media (max-width: 900px){ .shell{height:100dvh;} }
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -880,6 +1015,9 @@
 <div class="shell">
 
   <header class="topbar">
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menu" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
     <div class="client-logo-placeholder" id="client-logo-placeholder" title="Clique para enviar a logo do cliente">
       <div class="client-logo-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15.5l-5.2-5.2a1.5 1.5 0 00-2.1 0L4 19.5"/></svg>
@@ -940,6 +1078,8 @@
     </div>
     </div>
   </header>
+
+  <div class="overlay" id="sidebar-overlay"></div>
 
   <div class="app-row">
 
@@ -1074,7 +1214,7 @@
           </button>
         </div>
 
-        <div class="section-block" style="margin-bottom:16px;display:flex;gap:12px;align-items:center;">
+        <div class="section-block mobile-toolbar" style="margin-bottom:16px;display:flex;gap:12px;align-items:center;">
           <div class="search-input" style="flex:1;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
             <input type="text" id="atend-search" placeholder="Buscar por cliente ou produto">
@@ -1553,12 +1693,10 @@
           <div class="select-wrap" style="width:200px;">
             <select class="std" id="notif-filter-tipo" style="height:40px;font-size:13px;">
               <option value="todos">Todos os tipos</option>
-              <option value="negociacao">Negociação</option>
-              <option value="handoff">Atendimento humano</option>
-              <option value="venda">Venda concluída</option>
-              <option value="perdido">Atendimento perdido</option>
-              <option value="sla">Tempo de resposta</option>
-              <option value="sistema">Sistema</option>
+              <option value="conversa_parada">Conversa parada</option>
+              <option value="lead_esfriando">Lead esfriando</option>
+              <option value="sla_humano">SLA humano</option>
+              <option value="queda_leads">Queda de leads</option>
             </select>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="top:50%;"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
@@ -1884,25 +2022,56 @@
 
       <div class="field" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <span class="field-label" style="margin-bottom:0;">Split PicPay (SubSeller)</span>
-          <span class="status-pill" id="admin-picpay-status-pill">—</span>
+          <span class="field-label" style="margin-bottom:0;">Recebimento via Asaas (split)</span>
+          <span class="status-pill" id="admin-asaas-status-pill">—</span>
         </div>
-        <p class="card-sub" style="margin-bottom:12px;">Cole o código gerado ao cadastrar este cliente como SubSeller no Painel Negócios PicPay (menu Split de Pagamento).</p>
+        <p class="card-sub" style="margin-bottom:14px;">Crie a subconta Asaas deste cliente para que as vendas sejam recebidas por ele, com sua comissão retida automaticamente.</p>
 
-        <label class="field-label" for="admin-picpay-merchant-code">Merchant Code</label>
-        <input type="text" id="admin-picpay-merchant-code" class="auth-input" placeholder="Ex: 000000001179422" style="margin-bottom:12px;">
-
-        <label class="field-label" for="admin-picpay-commission-pct">Comissão da plataforma (%)</label>
-        <input type="number" id="admin-picpay-commission-pct" class="auth-input" placeholder="Deixe em branco para usar a regra padrão do PicPay" step="0.01" min="0" max="100" style="margin-bottom:14px;">
-
-        <button class="ghost-action" id="admin-picpay-save" type="button" style="width:100%;justify-content:center;">Salvar configuração PicPay</button>
-
-        <div class="settings-row" style="border-bottom:none;padding-top:16px;">
-          <div class="settings-row-left">
-            <div class="settings-row-text"><p class="s-title">Recebimento ativo</p><p class="s-desc" id="admin-picpay-status-sub">Cadastre o Merchant Code para ativar</p></div>
+        <!-- estado SEM subconta: formulário de criação -->
+        <div id="admin-asaas-create">
+          <label class="field-label" for="admin-asaas-email">E-mail do cliente</label>
+          <input type="email" id="admin-asaas-email" class="auth-input" placeholder="cliente@empresa.com" style="margin-bottom:10px;">
+          <label class="field-label" for="admin-asaas-cpfcnpj">CPF/CNPJ do cliente</label>
+          <input type="text" id="admin-asaas-cpfcnpj" class="auth-input" placeholder="Somente números" style="margin-bottom:10px;">
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label class="field-label" for="admin-asaas-tipo">Tipo</label>
+              <select class="std" id="admin-asaas-tipo" style="height:44px;width:100%;"><option value="MEI">MEI</option><option value="LIMITED">LTDA</option><option value="INDIVIDUAL">Pessoa física</option><option value="ASSOCIATION">Associação</option></select></div>
+            <div style="flex:1;"><label class="field-label" for="admin-asaas-cep">CEP</label>
+              <input type="text" id="admin-asaas-cep" class="auth-input" placeholder="00000000"></div>
           </div>
-          <label class="toggle-switch"><input type="checkbox" id="admin-picpay-active-toggle" disabled><span class="toggle-slider"></span></label>
+          <label class="field-label" for="admin-asaas-telefone" style="margin-top:10px;">Telefone</label>
+          <input type="text" id="admin-asaas-telefone" class="auth-input" placeholder="(11) 99999-9999" style="margin-bottom:14px;">
+          <button class="ghost-action" id="admin-asaas-create-btn" type="button" style="width:100%;justify-content:center;">Criar subconta Asaas</button>
         </div>
+
+        <!-- estado COM subconta: mostra wallet + comissão -->
+        <div id="admin-asaas-configured" style="display:none;">
+          <div class="settings-row" style="padding-top:0;">
+            <div class="settings-row-left"><div class="settings-row-text">
+              <p class="s-title">Subconta criada</p><p class="s-desc" id="admin-asaas-wallet">—</p>
+            </div></div>
+            <button class="ghost-action" id="admin-asaas-sync-btn" type="button" style="height:34px;">Verificar status</button>
+          </div>
+
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+            <label class="field-label">Como reter sua comissão</label>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+              <button class="comm-type-btn active" data-type="percentual" type="button">Percentual (%)</button>
+              <button class="comm-type-btn" data-type="fixo" type="button">Valor fixo (R$)</button>
+            </div>
+            <div id="admin-comm-pct-wrap">
+              <label class="field-label" for="admin-asaas-comm-pct">Comissão (%) sobre cada venda</label>
+              <input type="number" id="admin-asaas-comm-pct" class="auth-input" placeholder="Ex: 5" step="0.01" min="0" max="100" style="margin-bottom:14px;">
+            </div>
+            <div id="admin-comm-fixo-wrap" style="display:none;">
+              <label class="field-label" for="admin-asaas-comm-fixo">Comissão fixa (R$) por venda</label>
+              <input type="number" id="admin-asaas-comm-fixo" class="auth-input" placeholder="Ex: 2.00" step="0.01" min="0" style="margin-bottom:14px;">
+            </div>
+            <button class="ghost-action" id="admin-asaas-comm-save" type="button" style="width:100%;justify-content:center;">Salvar comissão</button>
+          </div>
+        </div>
+
+        <p class="hint" style="margin-top:14px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8.2" r="0.6" fill="currentColor"/></svg>Processado por Asaas Gestão Financeira Instituição de Pagamento S.A., autorizada pelo Banco Central.</p>
       </div>
     </div>
 
@@ -2141,9 +2310,12 @@ async function onAuthReady(session){
   await refreshOperacao();
   iaDiagUpdateVisibility('dashboard');
   setMode('empresa');
-  // carrega estado do agente para o badge do menu aparecer já no login
+  // carrega estado do agente para o badge do menu e o sino
   await loadAgenteEstado();
   if(agenteAtivoEmpresa){ await loadAlertas(); updateAgenteBadge(); }
+  await loadSinoAlertas();
+  updateBellBadge();
+  renderNotifPage();
 }
 
 (async function initSession(){
@@ -2206,9 +2378,27 @@ sidebarToggleBtn.addEventListener('click',()=>{
   sidebarToggleBtn.title = collapsed ? 'Expandir menu' : 'Recolher menu';
 });
 
+/* ===================== menu retrátil (mobile) ===================== */
+const hamburgerBtn=document.getElementById('hamburger-btn');
+const sidebarOverlay=document.getElementById('sidebar-overlay');
+
+function openMobileSidebar(){
+  sidebarEl.classList.add('mobile-open');
+  sidebarOverlay.classList.add('open');
+}
+function closeMobileSidebar(){
+  sidebarEl.classList.remove('mobile-open');
+  sidebarOverlay.classList.remove('open');
+}
+hamburgerBtn.addEventListener('click', openMobileSidebar);
+sidebarOverlay.addEventListener('click', closeMobileSidebar);
+
 /* ===================== navegação ===================== */
 document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
-  item.addEventListener('click',()=>switchView(item.dataset.view));
+  item.addEventListener('click',()=>{
+    switchView(item.dataset.view);
+    closeMobileSidebar();
+  });
 });
 
 /* ===================== seletor de contexto: Minha empresa / Administração (admins) ===================== */
@@ -2334,40 +2524,46 @@ const notifTipos={
     icon:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>'},
   perdido:{label:'Atendimento perdido',color:'var(--red)',bg:'var(--red-bg)',
     icon:'<circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>'},
-  sla:{label:'Tempo de resposta',color:'var(--amber)',bg:'var(--amber-bg)',
+  sla_humano:{label:'SLA humano',color:'var(--red)',bg:'var(--red-bg)',
     icon:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>'},
+  conversa_parada:{label:'Conversa parada',color:'var(--amber)',bg:'var(--amber-bg)',
+    icon:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'},
+  lead_esfriando:{label:'Lead esfriando',color:'var(--accent-dark)',bg:'var(--accent-soft)',
+    icon:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>'},
+  queda_leads:{label:'Queda de leads',color:'var(--red)',bg:'var(--red-bg)',
+    icon:'<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>'},
   sistema:{label:'Sistema',color:'var(--text-secondary)',bg:'#F0F1F4',
-    icon:'<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/>'},
-  chamado:{label:'Chamado',color:'var(--red)',bg:'var(--red-bg)',
-    icon:'<path d="M4 13a8 8 0 0116 0v4a2 2 0 01-2 2h-1v-7h3"/><path d="M4 17v-4h3v7H5a2 2 0 01-2-2z"/>'}
+    icon:'<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/>'}
 };
 
-const notificationsMock=[
-  {id:1,tipo:'negociacao',titulo:'Desconto acima do limite solicitado',
-    descricao:'Marina Silva pediu 25% de desconto em Consultoria UX, mas o limite configurado é 15%. A IA manteve o valor máximo permitido e não fechou acima disso.',
-    atendId:1,lida:false,minAgo:12},
-  {id:2,tipo:'handoff',titulo:'Cliente pediu para falar com um atendente',
-    descricao:'Juliana Prado solicitou atendimento humano para tirar dúvidas sobre entrega em Curitiba.',
-    atendId:3,lida:false,minAgo:25},
-  {id:3,tipo:'venda',titulo:'Negociação concluída com sucesso',
-    descricao:'Rafael Almeida fechou o Plano mensal Premium por R$ 199,00 sem necessidade de desconto.',
-    atendId:2,lida:false,minAgo:70},
-  {id:4,tipo:'perdido',titulo:'Atendimento perdido',
-    descricao:'Thiago Ferreira encerrou a conversa sobre o Plano mensal Premium sem concluir a compra, alegando que achou o preço alto.',
-    atendId:8,lida:false,minAgo:140},
-  {id:5,tipo:'sistema',titulo:'Produto sem preço mínimo definido',
-    descricao:'O produto "Cabo USB-C 1m" está sem preço mínimo configurado. A IA pode negociar esse item sem um piso de valor.',
-    lida:false,minAgo:200},
-  {id:6,tipo:'negociacao',titulo:'IA ofereceu o desconto máximo permitido',
-    descricao:'Beatriz Lima recebeu 15% de desconto em Plano mensal Premium — o limite máximo configurado para esse produto.',
-    atendId:5,lida:true,minAgo:300},
-  {id:7,tipo:'sla',titulo:'Cliente aguardando resposta há mais de 1 hora',
-    descricao:'Patrícia Gomes está sem retorno desde a primeira mensagem sobre Consultoria UX.',
-    atendId:7,lida:true,minAgo:340},
-  {id:8,tipo:'venda',titulo:'Negociação concluída com sucesso',
-    descricao:'Eduardo Santos comprou 10 unidades de Cabo USB-C 1m com 10% de desconto automático aplicado.',
-    atendId:6,lida:true,minAgo:1500}
-];
+// Fonte real das notificações do sino: alertas do agente da PRÓPRIA empresa do usuário.
+// (Independente da visão macro, o sino é sempre do usuário logado.)
+let sinoAlertasCache=[];
+
+async function loadSinoAlertas(){
+  if(!currentProfile || !currentProfile.company_id){ sinoAlertasCache=[]; return; }
+  // só carrega se o agente da própria empresa estiver ativo
+  const {data:comp}=await sb.from('companies').select('agente_ativo').eq('id', currentProfile.company_id).single();
+  if(!comp || !comp.agente_ativo){ sinoAlertasCache=[]; return; }
+  const {data}=await sb.from('agente_alertas').select('*')
+    .eq('company_id', currentProfile.company_id)
+    .order('created_at',{ascending:false}).limit(100);
+  sinoAlertasCache=data||[];
+}
+
+function notifData(){
+  return sinoAlertasCache
+    .filter(a=>!a.resolvido)
+    .map(a=>({
+      id:a.id,
+      tipo:a.tipo,
+      titulo:a.titulo,
+      descricao:a.detalhe,
+      atendId:a.conversa_id || null,
+      lida:a.lido,
+      minAgo:Math.round((Date.now()-new Date(a.created_at).getTime())/60000)
+    }));
+}
 
 function notifIconHtml(tipo){
   const t=notifTipos[tipo]||notifTipos.sistema;
@@ -2378,7 +2574,7 @@ function notifTimeLabel(min){
   if(min<1440) return `há ${Math.floor(min/60)}h`;
   return `há ${Math.floor(min/1440)} dia(s)`;
 }
-function unreadCount(){ return notificationsMock.filter(n=>!n.lida).length; }
+function unreadCount(){ return notifData().filter(n=>!n.lida).length; }
 
 function updateBellBadge(){
   const count=unreadCount();
@@ -2390,7 +2586,7 @@ function updateBellBadge(){
 /* --- painel suspenso (mostra só não lidas, somem ao serem lidas) --- */
 function renderBellPanel(){
   const list=document.getElementById('notif-panel-list');
-  const unread=notificationsMock.filter(n=>!n.lida).sort((a,b)=>a.minAgo-b.minAgo).slice(0,8);
+  const unread=notifData().filter(n=>!n.lida).sort((a,b)=>a.minAgo-b.minAgo).slice(0,8);
   if(unread.length===0){
     list.innerHTML='<div class="notif-panel-empty">Nenhuma notificação nova. Tudo em dia! 🎉</div>';
     return;
@@ -2399,42 +2595,35 @@ function renderBellPanel(){
     <div class="notif-item" data-id="${n.id}">
       ${notifIconHtml(n.tipo)}
       <div class="notif-body">
-        <div class="notif-title-row"><span class="notif-dot"></span><p>${n.titulo}</p></div>
-        <p class="notif-desc">${n.descricao}</p>
+        <div class="notif-title-row"><span class="notif-dot"></span><p>${escapeHtml(n.titulo)}</p></div>
+        <p class="notif-desc">${escapeHtml(n.descricao)}</p>
         <span class="notif-time">${notifTimeLabel(n.minAgo)}</span>
       </div>
     </div>`).join('');
   list.querySelectorAll('.notif-item').forEach(el=>{
-    el.addEventListener('click',()=>expandAndReadPanelItem(parseInt(el.dataset.id,10), el));
+    el.addEventListener('click',()=>expandAndReadPanelItem(el.dataset.id, el));
   });
 }
 
-function expandAndReadPanelItem(id, el){
+async function expandAndReadPanelItem(id, el){
   if(el.classList.contains('expanded')) return;
   el.classList.add('expanded');
-  const n=notificationsMock.find(x=>x.id===id);
-  if(n) n.lida=true;
+  await marcarAlerta(id, {lido:true});
   updateBellBadge();
   renderNotifPage();
   setTimeout(()=>{
     el.classList.add('removing');
     setTimeout(()=>renderBellPanel(),260);
-  }, 1100);
+  }, 900);
 }
 
-document.getElementById('mark-all-read-panel').addEventListener('click',()=>{
-  notificationsMock.forEach(n=>n.lida=true);
-  updateBellBadge();
-  renderBellPanel();
-  renderNotifPage();
+document.getElementById('mark-all-read-panel').addEventListener('click', async ()=>{
+  await marcarTodosAlertasLidos();
   showToast('Todas as notificações foram marcadas como lidas');
 });
 
-document.getElementById('mark-all-read-page').addEventListener('click',()=>{
-  notificationsMock.forEach(n=>n.lida=true);
-  updateBellBadge();
-  renderBellPanel();
-  renderNotifPage();
+document.getElementById('mark-all-read-page').addEventListener('click', async ()=>{
+  await marcarTodosAlertasLidos();
   showToast('Todas as notificações foram marcadas como lidas');
 });
 
@@ -2466,7 +2655,7 @@ function renderNotifPage(){
   const statusFilter=document.getElementById('notif-filter-status').value;
   const tipoFilter=document.getElementById('notif-filter-tipo').value;
 
-  let list=[...notificationsMock].sort((a,b)=>a.minAgo-b.minAgo);
+  let list=[...notifData()].sort((a,b)=>a.minAgo-b.minAgo);
   if(q) list=list.filter(n=>n.titulo.toLowerCase().includes(q)||n.descricao.toLowerCase().includes(q));
   if(statusFilter==='nao-lidas') list=list.filter(n=>!n.lida);
   if(statusFilter==='lidas') list=list.filter(n=>n.lida);
@@ -2482,48 +2671,38 @@ function renderNotifPage(){
   container.style.display='block'; empty.style.display='none';
 
   container.innerHTML=list.map(n=>`
-    <div class="notif-item ${n.lida?'':''}" data-id="${n.id}">
+    <div class="notif-item" data-id="${n.id}">
       ${notifIconHtml(n.tipo)}
       <div class="notif-body">
         <div class="notif-title-row">
           ${n.lida?'':'<span class="notif-dot"></span>'}
-          <p>${n.titulo}</p>
+          <p>${escapeHtml(n.titulo)}</p>
           <span class="read-pill" style="margin-left:auto;">${n.lida?'Lida':'Não lida'}</span>
         </div>
-        <p class="notif-desc">${n.descricao}</p>
+        <p class="notif-desc">${escapeHtml(n.descricao)}</p>
         <span class="notif-time">${notifTimeLabel(n.minAgo)}</span>
         ${n.atendId?`<span class="notif-link" data-atend="${n.atendId}">Ver atendimento →</span>`:''}
-        ${n.chamadoId?`<span class="notif-link" data-chamado="${n.chamadoId}">Ver chamado →</span>`:''}
       </div>
     </div>`).join('');
 
   container.querySelectorAll('.notif-item').forEach(el=>{
-    el.addEventListener('click',e=>{
+    el.addEventListener('click', async e=>{
       if(e.target.closest('.notif-link')) return;
-      const n=notificationsMock.find(x=>x.id===parseInt(el.dataset.id,10));
-      if(n && !n.lida){ n.lida=true; updateBellBadge(); renderNotifPage(); }
+      const n=notifData().find(x=>x.id===el.dataset.id);
+      if(n && !n.lida){ await marcarAlerta(el.dataset.id,{lido:true}); updateBellBadge(); renderNotifPage(); }
     });
   });
   container.querySelectorAll('.notif-link[data-atend]').forEach(link=>{
     link.addEventListener('click',e=>{
       e.stopPropagation();
-      openAtendDrawer(parseInt(link.dataset.atend,10));
-    });
-  });
-  container.querySelectorAll('.notif-link[data-chamado]').forEach(link=>{
-    link.addEventListener('click',e=>{
-      e.stopPropagation();
-      switchView('chamados');
-      setTimeout(()=>openChamadoDrawer(parseInt(link.dataset.chamado,10)),50);
+      if(viewingCompanyId){ showToast('Abra o ambiente do cliente para ver a conversa.'); return; }
+      openAtendDrawer(link.dataset.atend);
     });
   });
 }
 document.getElementById('notif-search').addEventListener('input',renderNotifPage);
 document.getElementById('notif-filter-status').addEventListener('change',renderNotifPage);
 document.getElementById('notif-filter-tipo').addEventListener('change',renderNotifPage);
-
-updateBellBadge();
-renderNotifPage();
 
 document.getElementById('client-logo-placeholder').addEventListener('click',()=>{
   showToast('Em breve: envie aqui a logo da sua empresa');
@@ -2672,13 +2851,13 @@ function renderAdminClientList(filterText){
       ? '<span class="status-pill INDEXADO">Configurada</span>'
       : '<span class="status-pill ERRO">Pendente</span>';
     return `<tr data-id="${c.id}" data-name="${escapeHtml(c.name)}" style="cursor:pointer;">
-      <td><strong>${c.name}</strong></td>
-      <td class="cell-muted">${resp.nome||'—'}</td>
-      <td class="cell-muted">${dataCad}</td>
-      <td>${atendStatus}</td>
-      <td>${iaStatus}</td>
-      <td class="cell-mono">${nProdutos}</td>
-      <td onclick="event.stopPropagation()" style="white-space:nowrap;">
+      <td data-label="Empresa"><strong>${c.name}</strong></td>
+      <td class="cell-muted" data-label="Responsável">${resp.nome||'—'}</td>
+      <td class="cell-muted" data-label="Cadastro">${dataCad}</td>
+      <td data-label="Atendimento">${atendStatus}</td>
+      <td data-label="IA">${iaStatus}</td>
+      <td class="cell-mono" data-label="Produtos">${nProdutos}</td>
+      <td data-label="" onclick="event.stopPropagation()" class="admin-row-actions">
         <button class="ghost-action admin-enter-btn" style="height:32px;padding:0 11px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Abrir ambiente</button>
         <button class="ghost-action admin-open-btn" style="height:32px;padding:0 11px;">Ver detalhes</button>
       </td>
@@ -2735,15 +2914,13 @@ async function openAdminDrawer(companyId){
   }
 
   // buscar dados completos (pagamento + persona) que não vieram na lista resumida
-  const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, agente_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom, picpay_merchant_code, picpay_status, picpay_commission_percentage').eq('id', companyId).single();
+  const {data:full}=await sb.from('companies').select('payment_methods, atendimento_ativo, agente_ativo, llm_provider, ia_nome, ia_foto, ia_sexo, ia_tom, asaas_wallet_id, asaas_account_status, asaas_commission_type, asaas_commission_percentage, asaas_commission_fixed_cents').eq('id', companyId).single();
   const pm=(full&&full.payment_methods)||{pix:true,cartao:true,boleto:true};
   document.getElementById('admin-pay-toggle-pix').checked=false;
   document.getElementById('admin-pay-toggle-cartao').checked=pm.cartao!==false;
   document.getElementById('admin-pay-toggle-boleto').checked=false;
 
-  document.getElementById('admin-picpay-merchant-code').value=(full&&full.picpay_merchant_code)||'';
-  document.getElementById('admin-picpay-commission-pct').value=(full&&full.picpay_commission_percentage!=null)?full.picpay_commission_percentage:'';
-  renderPicpayStatus((full&&full.picpay_status)||'nao_configurado', !!(full&&full.picpay_merchant_code));
+  renderAsaasSection(full||{});
 
   document.getElementById('admin-atendimento-toggle').checked=full ? full.atendimento_ativo!==false : true;
   const agToggle=document.getElementById('admin-agente-toggle');
@@ -2843,64 +3020,106 @@ document.querySelectorAll('#admin-tab-pagamento .toggle-switch input[data-method
   });
 });
 
-function renderPicpayStatus(status, hasMerchantCode){
-  const pill=document.getElementById('admin-picpay-status-pill');
-  const sub=document.getElementById('admin-picpay-status-sub');
-  const toggle=document.getElementById('admin-picpay-active-toggle');
+let adminAsaasCommType='percentual';
+
+function renderAsaasSection(full){
+  const wallet=full.asaas_wallet_id;
+  const status=full.asaas_account_status||'nao_configurado';
+  const pill=document.getElementById('admin-asaas-status-pill');
+  const createBox=document.getElementById('admin-asaas-create');
+  const configBox=document.getElementById('admin-asaas-configured');
+
   const map={
     nao_configurado:{cls:'PROCESSANDO',label:'Não configurado'},
+    pendente:{cls:'PROCESSANDO',label:'Aguardando aprovação'},
     ativo:{cls:'INDEXADO',label:'Ativo'},
-    pausado:{cls:'ERRO',label:'Pausado'}
+    recusado:{cls:'ERRO',label:'Recusado'}
   };
   const s=map[status]||map.nao_configurado;
   pill.className='status-pill '+s.cls;
   pill.textContent=s.label;
-  toggle.disabled=!hasMerchantCode;
-  toggle.checked=status==='ativo';
-  sub.textContent=!hasMerchantCode
-    ? 'Cadastre o Merchant Code para ativar'
-    : (status==='ativo' ? 'Recebendo pagamentos com split automático' : 'Pausado — nenhum pagamento será dividido para este cliente');
+
+  if(wallet){
+    createBox.style.display='none';
+    configBox.style.display='block';
+    document.getElementById('admin-asaas-wallet').textContent='ID: '+wallet.slice(0,8)+'…'+(status==='pendente'?' · aguardando documentos/aprovação':'');
+    // comissão
+    adminAsaasCommType=full.asaas_commission_type||'percentual';
+    setCommTypeUI(adminAsaasCommType);
+    document.getElementById('admin-asaas-comm-pct').value=(full.asaas_commission_percentage>0)?full.asaas_commission_percentage:'';
+    document.getElementById('admin-asaas-comm-fixo').value=(full.asaas_commission_fixed_cents>0)?(full.asaas_commission_fixed_cents/100).toFixed(2):'';
+  }else{
+    createBox.style.display='block';
+    configBox.style.display='none';
+  }
 }
 
-document.getElementById('admin-picpay-save').addEventListener('click', async ()=>{
+function setCommTypeUI(tipo){
+  adminAsaasCommType=tipo;
+  document.querySelectorAll('.comm-type-btn').forEach(b=>b.classList.toggle('active', b.dataset.type===tipo));
+  document.getElementById('admin-comm-pct-wrap').style.display = tipo==='percentual'?'block':'none';
+  document.getElementById('admin-comm-fixo-wrap').style.display = tipo==='fixo'?'block':'none';
+}
+document.querySelectorAll('.comm-type-btn').forEach(b=>b.addEventListener('click',()=>setCommTypeUI(b.dataset.type)));
+
+document.getElementById('admin-asaas-create-btn').addEventListener('click', async ()=>{
   if(!adminSelectedCompanyId) return;
-  const codeInput=document.getElementById('admin-picpay-merchant-code');
-  const pctInput=document.getElementById('admin-picpay-commission-pct');
-  const code=codeInput.value.trim();
-
-  if(code && !/^\d{15,}$/.test(code)){
-    showToast('Merchant Code inválido — deve ter só números, com 15+ dígitos.');
-    return;
-  }
-  let pct=pctInput.value===''?null:parseFloat(pctInput.value);
-  if(pct!=null && (isNaN(pct) || pct<0 || pct>100)){
-    showToast('Comissão deve ser um número entre 0 e 100.');
-    return;
-  }
-
-  const {data:current}=await sb.from('companies').select('picpay_status').eq('id', adminSelectedCompanyId).single();
-  let novoStatus=(current&&current.picpay_status)||'nao_configurado';
-  if(!code) novoStatus='nao_configurado';
-  else if(novoStatus==='nao_configurado') novoStatus='ativo';
-
-  const {error}=await sb.from('companies').update({
-    picpay_merchant_code: code||null,
-    picpay_commission_percentage: pct,
-    picpay_status: novoStatus
-  }).eq('id', adminSelectedCompanyId);
-
-  if(error){ showToast('Erro ao salvar: '+error.message); return; }
-  renderPicpayStatus(novoStatus, !!code);
-  showToast('Configuração PicPay salva');
+  const email=document.getElementById('admin-asaas-email').value.trim();
+  const cpfCnpj=document.getElementById('admin-asaas-cpfcnpj').value.replace(/\D/g,'');
+  if(!email || !cpfCnpj){ showToast('Preencha e-mail e CPF/CNPJ do cliente.'); return; }
+  const btn=document.getElementById('admin-asaas-create-btn');
+  btn.disabled=true; btn.textContent='Criando...';
+  try{
+    const {data,error}=await sb.functions.invoke('asaas', {body:{
+      action:'create_subaccount',
+      company_id:adminSelectedCompanyId,
+      email, cpfCnpj,
+      companyType:document.getElementById('admin-asaas-tipo').value,
+      postalCode:document.getElementById('admin-asaas-cep').value.replace(/\D/g,''),
+      phone:document.getElementById('admin-asaas-telefone').value.trim(),
+    }});
+    if(error){ let m=error.message; try{const b=await error.context.json(); if(b?.error)m=b.error;}catch(_e){} throw new Error(m); }
+    if(data?.error) throw new Error(data.error);
+    showToast('Subconta criada! Aguardando aprovação do Asaas.');
+    // recarrega a seção
+    const {data:full}=await sb.from('companies').select('asaas_wallet_id, asaas_account_status, asaas_commission_type, asaas_commission_percentage, asaas_commission_fixed_cents').eq('id', adminSelectedCompanyId).single();
+    renderAsaasSection(full||{});
+  }catch(e){ showToast('Erro: '+(e.message||e)); }
+  btn.disabled=false; btn.textContent='Criar subconta Asaas';
 });
 
-document.getElementById('admin-picpay-active-toggle').addEventListener('change', async (e)=>{
+document.getElementById('admin-asaas-sync-btn').addEventListener('click', async ()=>{
   if(!adminSelectedCompanyId) return;
-  const novoStatus=e.target.checked?'ativo':'pausado';
-  const {error}=await sb.from('companies').update({picpay_status:novoStatus}).eq('id', adminSelectedCompanyId);
-  if(error){ showToast('Erro ao salvar: '+error.message); e.target.checked=!e.target.checked; return; }
-  const hasCode=!!document.getElementById('admin-picpay-merchant-code').value.trim();
-  renderPicpayStatus(novoStatus, hasCode);
+  const btn=document.getElementById('admin-asaas-sync-btn');
+  btn.disabled=true; btn.textContent='Verificando...';
+  try{
+    const {data,error}=await sb.functions.invoke('asaas', {body:{action:'sync_status', company_id:adminSelectedCompanyId}});
+    if(error){ let m=error.message; try{const b=await error.context.json(); if(b?.error)m=b.error;}catch(_e){} throw new Error(m); }
+    if(data?.error) throw new Error(data.error);
+    const {data:full}=await sb.from('companies').select('asaas_wallet_id, asaas_account_status, asaas_commission_type, asaas_commission_percentage, asaas_commission_fixed_cents').eq('id', adminSelectedCompanyId).single();
+    renderAsaasSection(full||{});
+    showToast('Status atualizado: '+(data.status||'—'));
+  }catch(e){ showToast('Erro: '+(e.message||e)); }
+  btn.disabled=false; btn.textContent='Verificar status';
+});
+
+document.getElementById('admin-asaas-comm-save').addEventListener('click', async ()=>{
+  if(!adminSelectedCompanyId) return;
+  const upd={asaas_commission_type:adminAsaasCommType};
+  if(adminAsaasCommType==='percentual'){
+    const pct=parseFloat(document.getElementById('admin-asaas-comm-pct').value);
+    if(isNaN(pct)||pct<0||pct>100){ showToast('Comissão % deve ser entre 0 e 100.'); return; }
+    upd.asaas_commission_percentage=pct;
+    upd.asaas_commission_fixed_cents=0;
+  }else{
+    const val=parseFloat(document.getElementById('admin-asaas-comm-fixo').value);
+    if(isNaN(val)||val<0){ showToast('Comissão fixa inválida.'); return; }
+    upd.asaas_commission_fixed_cents=Math.round(val*100);
+    upd.asaas_commission_percentage=0;
+  }
+  const {error}=await sb.from('companies').update(upd).eq('id', adminSelectedCompanyId);
+  if(error){ showToast('Erro ao salvar: '+error.message); return; }
+  showToast('Comissão salva');
 });
 
 document.getElementById('admin-atendimento-toggle').addEventListener('change', async (e)=>{
@@ -3128,13 +3347,13 @@ function renderAtendimentosTable(bodyId, list){
   }
   body.innerHTML=list.map(a=>`
     <tr data-id="${a.id}">
-      <td>${escapeHtml(a.cliente)}</td>
-      <td class="cell-muted">${escapeHtml(a.produto)}</td>
-      <td><span class="status-pill ${a.status}">${statusLabel(a.status)}</span>${a.esfriado?'<span class="lead-frio-tag" title="Passou de 24h sem fechar — fora da janela de resposta">esfriou</span>':''}</td>
-      ${bodyId==='atendimentos-body' ? `<td class="cell-muted">${escapeHtml(a.ultimaMsg)}</td>` : ''}
-      <td class="cell-mono">${a.valor}</td>
-      <td class="cell-muted">${notifTimeLabel(a.minAgo)}</td>
-      <td onclick="event.stopPropagation()"><button class="ghost-action ver-conversa-btn" style="height:32px;padding:0 12px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button></td>
+      <td data-label="Cliente">${escapeHtml(a.cliente)}</td>
+      <td class="cell-muted" data-label="Produto">${escapeHtml(a.produto)}</td>
+      <td data-label="Status"><span class="status-pill ${a.status}">${statusLabel(a.status)}</span>${a.esfriado?'<span class="lead-frio-tag" title="Passou de 24h sem fechar — fora da janela de resposta">esfriou</span>':''}</td>
+      ${bodyId==='atendimentos-body' ? `<td class="cell-muted" data-label="Última mensagem">${escapeHtml(a.ultimaMsg)}</td>` : ''}
+      <td class="cell-mono" data-label="Valor">${a.valor}</td>
+      <td class="cell-muted" data-label="Quando">${notifTimeLabel(a.minAgo)}</td>
+      <td data-label="" onclick="event.stopPropagation()"><button class="ghost-action ver-conversa-btn" style="height:32px;padding:0 12px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ver conversa</button></td>
     </tr>`).join('');
   body.querySelectorAll('tr[data-id]').forEach(tr=>{
     tr.addEventListener('click',()=>openAtendDrawer(tr.dataset.id));
@@ -4613,13 +4832,13 @@ function renderVendasTable(list){
   }
   body.innerHTML=list.map(v=>`
     <tr data-id="${v.id}" data-atend="${v.atendId||''}">
-      <td>${escapeHtml(v.cliente)}</td>
-      <td class="cell-muted">${escapeHtml(v.produto)}</td>
-      <td class="cell-mono">R$ ${formatBRL(v.valor)}</td>
-      <td class="desconto-cell">${v.desconto>0?v.desconto+'%':'—'}</td>
-      <td class="cell-muted">${escapeHtml(v.pagamento)}</td>
-      <td><span class="canal-pill ${v.atendidoPor}">${v.atendidoPor}</span></td>
-      <td class="cell-muted">${notifTimeLabel(v.minAgo)}</td>
+      <td data-label="Cliente">${escapeHtml(v.cliente)}</td>
+      <td class="cell-muted" data-label="Produto">${escapeHtml(v.produto)}</td>
+      <td class="cell-mono" data-label="Valor">R$ ${formatBRL(v.valor)}</td>
+      <td class="desconto-cell" data-label="Desconto">${v.desconto>0?v.desconto+'%':'—'}</td>
+      <td class="cell-muted" data-label="Pagamento">${escapeHtml(v.pagamento)}</td>
+      <td data-label="Atendido por"><span class="canal-pill ${v.atendidoPor}">${v.atendidoPor}</span></td>
+      <td class="cell-muted" data-label="Data">${notifTimeLabel(v.minAgo)}</td>
     </tr>`).join('');
   body.querySelectorAll('tr[data-atend]').forEach(tr=>{
     tr.addEventListener('click',()=>{
@@ -4863,10 +5082,26 @@ async function marcarAlerta(id, campos){
   if(viewingCompanyId){ showToast('Somente leitura — entre no ambiente do cliente para agir.'); return; }
   const {error}=await sb.from('agente_alertas').update(campos).eq('id', id);
   if(error){ showToast('Erro: '+error.message); return; }
-  const a=alertasCache.find(x=>x.id===id);
-  if(a) Object.assign(a, campos);
-  renderAlertas();
+  // sincroniza os dois caches (tela Agente + sino)
+  const a1=alertasCache.find(x=>x.id===id); if(a1) Object.assign(a1, campos);
+  const a2=sinoAlertasCache.find(x=>x.id===id); if(a2) Object.assign(a2, campos);
+  if(document.getElementById('view-agente').classList.contains('active')) renderAlertas();
   updateAgenteBadge();
+  updateBellBadge();
+}
+
+async function marcarTodosAlertasLidos(){
+  if(viewingCompanyId){ showToast('Somente leitura — entre no ambiente do cliente para agir.'); return; }
+  const {error}=await sb.from('agente_alertas').update({lido:true})
+    .eq('company_id', currentProfile.company_id).eq('lido', false).eq('resolvido', false);
+  if(error){ showToast('Erro: '+error.message); return; }
+  alertasCache.forEach(a=>{ if(!a.resolvido) a.lido=true; });
+  sinoAlertasCache.forEach(a=>{ if(!a.resolvido) a.lido=true; });
+  updateBellBadge();
+  renderBellPanel();
+  renderNotifPage();
+  updateAgenteBadge();
+  if(document.getElementById('view-agente').classList.contains('active')) renderAlertas();
 }
 
 function updateAgenteBadge(){

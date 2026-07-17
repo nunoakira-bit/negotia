@@ -85,6 +85,9 @@
   .nav-item.disabled:hover{background:transparent;color:var(--text-secondary);}
 
   .sidebar-footer{border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;gap:10px;}
+  .sidebar-version{padding:8px 4px 2px;font-size:10.5px;color:var(--text-tertiary);text-align:center;
+    letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sidebar.collapsed .sidebar-version{font-size:9px;padding:8px 0 2px;}
   .sidebar.collapsed .sidebar-footer{justify-content:center;}
   .avatar-sm{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);
     display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;flex-shrink:0;}
@@ -550,6 +553,17 @@
     color:var(--accent-dark);font-size:12px;font-weight:500;align-items:center;gap:7px;}
   #atend-drawer.read-only .read-only-note{display:flex;}
   .read-only-note svg{width:15px;height:15px;flex-shrink:0;}
+  #atend-drawer.read-only .cobranca-banner{display:none !important;}
+  .cobranca-banner{margin:0 0 14px;padding:12px 14px;border-radius:11px;background:var(--green-bg);
+    border:1px solid color-mix(in srgb, var(--green) 30%, transparent);}
+  .cobranca-banner-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:11px;}
+  .cobranca-banner-head svg{width:20px;height:20px;flex-shrink:0;color:var(--green);margin-top:1px;}
+  .cobranca-banner-title{font-size:13px;font-weight:700;color:var(--text-primary);margin:0 0 2px;}
+  .cobranca-banner-sub{font-size:12px;color:var(--text-secondary);margin:0;line-height:1.35;}
+  .cobranca-banner-actions{display:flex;gap:8px;}
+  .cobranca-banner-actions button{flex:1;padding:9px 12px;font-size:12.5px;font-weight:600;}
+  .cobranca-approve{background:var(--green);border-color:var(--green);}
+  .cobranca-reject{color:var(--text-secondary);}
   /* banner de contexto no topo quando vendo o ambiente de um cliente */
   .macro-banner{display:none;align-items:center;gap:10px;padding:10px 16px;margin-bottom:16px;border-radius:11px;
     background:linear-gradient(135deg,rgba(79,70,229,.08),rgba(124,58,237,.08));border:1px solid var(--border);}
@@ -965,6 +979,18 @@
 @supports (height: 100dvh){
   @media (max-width: 900px){ .shell{height:100dvh;} }
 }
+/* ===== Conexão WhatsApp ===== */
+.wa-status-row{display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:#FAFAFB;}
+.wa-status-dot{width:10px;height:10px;border-radius:50%;background:#C4C4CC;flex-shrink:0;}
+.wa-status-dot.conectado{background:#22C55E;}
+.wa-status-dot.aguardando_qr{background:#F59E0B;}
+.wa-status-dot.desconectado{background:#C4C4CC;}
+.wa-status-text{font-size:14px;color:var(--text-primary);font-weight:500;}
+.wa-status-num{font-size:13px;color:var(--text-secondary);margin-left:auto;}
+.wa-qr-box{display:none;margin-top:16px;text-align:center;padding:18px;border:1px dashed var(--border);border-radius:12px;}
+.wa-qr-box.visible{display:block;}
+.wa-qr-box img{width:220px;height:220px;image-rendering:pixelated;border-radius:8px;}
+.wa-privacy{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);font-size:13px;line-height:1.55;color:var(--text-primary);}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1136,6 +1162,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
+    <div class="sidebar-version" id="sidebar-version" title="Versão do Negotia AI">Negotia AI · v1.0.0</div>
   </aside>
 
   <main class="main">
@@ -1494,16 +1521,17 @@
               <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
               <div>
                 <p class="card-title">Manual ou arquivo de conhecimento</p>
-                <p class="card-sub">Um PDF que a IA pode consultar para tirar dúvidas específicas sobre este produto</p>
+                <p class="card-sub">Um PDF que a IA pode consultar para tirar dúvidas específicas sobre este produto. Cada produto mantém apenas um documento.</p>
               </div>
             </div>
 
             <p class="hint" id="product-doc-empty" style="margin:0 0 12px;">Salve o produto antes de anexar um arquivo.</p>
             <div id="product-doc-list" class="product-doc-list"></div>
+            <p class="hint" id="product-doc-replace-hint" style="display:none;margin:0 0 12px;color:var(--amber);">Ao enviar um novo PDF, o documento atual será substituído.</p>
 
             <button type="button" class="btn-secondary" id="product-doc-add">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Adicionar PDF
+              <span id="product-doc-add-label">Adicionar PDF</span>
             </button>
           </section>
 
@@ -1812,6 +1840,58 @@
             <button class="btn-primary" id="ia-persona-save">Salvar configurações da IA</button>
           </div>
         </div>
+
+        <div class="card" style="max-width:640px;margin-top:18px;">
+          <p class="card-title">Cobrança pelo chat</p>
+          <p class="card-sub">Quando a IA fecha uma venda, o sistema gera um link de pagamento seguro (Asaas) já com o split configurado. Escolha se o link vai direto para o cliente ou se você aprova antes.</p>
+
+          <div class="field" style="margin-top:18px;margin-bottom:0;">
+            <span class="field-label">Ao fechar uma venda</span>
+            <div class="segmented wide" id="cobranca-modo-segmented">
+              <button type="button" class="active" data-value="aprovacao">Aprovar antes de enviar</button>
+              <button type="button" data-value="auto">Enviar link automaticamente</button>
+            </div>
+            <p class="hint" style="margin:10px 0 0;" id="cobranca-modo-hint">No modo de aprovação, você recebe um alerta e libera o link com um clique — recomendado no início.</p>
+          </div>
+
+          <div style="margin-top:16px;">
+            <button class="btn-primary" id="cobranca-modo-save">Salvar preferência de cobrança</button>
+          </div>
+        </div>
+
+        <div class="card" style="max-width:640px;margin-top:18px;">
+          <p class="card-title">Conexão WhatsApp</p>
+          <p class="card-sub">Conecte o WhatsApp da sua empresa para a IA atender seus clientes diretamente por lá. Recomendamos usar um número comercial dedicado.</p>
+
+          <div class="wa-status-row">
+            <span class="wa-status-dot" id="wa-status-dot"></span>
+            <span class="wa-status-text" id="wa-status-text">Verificando…</span>
+            <span class="wa-status-num" id="wa-status-num"></span>
+          </div>
+
+          <div class="wa-qr-box" id="wa-qr-box">
+            <img id="wa-qr-img" alt="QR Code do WhatsApp">
+            <p class="hint" style="margin:12px 0 0;">Abra o WhatsApp no celular da empresa → Dispositivos conectados → Conectar dispositivo, e escaneie o código acima.</p>
+          </div>
+
+          <div class="field" style="margin-top:16px;margin-bottom:0;">
+            <label class="field-label" for="wa-produto-select">Produto atendido no WhatsApp</label>
+            <select id="wa-produto-select" class="auth-input" style="margin-bottom:0;">
+              <option value="">Selecione um produto…</option>
+            </select>
+            <p class="hint" style="margin:8px 0 0;">Por enquanto, a IA negocia um produto por canal. Novas mensagens no WhatsApp abrem conversas sobre este produto.</p>
+          </div>
+
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn-primary" id="wa-connect-btn">Conectar WhatsApp</button>
+            <button class="btn-secondary" id="wa-disconnect-btn" style="display:none;">Desconectar</button>
+            <button class="btn-secondary" id="wa-produto-save">Salvar produto</button>
+          </div>
+
+          <div class="wa-privacy">
+            <strong>Privacidade por design.</strong> A IA processa somente as mensagens de texto recebidas em conversas individuais, iniciadas pelos seus clientes após a conexão. Grupos, status e o histórico anterior à conexão nunca são lidos nem armazenados, e a IA só envia mensagens como resposta dentro de uma conversa ativa.
+          </div>
+        </div>
       </section>
 
       <!-- ===================== ADMINISTRAÇÃO (somente admin) ===================== -->
@@ -1885,6 +1965,20 @@
   <div class="read-only-note">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
     Visualização do ambiente do cliente — somente leitura.
+  </div>
+
+  <div class="cobranca-banner" id="atend-cobranca-banner" style="display:none;">
+    <div class="cobranca-banner-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <div>
+        <p class="cobranca-banner-title">Venda fechada — aprovar cobrança</p>
+        <p class="cobranca-banner-sub" id="atend-cobranca-detalhe">—</p>
+      </div>
+    </div>
+    <div class="cobranca-banner-actions">
+      <button class="btn-secondary cobranca-reject" id="atend-cobranca-reject" type="button">Recusar</button>
+      <button class="btn-primary cobranca-approve" id="atend-cobranca-approve" type="button">Aprovar e enviar link</button>
+    </div>
   </div>
 
   <div class="phone-frame" id="atend-phone-frame"></div>
@@ -2371,11 +2465,18 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
 });
 
 
+const APP_VERSION='1.1.0';
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
+function updateVersionLabel(){
+  const el=document.getElementById('sidebar-version');
+  if(el) el.textContent = sidebarEl.classList.contains('collapsed') ? `v${APP_VERSION}` : `Negotia AI · v${APP_VERSION}`;
+}
+updateVersionLabel();
 sidebarToggleBtn.addEventListener('click',()=>{
   const collapsed=sidebarEl.classList.toggle('collapsed');
   sidebarToggleBtn.title = collapsed ? 'Expandir menu' : 'Recolher menu';
+  updateVersionLabel();
 });
 
 /* ===================== menu retrátil (mobile) ===================== */
@@ -2484,7 +2585,7 @@ function switchView(name){
   if(name==='produtos'){ showProductList(); }
   if(name==='chamados'){ refreshChamados(); }
   if(name==='vendas'){ refreshVendas(); }
-  if(name==='configuracoes'){ syncIaPersonaUI(); }
+  if(name==='configuracoes'){ syncIaPersonaUI(); loadWhatsappCard(); }
   if(name==='admin'){ refreshAdminClientList(); }
   if(name==='agente'){ refreshAgente(); }
   iaDiagUpdateVisibility(name);
@@ -2532,6 +2633,10 @@ const notifTipos={
     icon:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>'},
   queda_leads:{label:'Queda de leads',color:'var(--red)',bg:'var(--red-bg)',
     icon:'<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>'},
+  cobranca_aprovacao:{label:'Cobrança para aprovar',color:'var(--green)',bg:'var(--green-bg)',
+    icon:'<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'},
+  guardrail_preco:{label:'Limite comercial',color:'var(--red)',bg:'var(--red-bg)',
+    icon:'<path d="M12 2l9 4.5v5c0 5-3.5 8.5-9 10.5-5.5-2-9-5.5-9-10.5v-5z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/>'},
   sistema:{label:'Sistema',color:'var(--text-secondary)',bg:'#F0F1F4',
     icon:'<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/>'}
 };
@@ -2767,11 +2872,13 @@ iaAvatarInput.addEventListener('change', async ()=>{
 });
 
 async function syncIaPersonaUI(){
-  const {data, error}=await sb.from('companies').select('ia_nome, ia_foto, ia_sexo, ia_tom').eq('id', currentProfile.company_id).single();
+  const {data, error}=await sb.from('companies').select('ia_nome, ia_foto, ia_sexo, ia_tom, cobranca_auto').eq('id', currentProfile.company_id).single();
   if(error || !data) return;
   document.getElementById('ia-nome-input').value=data.ia_nome || '';
   setSegmented('ia-sexo-segmented', data.ia_sexo || 'neutro');
   setSegmented('ia-tom-segmented', data.ia_tom || 'amigavel');
+  setSegmented('cobranca-modo-segmented', data.cobranca_auto ? 'auto' : 'aprovacao');
+  updateCobrancaHint();
   iaAvatarPendingPath=data.ia_foto || null;
   const preview=document.getElementById('ia-avatar-preview');
   if(data.ia_foto){
@@ -2781,6 +2888,103 @@ async function syncIaPersonaUI(){
     preview.textContent=(data.ia_nome||'IA').trim().slice(0,2).toUpperCase();
   }
 }
+
+/* ===== Conexão WhatsApp ===== */
+let waPollTimer=null;
+let waInfraConfigured=null;
+
+function waSetStatusUI(status, numero){
+  const dot=document.getElementById('wa-status-dot');
+  const txt=document.getElementById('wa-status-text');
+  const num=document.getElementById('wa-status-num');
+  const connBtn=document.getElementById('wa-connect-btn');
+  const discBtn=document.getElementById('wa-disconnect-btn');
+  dot.className='wa-status-dot '+(status||'desconectado');
+  const labels={conectado:'WhatsApp conectado', aguardando_qr:'Aguardando leitura do QR code', desconectado:'WhatsApp não conectado'};
+  txt.textContent=labels[status]||labels.desconectado;
+  num.textContent=numero ? '+'+numero : '';
+  connBtn.style.display = status==='conectado' ? 'none' : 'inline-flex';
+  discBtn.style.display = status==='conectado' ? 'inline-flex' : 'none';
+  if(status!=='aguardando_qr'){ document.getElementById('wa-qr-box').classList.remove('visible'); }
+  if(waInfraConfigured===false){
+    connBtn.disabled=true;
+    txt.textContent='Em preparação — a conexão será liberada em breve';
+  }else{
+    connBtn.disabled=false;
+  }
+}
+
+async function waFetchStatus(){
+  const {data, error}=await sb.functions.invoke('whatsapp-admin', {body:{action:'status'}});
+  if(error || !data){ return null; }
+  waInfraConfigured=data.configured;
+  waSetStatusUI(data.instancia?.status, data.instancia?.numero_conectado);
+  return data;
+}
+
+function waStopPolling(){ if(waPollTimer){ clearInterval(waPollTimer); waPollTimer=null; } }
+
+function waStartPolling(){
+  waStopPolling();
+  waPollTimer=setInterval(async ()=>{
+    const data=await waFetchStatus();
+    if(data?.instancia?.status==='conectado'){
+      waStopPolling();
+      showToast('WhatsApp conectado com sucesso!');
+    }
+    if(!document.getElementById('view-configuracoes').classList.contains('active')) waStopPolling();
+  }, 4000);
+}
+
+async function waLoadProdutos(){
+  const sel=document.getElementById('wa-produto-select');
+  const [{data:prods}, {data:comp}]=await Promise.all([
+    sb.from('products').select('id, nome').eq('company_id', currentProfile.company_id).eq('ativo', true).order('nome'),
+    sb.from('companies').select('whatsapp_product_id').eq('id', currentProfile.company_id).single(),
+  ]);
+  sel.innerHTML='<option value="">Selecione um produto…</option>' +
+    (prods||[]).map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+  if(comp?.whatsapp_product_id) sel.value=comp.whatsapp_product_id;
+}
+
+async function loadWhatsappCard(){
+  waSetStatusUI(null, null);
+  await Promise.all([waFetchStatus(), waLoadProdutos()]);
+}
+
+document.getElementById('wa-connect-btn').addEventListener('click', async ()=>{
+  const btn=document.getElementById('wa-connect-btn');
+  btn.disabled=true; btn.textContent='Gerando QR code…';
+  const {data, error}=await sb.functions.invoke('whatsapp-admin', {body:{action:'connect'}});
+  btn.disabled=false; btn.textContent='Conectar WhatsApp';
+  if(error || data?.error){ showToast(data?.error || 'Não foi possível iniciar a conexão. Tente novamente.'); return; }
+  if(data.already_connected){ waSetStatusUI('conectado', null); waFetchStatus(); return; }
+  if(data.qr_base64){
+    const img=document.getElementById('wa-qr-img');
+    img.src = data.qr_base64.startsWith('data:') ? data.qr_base64 : 'data:image/png;base64,'+data.qr_base64;
+    document.getElementById('wa-qr-box').classList.add('visible');
+    waSetStatusUI('aguardando_qr', null);
+    waStartPolling();
+  }else{
+    showToast('QR code indisponível no momento. Tente novamente em instantes.');
+  }
+});
+
+document.getElementById('wa-disconnect-btn').addEventListener('click', async ()=>{
+  if(!confirm('Desconectar o WhatsApp? A IA deixará de atender por este canal até uma nova conexão.')) return;
+  const {error}=await sb.functions.invoke('whatsapp-admin', {body:{action:'disconnect'}});
+  if(error){ showToast('Erro ao desconectar. Tente novamente.'); return; }
+  waStopPolling();
+  waSetStatusUI('desconectado', null);
+  showToast('WhatsApp desconectado.');
+});
+
+document.getElementById('wa-produto-save').addEventListener('click', async ()=>{
+  const val=document.getElementById('wa-produto-select').value || null;
+  const {error}=await sb.from('companies').update({whatsapp_product_id: val}).eq('id', currentProfile.company_id);
+  if(error){ showToast('Erro ao salvar: '+error.message); return; }
+  showToast(val ? 'Produto do WhatsApp salvo.' : 'Produto do WhatsApp removido.');
+});
 
 document.getElementById('ia-persona-save').addEventListener('click', async ()=>{
   const btn=document.getElementById('ia-persona-save');
@@ -2795,6 +2999,28 @@ document.getElementById('ia-persona-save').addEventListener('click', async ()=>{
   btn.disabled=false;
   if(error){ showToast('Erro ao salvar: '+error.message); return; }
   showToast('Configurações da IA salvas com sucesso');
+});
+
+function updateCobrancaHint(){
+  const modo=getSegmented('cobranca-modo-segmented');
+  const hint=document.getElementById('cobranca-modo-hint');
+  if(!hint) return;
+  hint.textContent = modo==='auto'
+    ? 'No modo automático, o link de pagamento é enviado ao cliente assim que a IA fecha a venda, sempre dentro dos limites do produto.'
+    : 'No modo de aprovação, você recebe um alerta e libera o link com um clique — recomendado no início.';
+}
+document.getElementById('cobranca-modo-segmented').addEventListener('click', e=>{
+  const btn=e.target.closest('button');
+  if(btn){ setSegmented('cobranca-modo-segmented', btn.dataset.value); updateCobrancaHint(); }
+});
+document.getElementById('cobranca-modo-save').addEventListener('click', async ()=>{
+  const btn=document.getElementById('cobranca-modo-save');
+  btn.disabled=true;
+  const cobrancaAuto=getSegmented('cobranca-modo-segmented')==='auto';
+  const {error}=await sb.from('companies').update({cobranca_auto:cobrancaAuto}).eq('id', currentProfile.company_id);
+  btn.disabled=false;
+  if(error){ showToast('Erro ao salvar: '+error.message); return; }
+  showToast(cobrancaAuto ? 'Cobrança automática ativada.' : 'Cobrança com aprovação ativada.');
 });
 
 /* ===================== painel de administração ===================== */
@@ -3590,11 +3816,58 @@ async function openAtendDrawer(id){
     `<div class="bubble ${m.role==='cliente'?'in':'out'}">${escapeHtml(m.content)}</div>`).join('')
     || '<div class="system-note">Conversa sem mensagens.</div>';
   frame.scrollTop=frame.scrollHeight;
+  loadCobrancaPendente(id);
 }
+
+let cobrancaPendenteAtual=null;
+async function loadCobrancaPendente(convId){
+  const banner=document.getElementById('atend-cobranca-banner');
+  cobrancaPendenteAtual=null;
+  banner.style.display='none';
+  if(viewingCompanyId) return; // macro-view é somente leitura
+  const {data}=await sb.from('cobrancas')
+    .select('id, qtd, valor_cents, product_id, products(nome)')
+    .eq('conversa_id', convId).eq('status','pendente_aprovacao').maybeSingle();
+  if(!data || currentAtendId!==convId) return;
+  cobrancaPendenteAtual=data;
+  const nome=data.products?.nome || 'produto';
+  document.getElementById('atend-cobranca-detalhe').textContent=
+    `${data.qtd}x ${nome} — R$ ${formatBRL(data.valor_cents/100)}`;
+  banner.style.display='block';
+}
+
+async function resolverCobranca(action){
+  if(!cobrancaPendenteAtual) return;
+  const approveBtn=document.getElementById('atend-cobranca-approve');
+  const rejectBtn=document.getElementById('atend-cobranca-reject');
+  approveBtn.disabled=true; rejectBtn.disabled=true;
+  try{
+    const {data,error}=await sb.functions.invoke('asaas', {body:{action, cobranca_id:cobrancaPendenteAtual.id}});
+    if(error){ let m=error.message; try{const b=await error.context.json(); if(b?.error)m=b.error;}catch(_e){} throw new Error(m); }
+    if(data?.error) throw new Error(data.error);
+    document.getElementById('atend-cobranca-banner').style.display='none';
+    cobrancaPendenteAtual=null;
+    if(action==='approve_charge'){
+      showToast('Cobrança aprovada! O link foi enviado no chat. 🎉');
+      openAtendDrawer(currentAtendId); // recarrega mensagens com o link
+    }else{
+      showToast('Cobrança recusada.');
+    }
+    loadSinoAlertas().then(()=>{ updateBellBadge(); renderBellPanel(); });
+    refreshOperacao();
+  }catch(e){
+    showToast('Erro: '+(e.message||e));
+  }
+  approveBtn.disabled=false; rejectBtn.disabled=false;
+}
+document.getElementById('atend-cobranca-approve').addEventListener('click',()=>resolverCobranca('approve_charge'));
+document.getElementById('atend-cobranca-reject').addEventListener('click',()=>resolverCobranca('reject_charge'));
 function closeAtendDrawer(){
   atendOverlay.classList.remove('open'); atendDrawer.classList.remove('open');
   currentMode='ia';
   currentAtendId=null;
+  cobrancaPendenteAtual=null;
+  document.getElementById('atend-cobranca-banner').style.display='none';
 }
 document.getElementById('close-atend-drawer').addEventListener('click',closeAtendDrawer);
 atendOverlay.addEventListener('click',closeAtendDrawer);
@@ -3881,10 +4154,14 @@ async function refreshProductDocs(productId){
   const listEl=document.getElementById('product-doc-list');
   const emptyEl=document.getElementById('product-doc-empty');
   const addBtn=document.getElementById('product-doc-add');
+  const addLabel=document.getElementById('product-doc-add-label');
+  const replaceHint=document.getElementById('product-doc-replace-hint');
   if(!productId){
     listEl.innerHTML='';
     emptyEl.textContent='Salve o produto antes de anexar um arquivo.';
     emptyEl.style.display='block';
+    replaceHint.style.display='none';
+    addLabel.textContent='Adicionar PDF';
     addBtn.disabled=true;
     return;
   }
@@ -3896,9 +4173,13 @@ async function refreshProductDocs(productId){
     listEl.innerHTML='';
     emptyEl.textContent='Nenhum arquivo enviado ainda para este produto.';
     emptyEl.style.display='block';
+    replaceHint.style.display='none';
+    addLabel.textContent='Adicionar PDF';
     return;
   }
   emptyEl.style.display='none';
+  replaceHint.style.display='block';
+  addLabel.textContent='Substituir documento';
   listEl.innerHTML=docs.map(d=>{
     const st=kbStatusInfo(d.status);
     return `
@@ -3949,6 +4230,8 @@ productDocInput.addEventListener('change', async ()=>{
   const {data:fnData, error:fnErr}=await sb.functions.invoke('process-document', {body:{document_id:newDoc.id}});
   if(fnErr || fnData?.error){
     showToast('Não foi possível indexar o PDF: '+(fnData?.error || fnErr.message));
+  }else if(fnData.replaced > 0){
+    showToast(`"${file.name}" indexado com sucesso (${fnData.chunks} trechos). O documento anterior foi substituído.`);
   }else{
     showToast(`"${file.name}" indexado com sucesso (${fnData.chunks} trechos).`);
   }

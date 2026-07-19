@@ -2416,7 +2416,6 @@ async function onAuthReady(session){
   document.getElementById('sidebar-avatar').textContent=(profile.nome||session.user.email).trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
   document.body.classList.add('authed');
   document.body.classList.toggle('is-admin-user', !!profile.is_admin);
-  await seedProductsIfEmpty();
   await refreshProductsFromDb();
   await refreshKbDocsFromDb();
   await syncAtendimentoStatus();
@@ -2485,7 +2484,7 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
 });
 
 
-const APP_VERSION='1.2.0';
+const APP_VERSION='1.2.1';
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
 function updateVersionLabel(){
@@ -4092,32 +4091,10 @@ function dbProductToForm(p){
 }
 
 async function refreshProductsFromDb(){
-  const {data, error}=await sb.from('products').select('*').order('created_at',{ascending:true});
+  const {data, error}=await sb.from('products').select('*').eq('company_id', currentProfile.company_id).order('created_at',{ascending:true});
   if(error){ showToast('Erro ao carregar produtos: '+error.message); return; }
   productsCache=(data||[]).map(dbProductToForm);
   renderProductGrid('');
-}
-
-async function seedProductsIfEmpty(){
-  const {count, error}=await sb.from('products').select('id',{count:'exact', head:true});
-  if(error || (count && count>0)) return;
-  const companyId=currentProfile.company_id;
-  const seed=[
-    {company_id:companyId, nome:'Consultoria UX', tipo:'produto', preco_padrao:350.00, unidade:'Hora',
-      descricao:'Sessão de consultoria de UX para revisão de produtos digitais.',
-      desconto_max:15, estrategia:'se-pedir', regras:[{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}],
-      restricoes:['Frete','Prazo'], restricao_outro:'',
-      instrucoes:'Nunca ofereça desconto logo na primeira mensagem. Priorize pagamento via PIX.'},
-    {company_id:companyId, nome:'Plano mensal Premium', tipo:'servico', preco_padrao:199.00, unidade:'mensalidade',
-      descricao:'Plano de assinatura mensal com acesso completo à plataforma.',
-      desconto_max:20, estrategia:'imediato', regras:[], restricoes:['Forma de pagamento'], restricao_outro:'',
-      instrucoes:'Se o cliente pedir o plano anual, ofereça 15% de desconto.'},
-    {company_id:companyId, nome:'Cabo USB-C 1m', tipo:'produto', preco_padrao:39.90, unidade:'Unidade',
-      descricao:'Cabo USB-C de 1 metro, alta velocidade de carregamento e dados.',
-      desconto_max:25, estrategia:'imediato', regras:[{qtd:10,desconto:10},{qtd:50,desconto:20}], restricoes:['Garantia'], restricao_outro:'',
-      instrucoes:'Se o cliente comprar mais de 10 unidades, ofereça frete grátis.'}
-  ];
-  await sb.from('products').insert(seed);
 }
 
 let editingId=null;

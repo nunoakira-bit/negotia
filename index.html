@@ -2504,7 +2504,7 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
 });
 
 
-const APP_VERSION='1.2.2';
+const APP_VERSION='1.2.3';
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
 function updateVersionLabel(){
@@ -4220,6 +4220,9 @@ async function refreshProductDocs(productId){
   });
 }
 
+function safeStorageName(name){
+  return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]/g,'_');
+}
 const productDocInput=document.createElement('input');
 productDocInput.type='file'; productDocInput.accept='application/pdf'; productDocInput.style.display='none'; productDocInput.id='product-doc-file-input';
 document.body.appendChild(productDocInput);
@@ -4235,7 +4238,7 @@ productDocInput.addEventListener('change', async ()=>{
   if(file.size > 20*1024*1024){ showToast('Arquivo maior que 20MB não é suportado.'); return; }
 
   showToast('Enviando '+file.name+'...');
-  const path=`${currentProfile.company_id}/${Date.now()}-${file.name}`;
+  const path=`${currentProfile.company_id}/${Date.now()}-${safeStorageName(file.name)}`;
   const {error:upErr}=await sb.storage.from('knowledge').upload(path, file);
   if(upErr){ showToast('Erro no upload: '+upErr.message); return; }
 
@@ -5011,7 +5014,7 @@ kbFileInput.addEventListener('change', async ()=>{
   if(file.size > 20*1024*1024){ showToast('Arquivo maior que 20MB não é suportado.'); return; }
 
   showToast('Enviando '+file.name+'...');
-  const path=`${currentProfile.company_id}/${Date.now()}-${file.name}`;
+  const path=`${currentProfile.company_id}/${Date.now()}-${safeStorageName(file.name)}`;
   const {error:upErr}=await sb.storage.from('knowledge').upload(path, file);
   if(upErr){ showToast('Erro no upload: '+upErr.message); return; }
 

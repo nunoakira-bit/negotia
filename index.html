@@ -2464,6 +2464,26 @@ async function syncAtendimentoStatus(){
   if(companyData) atendimentoAtivo = companyData.atendimento_ativo !== false;
   iaConfigurada = !!(keyStatus && keyStatus[0] && keyStatus[0].configured);
   renderAtendimentoStatus();
+  subscribeAtendimentoRealtime();
+}
+
+/* Sincroniza o switch em tempo real quando o status muda por outro caminho
+   (ex.: /desligarmercs ou /ligarmercs enviados pelo WhatsApp). */
+let atendimentoRealtimeChannel=null;
+function subscribeAtendimentoRealtime(){
+  if(atendimentoRealtimeChannel || !currentProfile || !currentProfile.company_id) return;
+  atendimentoRealtimeChannel=sb.channel('company-atendimento')
+    .on('postgres_changes',
+      {event:'UPDATE', schema:'public', table:'companies', filter:`id=eq.${currentProfile.company_id}`},
+      (payload)=>{
+        if(!payload.new || typeof payload.new.atendimento_ativo==='undefined') return;
+        const novo=payload.new.atendimento_ativo!==false;
+        if(novo===atendimentoAtivo) return;
+        atendimentoAtivo=novo;
+        renderAtendimentoStatus();
+        showToast(novo ? 'Atendimento por IA reativado (via WhatsApp)' : 'Atendimento por IA pausado (via WhatsApp)');
+      })
+    .subscribe();
 }
 
 document.getElementById('ia-status-toggle').addEventListener('click', async ()=>{
@@ -2484,7 +2504,7 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
 });
 
 
-const APP_VERSION='1.2.1';
+const APP_VERSION='1.2.2';
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
 function updateVersionLabel(){

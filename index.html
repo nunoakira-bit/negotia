@@ -1357,6 +1357,7 @@
               <div class="segmented" id="tipo-segmented">
                 <button type="button" class="active" data-value="produto">Produto</button>
                 <button type="button" data-value="servico">Serviço</button>
+                <button type="button" data-value="plano">Plano</button>
               </div>
             </div>
 
@@ -1438,7 +1439,7 @@
           </section>
 
           <!-- CARD 3 — Desconto por quantidade -->
-          <section class="card">
+          <section class="card" id="card-regras-qtd">
             <div class="card-header">
               <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.2" cy="6" r="1"/><circle cx="4.2" cy="12" r="1"/><circle cx="4.2" cy="18" r="1"/></svg></div>
               <div>
@@ -1470,6 +1471,35 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Adicionar regra
             </button>
+          </section>
+
+          <!-- CARD 3B — Plano: preços por duração -->
+          <section class="card" id="card-plano" style="display:none;">
+            <div class="card-header">
+              <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></div>
+              <div>
+                <p class="card-title">Preços por duração do plano</p>
+                <p class="card-sub">Quanto maior o compromisso, melhor a condição</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Modelo de preço</span>
+              <div class="segmented" id="plano-modelo-segmented">
+                <button type="button" class="active" data-value="desconto">Desconto na mensalidade</button>
+                <button type="button" data-value="pacote">Preço fixo por pacote</button>
+              </div>
+            </div>
+
+            <div class="rules-table" id="duracao-table">
+              <div class="rules-header"><span id="duracao-col1">Duração mínima</span><span id="duracao-col2">Desconto</span><span></span></div>
+            </div>
+
+            <button class="add-rule-btn" id="add-duracao">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar duração
+            </button>
+            <p class="drawer-note" id="plano-modelo-hint" style="margin-top:8px;"></p>
           </section>
 
           <!-- CARD 4 — Restrições -->
@@ -2504,7 +2534,7 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
 });
 
 
-const APP_VERSION='1.2.3';
+const APP_VERSION='1.3.0';
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
 function updateVersionLabel(){
@@ -3085,7 +3115,7 @@ let adminSelectedProfileId=null;
 
 async function refreshAdminClientList(){
   const {data, error}=await sb.from('companies')
-    .select('id, name, created_at, atendimento_ativo, llm_api_key, profiles(id,nome,email,is_admin), products(count)')
+    .select('id, name, created_at, atendimento_ativo, llm_api_key, profiles(id,nome,email,is_admin), products!products_company_id_fkey(count)')
     .order('created_at',{ascending:false});
   if(error){ showToast('Erro ao carregar clientes: '+error.message); return; }
   adminClientsCache=data||[];
@@ -4105,6 +4135,7 @@ function dbProductToForm(p){
     precoPadrao:Number(p.preco_padrao).toFixed(2).replace('.',','),
     unidade:p.unidade, descontoMax:Number(p.desconto_max),
     estrategia:p.estrategia, regras:p.regras||[],
+    modeloPreco:p.modelo_preco_plano||'desconto', regrasDuracao:p.regras_duracao||[],
     restricoes:p.restricoes||[], restricaoOutro:p.restricao_outro||'',
     instrucoes:p.instrucoes||'', imagens:p.imagens||[]
   };
@@ -4342,6 +4373,9 @@ function resetForm(){
   setSlider(15);
   setStrategy('se-pedir');
   setRules([{qtd:5,desconto:5},{qtd:10,desconto:10},{qtd:20,desconto:15}]);
+  setPlanoModelo('desconto');
+  setDuracaoRules([{meses:3,desconto:5},{meses:6,desconto:10},{meses:12,desconto:20}]);
+  updatePlanoVisibility();
   setRestrictions([], '');
   document.getElementById('f-instrucoes').value='';
   productImages=[]; productImageFolder=null;
@@ -4398,6 +4432,64 @@ function getRules(){
     return {qtd:inputs[0].value.trim(), desconto:inputs[1].value.trim()};
   }).filter(r=>r.qtd!=='' || r.desconto!=='');
 }
+
+/* ===================== plano: preços por duração ===================== */
+function getPlanoModelo(){ return document.querySelector('#plano-modelo-segmented button.active').dataset.value; }
+function setPlanoModelo(value){
+  document.querySelectorAll('#plano-modelo-segmented button').forEach(b=>b.classList.toggle('active', b.dataset.value===value));
+  const pacote=value==='pacote';
+  document.getElementById('duracao-col1').textContent=pacote?'Duração':'Duração mínima';
+  document.getElementById('duracao-col2').textContent=pacote?'Preço total':'Desconto';
+  document.getElementById('plano-modelo-hint').textContent=pacote
+    ? 'A IA oferece cada duração pelo preço total do pacote. Ex.: 12 meses por R$ 1.990.'
+    : 'A IA aplica o desconto sobre a mensalidade a partir da duração. Ex.: 12+ meses, mensalidade com 20% off.';
+  document.querySelectorAll('#duracao-table .rule-row').forEach(row=>{
+    row.querySelectorAll('.suffix')[1].textContent=pacote?'R$':'%';
+  });
+}
+function duracaoRowHtml(meses, valor){
+  const pacote=getPlanoModelo()==='pacote';
+  return `
+    <div class="rule-row">
+      <div class="rule-input"><input type="text" value="${meses!==undefined?meses:''}" inputmode="numeric"><span class="suffix">meses</span></div>
+      <div class="rule-input"><input type="text" value="${valor!==undefined?valor:''}" inputmode="decimal"><span class="suffix">${pacote?'R$':'%'}</span></div>
+      <button class="icon-btn-ghost delete-row" aria-label="Remover duração"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 7 20 7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>
+    </div>`;
+}
+function setDuracaoRules(rules){
+  const table=document.getElementById('duracao-table');
+  table.querySelectorAll('.rule-row').forEach(r=>r.remove());
+  const pacote=getPlanoModelo()==='pacote';
+  rules.forEach(r=>table.insertAdjacentHTML('beforeend', duracaoRowHtml(r.meses, pacote?r.preco:r.desconto)));
+}
+function getDuracaoRules(){
+  const pacote=getPlanoModelo()==='pacote';
+  return Array.from(document.querySelectorAll('#duracao-table .rule-row')).map(row=>{
+    const inputs=row.querySelectorAll('input');
+    const meses=inputs[0].value.trim(); const v=inputs[1].value.trim();
+    return pacote ? {meses, preco:v} : {meses, desconto:v};
+  }).filter(r=>r.meses!=='');
+}
+function updatePlanoVisibility(){
+  const isPlano=getTipo()==='plano';
+  document.getElementById('card-plano').style.display=isPlano?'':'none';
+  document.getElementById('card-regras-qtd').style.display=isPlano?'none':'';
+  if(isPlano && document.getElementById('f-unidade').value==='Unidade'){
+    document.getElementById('f-unidade').value='mensalidade';
+  }
+}
+document.getElementById('plano-modelo-segmented').addEventListener('click',e=>{
+  const btn=e.target.closest('button');
+  if(btn) setPlanoModelo(btn.dataset.value);
+});
+document.getElementById('duracao-table').addEventListener('click', e=>{
+  const btn=e.target.closest('.delete-row');
+  if(btn){ btn.closest('.rule-row').remove(); }
+});
+document.getElementById('add-duracao').addEventListener('click',()=>{
+  document.getElementById('duracao-table').insertAdjacentHTML('beforeend', duracaoRowHtml());
+  document.querySelector('#duracao-table .rule-row:last-child input').focus();
+});
 document.getElementById('rules-table').addEventListener('click', e=>{
   const btn=e.target.closest('.delete-row');
   if(btn){ btn.closest('.rule-row').remove(); }
@@ -4434,7 +4526,7 @@ document.querySelectorAll('#restrictions-grid .chip').forEach(chip=>{
 
 document.getElementById('tipo-segmented').addEventListener('click',e=>{
   const btn=e.target.closest('button');
-  if(btn) setTipo(btn.dataset.value);
+  if(btn){ setTipo(btn.dataset.value); updatePlanoVisibility(); }
 });
 
 /* ===================== formulário: abrir / salvar / cancelar ===================== */
@@ -4452,6 +4544,9 @@ function openProductForm(product){
     setSlider(product.descontoMax);
     setStrategy(product.estrategia);
     setRules(product.regras&&product.regras.length ? product.regras : [{}]);
+    setPlanoModelo(product.modeloPreco||'desconto');
+    setDuracaoRules(product.regrasDuracao&&product.regrasDuracao.length ? product.regrasDuracao : [{}]);
+    updatePlanoVisibility();
     setRestrictions(product.restricoes||[], product.restricaoOutro||'');
     document.getElementById('f-instrucoes').value=product.instrucoes||'';
     productImageFolder=product.id;
@@ -4489,6 +4584,8 @@ document.getElementById('btn-salvar-produto').addEventListener('click', async ()
     desconto_max:parseInt(document.getElementById('f-discount-slider').value,10),
     estrategia:getStrategy(),
     regras:getRules(),
+    modelo_preco_plano:getPlanoModelo(),
+    regras_duracao:getDuracaoRules(),
     restricoes:restr.list,
     restricao_outro:restr.outro,
     instrucoes:document.getElementById('f-instrucoes').value,

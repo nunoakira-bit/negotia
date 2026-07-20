@@ -2496,10 +2496,39 @@ async function syncAtendimentoStatus(){
   iaConfigurada = !!(keyStatus && keyStatus[0] && keyStatus[0].configured);
   renderAtendimentoStatus();
   subscribeAtendimentoRealtime();
+  subscribeConversasRealtime();
 }
 
 /* Sincroniza o switch em tempo real quando o status muda por outro caminho
    (ex.: /desligarmercs ou /ligarmercs enviados pelo WhatsApp). */
+/* Sincroniza a lista de conversas em tempo real quando atendido_por/status mudam
+   por qualquer caminho (comandos do WhatsApp, drawer, webhook). */
+let conversasRealtimeChannel=null;
+function subscribeConversasRealtime(){
+  if(conversasRealtimeChannel || !currentProfile || !currentProfile.company_id) return;
+  conversasRealtimeChannel=sb.channel('company-conversas')
+    .on('postgres_changes',
+      {event:'UPDATE', schema:'public', table:'conversas', filter:`company_id=eq.${currentProfile.company_id}`},
+      (payload)=>{
+        const n=payload.new; if(!n || !n.id) return;
+        const c=conversasCache.find(x=>x.id===n.id);
+        if(!c) return; // conversas novas entram no próximo load completo
+        let mudou=false;
+        if(typeof n.atendido_por!=='undefined' && c.atendidoPor!==n.atendido_por){ c.atendidoPor=n.atendido_por; mudou=true; }
+        if(typeof n.status!=='undefined' && c.rawStatus!==n.status){ c.rawStatus=n.status; c.status=n.status; mudou=true; }
+        if(typeof n.ultima_msg!=='undefined' && n.ultima_msg!==null){ c.ultimaMsg=n.ultima_msg; c.minAgo=minAgoFrom(n.ultima_msg_at||new Date().toISOString()); mudou=true; }
+        if(!mudou) return;
+        refreshAtendimentosTable();
+        refreshDashboardTable();
+        // se o drawer estiver aberto nessa conversa, sincroniza o modo exibido
+        if(currentAtendId===n.id && typeof n.atendido_por!=='undefined'){
+          const novoModo=n.atendido_por==='humano'?'humano':'ia';
+          if(currentMode!==novoModo){ currentMode=novoModo; updateModeUI(); }
+        }
+      })
+    .subscribe();
+}
+
 let atendimentoRealtimeChannel=null;
 function subscribeAtendimentoRealtime(){
   if(atendimentoRealtimeChannel || !currentProfile || !currentProfile.company_id) return;
@@ -2535,7 +2564,7 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
 });
 
 
-const APP_VERSION='1.3.1';
+const APP_VERSION='1.3.2';
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
 function updateVersionLabel(){
@@ -3816,6 +3845,8 @@ document.getElementById('atend-mode-toggle').addEventListener('click', async ()=
     if(error){ showToast('Erro ao atualizar: '+error.message); return; }
     const c=conversasCache.find(x=>x.id===currentAtendId);
     if(c) c.atendidoPor=novo;
+    refreshAtendimentosTable();
+    refreshDashboardTable();
   }
   currentMode=novo;
   updateModeUI();

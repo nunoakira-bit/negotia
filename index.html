@@ -1954,6 +1954,23 @@
           </div>
         </div>
 
+        <section class="card" style="margin-bottom:18px;">
+          <div class="card-header">
+            <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+            <div>
+              <p class="card-title">Custo de IA por cliente <span id="custos-mes-label" class="cell-muted" style="font-weight:400;"></span></p>
+              <p class="card-sub">Consumo real de tokens no mês corrente. Base para dimensionar planos.</p>
+            </div>
+          </div>
+          <table class="data-table" id="admin-custos-table" style="margin-top:6px;">
+            <thead>
+              <tr><th>Empresa</th><th>Conversas</th><th>Mensagens IA</th><th>Custo no mês</th><th>Custo/conversa</th></tr>
+            </thead>
+            <tbody id="admin-custos-body"></tbody>
+          </table>
+          <p class="drawer-note" id="custos-nota" style="margin-top:10px;"></p>
+        </section>
+
         <div style="margin-bottom:16px;max-width:340px;">
           <input type="text" id="admin-search" class="auth-input" placeholder="Buscar empresa..." style="margin-bottom:0;">
         </div>
@@ -2564,7 +2581,7 @@ document.getElementById('ia-status-toggle').addEventListener('click', async ()=>
 });
 
 
-const APP_VERSION='1.3.2';
+const APP_VERSION='1.4.0';
 const sidebarEl=document.getElementById('sidebar');
 const sidebarToggleBtn=document.getElementById('sidebar-toggle');
 function updateVersionLabel(){
@@ -2685,7 +2702,7 @@ function switchView(name){
   if(name==='chamados'){ refreshChamados(); }
   if(name==='vendas'){ refreshVendas(); }
   if(name==='configuracoes'){ syncIaPersonaUI(); loadWhatsappCard(); }
-  if(name==='admin'){ refreshAdminClientList(); }
+  if(name==='admin'){ refreshAdminClientList(); refreshAdminCustos(); }
   if(name==='saude'){ refreshAgente(); }
   if(name==='agente'){ refreshSkills(); }
   iaDiagUpdateVisibility(name);
@@ -3142,6 +3159,55 @@ document.getElementById('admin-llm-provider-select').addEventListener('change', 
 let adminClientsCache=[];
 let adminSelectedCompanyId=null;
 let adminSelectedProfileId=null;
+
+/* ===================== admin: custo de IA por cliente ===================== */
+const USD_BRL = 5.50; // referência para exibição; o dado bruto fica em USD
+
+function fmtUsdFromMicro(micro){
+  const usd = micro/1000000;
+  if(usd === 0) return '—';
+  if(usd < 0.01) return 'US$ <0,01';
+  return 'US$ ' + usd.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtBrlFromMicro(micro){
+  const brl = (micro/1000000)*USD_BRL;
+  if(brl === 0) return '';
+  if(brl < 0.01) return ' (R$ <0,01)';
+  return ' (R$ ' + brl.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}) + ')';
+}
+
+async function refreshAdminCustos(){
+  const body=document.getElementById('admin-custos-body');
+  const nota=document.getElementById('admin-custos-body') && document.getElementById('custos-nota');
+  const label=document.getElementById('custos-mes-label');
+  const mesNome=new Date().toLocaleDateString('pt-BR',{month:'long', year:'numeric'});
+  if(label) label.textContent='— '+mesNome;
+  body.innerHTML='<tr><td colspan="5" class="cell-muted" style="text-align:center;padding:16px 0;">Carregando…</td></tr>';
+  const {data, error}=await sb.rpc('admin_custos_clientes');
+  if(error){
+    body.innerHTML='<tr><td colspan="5" class="cell-muted" style="text-align:center;padding:16px 0;">Erro ao carregar custos.</td></tr>';
+    return;
+  }
+  const linhas=data||[];
+  if(!linhas.length){
+    body.innerHTML='<tr><td colspan="5" class="cell-muted" style="text-align:center;padding:16px 0;">Nenhum consumo registrado ainda.</td></tr>';
+    if(nota) nota.textContent='';
+    return;
+  }
+  body.innerHTML=linhas.map(l=>`
+    <tr>
+      <td data-label="Empresa">${escapeHtml(l.company_name||'—')}</td>
+      <td class="cell-mono" data-label="Conversas">${l.conversas_mes||0}</td>
+      <td class="cell-mono" data-label="Mensagens IA">${l.chamadas_mes||0}${l.regeneracoes_mes>0?` <span class="cell-muted" title="Regenerações do guardrail (custo extra)">(+${l.regeneracoes_mes})</span>`:''}</td>
+      <td class="cell-mono" data-label="Custo no mês">${fmtUsdFromMicro(l.custo_micro_usd_mes)}<span class="cell-muted">${fmtBrlFromMicro(l.custo_micro_usd_mes)}</span></td>
+      <td class="cell-mono" data-label="Custo/conversa">${fmtUsdFromMicro(l.custo_micro_usd_por_conversa)}</td>
+    </tr>`).join('');
+  const totalMicro=linhas.reduce((a,l)=>a+Number(l.custo_micro_usd_mes||0),0);
+  const totalConv=linhas.reduce((a,l)=>a+Number(l.conversas_mes||0),0);
+  if(nota){
+    nota.textContent=`Total no mês: ${fmtUsdFromMicro(totalMicro)}${fmtBrlFromMicro(totalMicro)} em ${totalConv} conversa(s). Conversão a R$ ${USD_BRL.toFixed(2)}/US$ apenas para referência.`;
+  }
+}
 
 async function refreshAdminClientList(){
   const {data, error}=await sb.from('companies')
